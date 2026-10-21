@@ -1,0 +1,60 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://props/locker/Locker.cs" id="1_locker"]
+[ext_resource type="Material" path="res://greybox/prop.tres" id="2_prop"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_locker"]
+size = Vector3(0.7, 2.1, 0.6)
+
+[node name="Locker" type="StaticBody3D" node_paths=PackedStringArray("HidePoint", "ExitPoint")]
+collision_layer = 9
+script = ExtResource("1_locker")
+HidePoint = NodePath("HidePoint")
+ExitPoint = NodePath("ExitPoint")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+shape = SubResource("BoxShape3D_locker")
+
+[node name="Shape" type="CSGCombiner3D" parent="."]
+
+[node name="Outer" type="CSGBox3D" parent="Shape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+size = Vector3(0.7, 2.1, 0.6)
+material = ExtResource("2_prop")
+
+[node name="Inner" type="CSGBox3D" parent="Shape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+operation = 2
+size = Vector3(0.64, 2.04, 0.54)
+material = ExtResource("2_prop")
+
+[node name="Slit1" type="CSGBox3D" parent="Shape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, -0.3)
+operation = 2
+size = Vector3(0.5, 0.06, 0.1)
+material = ExtResource("2_prop")
+
+[node name="Slit2" type="CSGBox3D" parent="Shape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.52, -0.3)
+operation = 2
+size = Vector3(0.5, 0.06, 0.1)
+material = ExtResource("2_prop")
+
+[node name="Slit3" type="CSGBox3D" parent="Shape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.64, -0.3)
+operation = 2
+size = Vector3(0.5, 0.06, 0.1)
+material = ExtResource("2_prop")
+
+[node name="Slit4" type="CSGBox3D" parent="Shape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.76, -0.3)
+operation = 2
+size = Vector3(0.5, 0.06, 0.1)
+material = ExtResource("2_prop")
+
+[node name="HidePoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+
+[node name="ExitPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.8)

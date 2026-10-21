@@ -23,6 +23,7 @@ godot --path .
 | Move | W A S D |
 | Sprint | Shift |
 | Crouch | Ctrl or C (hold) |
+| Interact (doors, lockers, batteries) | E |
 | Raise / lower camcorder | Right mouse button |
 | Night vision | F (camcorder raised) |
 | Replace battery | R |

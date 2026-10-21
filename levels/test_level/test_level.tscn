@@ -1,10 +1,13 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Environment" path="res://levels/asylum_environment.tres" id="1_env"]
 [ext_resource type="Material" path="res://greybox/wall.tres" id="2_wall"]
 [ext_resource type="Material" path="res://greybox/prop.tres" id="3_prop"]
 [ext_resource type="Script" path="res://lighting/FlickeringLight.cs" id="4_flicker"]
 [ext_resource type="PackedScene" path="res://player/player.tscn" id="5_player"]
+[ext_resource type="PackedScene" path="res://props/door/door.tscn" id="6_door"]
+[ext_resource type="PackedScene" path="res://props/locker/locker.tscn" id="7_locker"]
+[ext_resource type="PackedScene" path="res://props/battery/battery.tscn" id="8_battery"]
 
 [node name="TestLevel" type="Node3D"]
 
@@ -146,3 +149,33 @@ omni_range = 6.0
 
 [node name="Player" parent="." instance=ExtResource("5_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8.5)
+
+[node name="DoorLeft1" parent="." instance=ExtResource("6_door")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -1.45, 0, -7.2)
+
+[node name="DoorLeft3" parent="." instance=ExtResource("6_door")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -1.45, 0, 6.2)
+
+[node name="DoorRight1" parent="." instance=ExtResource("6_door")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 1.45, 0, -7.2)
+
+[node name="DoorRight2" parent="." instance=ExtResource("6_door")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 1.45, 0, -0.5)
+
+[node name="LockerLeft3" parent="." instance=ExtResource("7_locker")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -7.28, 0, 8.5)
+
+[node name="LockerCorridor" parent="." instance=ExtResource("7_locker")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0.98, 0, -3.35)
+
+[node name="LockerRight1" parent="." instance=ExtResource("7_locker")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 7.28, 0, -8.5)
+
+[node name="BatteryRight3" parent="." instance=ExtResource("8_battery")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.1, 0.8, 6.4)
+
+[node name="BatteryLeft1" parent="." instance=ExtResource("8_battery")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.6, 0.6, -7.5)
+
+[node name="BatteryCorridorEnd" parent="." instance=ExtResource("8_battery")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0, -9.4)

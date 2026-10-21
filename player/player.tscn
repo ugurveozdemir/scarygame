@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://player/Player.cs" id="1_player"]
 [ext_resource type="PackedScene" path="res://camcorder/camcorder.tscn" id="2_camcorder"]
+[ext_resource type="Script" path="res://interaction/Interactor.cs" id="3_interactor"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_standing"]
 radius = 0.35
@@ -11,7 +12,7 @@ height = 1.8
 radius = 0.35
 height = 1.0
 
-[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "Camera", "StandingCollision", "CrouchingCollision", "CeilingCheck")]
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "Camera", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder")]
 collision_layer = 2
 script = ExtResource("1_player")
 Head = NodePath("Head")
@@ -19,6 +20,7 @@ Camera = NodePath("Head/Camera3D")
 StandingCollision = NodePath("StandingCollision")
 CrouchingCollision = NodePath("CrouchingCollision")
 CeilingCheck = NodePath("CeilingCheck")
+Camcorder = NodePath("Head/Camera3D/Camcorder")
 
 [node name="StandingCollision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
@@ -41,3 +43,45 @@ current = true
 fov = 75.0
 
 [node name="Camcorder" parent="Head/Camera3D" instance=ExtResource("2_camcorder")]
+
+[node name="Interactor" type="RayCast3D" parent="Head/Camera3D" node_paths=PackedStringArray("Player", "PromptLabel")]
+target_position = Vector3(0, 0, -2)
+collision_mask = 9
+script = ExtResource("3_interactor")
+Player = NodePath("../../..")
+PromptLabel = NodePath("../../../Hud/PromptLabel")
+
+[node name="Hud" type="CanvasLayer" parent="."]
+layer = 3
+
+[node name="Crosshair" type="ColorRect" parent="Hud"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.5)
+
+[node name="PromptLabel" type="Label" parent="Hud"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = 24.0
+offset_right = 200.0
+offset_bottom = 54.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
