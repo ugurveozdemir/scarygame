@@ -12,8 +12,8 @@ public partial class Enemy : CharacterBody3D
 
 	private const uint SightCollisionMask = 0b11; // world and player layers
 	private const float DestinationChangeThreshold = 0.3f;
-	private const string IdleAnimation = "Zombie_Idle";
-	private const string WalkAnimation = "Zombie_Walk_Fwd";
+	private const string IdleAnimation = "ual2/Zombie_Idle";
+	private const string WalkAnimation = "ual2/Zombie_Walk_Fwd";
 	private const string JogAnimation = "ual1/Jog_Fwd";
 	private const string SprintAnimation = "ual1/Sprint";
 	private const string StrangleAnimation = "ual1/Idle"; // upright base pose; IK moves the arms
@@ -26,8 +26,9 @@ public partial class Enemy : CharacterBody3D
 
 	[ExportGroup("Animation")]
 	[Export] public AnimationPlayer AnimationPlayer { get; set; }
-	/// <summary>Running animations from a second library, retargeted onto the same humanoid skeleton.</summary>
-	[Export] public AnimationLibrary ExtraAnimations { get; set; }
+	/// <summary>Quaternius animation libraries retargeted onto the humanoid skeleton, added as "ual1" and "ual2".</summary>
+	[Export] public AnimationLibrary Ual1Animations { get; set; }
+	[Export] public AnimationLibrary Ual2Animations { get; set; }
 	[Export] public float AnimationBlendSeconds { get; set; } = 0.3f;
 
 	[ExportGroup("Senses")]
@@ -65,7 +66,8 @@ public partial class Enemy : CharacterBody3D
 	{
 		_patrolPoints = PatrolRoute.GetChildren().OfType<Node3D>().ToArray();
 		NavigationAgent.TargetPosition = GlobalPosition;
-		AnimationPlayer.AddAnimationLibrary("ual1", ExtraAnimations);
+		AnimationPlayer.AddAnimationLibrary("ual1", Ual1Animations);
+		AnimationPlayer.AddAnimationLibrary("ual2", Ual2Animations);
 	}
 
 	public override void _PhysicsProcess(double delta)

@@ -8,7 +8,8 @@ public partial class HideBonesModifier : SkeletonModifier3D
 {
 	private static readonly Vector3 HiddenScale = Vector3.One * 0.001f;
 
-	[Export] public string[] BoneNames { get; set; } = { "Neck" };
+	/// <summary>Bones to hide along with all their children; pick ones the arms do not hang from.</summary>
+	[Export] public string[] BoneNames { get; set; } = { "Head" };
 
 	public override void _ProcessModificationWithDelta(double delta)
 	{

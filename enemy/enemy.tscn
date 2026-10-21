@@ -1,27 +1,21 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://enemy/Enemy.cs" id="1_enemy"]
-[ext_resource type="PackedScene" path="res://assets/quaternius/ual2_standard.glb" id="2_mannequin"]
-[ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual1_standard.glb" id="3_running"]
+[ext_resource type="PackedScene" path="res://assets/rocketbox/medical_male_04/Medical_Male_04.fbx" id="2_surgeon"]
+[ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual1_standard.glb" id="3_ual1"]
+[ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual2_standard.glb" id="5_ual2"]
 [ext_resource type="Script" path="res://enemy/StrangleAttack.cs" id="4_strangle"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.38
 height = 2.15
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_skin"]
-albedo_color = Color(0.72, 0.69, 0.64, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_joints"]
-albedo_color = Color(0.32, 0.22, 0.2, 1)
-roughness = 0.9
-
 [node name="Enemy" type="CharacterBody3D" node_paths=PackedStringArray("AnimationPlayer", "Eyes", "NavigationAgent", "DoorCheck", "StrangleAttack")]
 collision_layer = 4
 script = ExtResource("1_enemy")
 AnimationPlayer = NodePath("Model/AnimationPlayer")
-ExtraAnimations = ExtResource("3_running")
+Ual1Animations = ExtResource("3_ual1")
+Ual2Animations = ExtResource("5_ual2")
 Eyes = NodePath("Eyes")
 NavigationAgent = NodePath("NavigationAgent")
 DoorCheck = NodePath("DoorCheck")
@@ -31,28 +25,24 @@ StrangleAttack = NodePath("StrangleAttack")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.075, 0)
 shape = SubResource("CapsuleShape3D_body")
 
-[node name="Model" parent="." instance=ExtResource("2_mannequin")]
+[node name="Model" parent="." instance=ExtResource("2_surgeon")]
 transform = Transform3D(-1.18, 0, 0, 0, 1.18, 0, 0, 0, -1.18, 0, 0, 0)
 
-[node name="Mannequin" parent="Model/Armature/GeneralSkeleton" index="0"]
-surface_material_override/0 = SubResource("StandardMaterial3D_skin")
-surface_material_override/1 = SubResource("StandardMaterial3D_joints")
-
-[node name="ArmsIK" type="TwoBoneIK3D" parent="Model/Armature/GeneralSkeleton"]
+[node name="ArmsIK" type="TwoBoneIK3D" parent="Model/GeneralSkeleton"]
 influence = 0.0
 setting_count = 2
-settings/0/target_node = NodePath("../../../../LeftHandTarget")
-settings/0/pole_node = NodePath("../../../../LeftElbowPole")
+settings/0/target_node = NodePath("../../../LeftHandTarget")
+settings/0/pole_node = NodePath("../../../LeftElbowPole")
 settings/0/root_bone_name = "LeftUpperArm"
 settings/0/middle_bone_name = "LeftLowerArm"
 settings/0/end_bone_name = "LeftHand"
-settings/1/target_node = NodePath("../../../../RightHandTarget")
-settings/1/pole_node = NodePath("../../../../RightElbowPole")
+settings/1/target_node = NodePath("../../../RightHandTarget")
+settings/1/pole_node = NodePath("../../../RightElbowPole")
 settings/1/root_bone_name = "RightUpperArm"
 settings/1/middle_bone_name = "RightLowerArm"
 settings/1/end_bone_name = "RightHand"
 
-[node name="HeadLookAt" type="LookAtModifier3D" parent="Model/Armature/GeneralSkeleton"]
+[node name="HeadLookAt" type="LookAtModifier3D" parent="Model/GeneralSkeleton"]
 influence = 0.0
 bone_name = "Head"
 
@@ -78,9 +68,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 1.5, -0.1)
 script = ExtResource("4_strangle")
 Body = NodePath("..")
 VictimLookTarget = NodePath("../VictimLookTarget")
-Skeleton = NodePath("../Model/Armature/GeneralSkeleton")
-ArmsIK = NodePath("../Model/Armature/GeneralSkeleton/ArmsIK")
-HeadLookAt = NodePath("../Model/Armature/GeneralSkeleton/HeadLookAt")
+Skeleton = NodePath("../Model/GeneralSkeleton")
+ArmsIK = NodePath("../Model/GeneralSkeleton/ArmsIK")
+HeadLookAt = NodePath("../Model/GeneralSkeleton/HeadLookAt")
 LeftHandTarget = NodePath("../LeftHandTarget")
 RightHandTarget = NodePath("../RightHandTarget")
 

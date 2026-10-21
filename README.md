@@ -54,11 +54,19 @@ Next up: sound, an objective and an exit.
 
 ## Animation
 
-The enemy is the Quaternius mannequin. Both Quaternius animation libraries are imported with a
-`SkeletonProfileHumanoid` bone map (`assets/quaternius/*_bone_map.tres`), so every animation targets the
-standard humanoid skeleton and can play on any character imported the same way.
+The enemy is a masked surgeon and the player's arms belong to a man in a denim jacket, both from the
+Microsoft Rocketbox library. The Quaternius animation libraries and the Rocketbox models are all imported with a
+`SkeletonProfileHumanoid` bone map (`assets/*/*bone_map.tres`), so every animation targets the standard humanoid
+skeleton and plays on every character. Rocketbox characters also need:
 
-The enemy model is scaled up to about 2.16 m. Its movement speeds are scaled with it so the feet don't slide.
+- `fix_silhouette` in their import settings, because they rest in an A-pose and the animations expect a T-pose.
+- `Bip01` mapped to `Root`, and the Quaternius imports keeping constant tracks, so the root track grounds them.
+
+Godot does not notice edits to a bone map, so after changing one, delete the model's files in `.godot/imported`
+to reimport it. Importing a Rocketbox FBX logs errors about missing `.tga` files: the FBX still points at the
+author's original textures, which our own materials (`assets/rocketbox/*/*.tres`) replace.
+
+The enemy model is scaled up to about 2.15 m. Its movement speeds are scaled with it so the feet don't slide.
 
 The strangle attack (`enemy/StrangleAttack.cs`) is not a canned animation. The enemy lunges in mid-sprint,
 grabs the player's shoulders and shakes them, then pushes them to arm's length and strangles them.
@@ -67,7 +75,7 @@ A `TwoBoneIK3D` modifier moves the hands to grab points on the player (`Player/G
 The IK needs its elbow pole markers (`LeftElbowPole`, `RightElbowPole`) to solve.
 
 The player's own hands (`player/view_hands.tscn`) only appear while reaching for something: opening
-or closing a door or locker. They belong to the same mannequin placed around the camera, with its head shrunk away by
+or closing a door or locker. They belong to a full body placed around the camera, with its head shrunk away by
 `HideBonesModifier`; `GripFingersModifier` curls the fingers into a grip and IK places the hand on a grip point.
 
 Interactions never stop the player abruptly. Doors don't lock the controls at all: the hand pushes the

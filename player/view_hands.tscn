@@ -1,54 +1,45 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://player/ViewHands.cs" id="1_view_hands"]
-[ext_resource type="PackedScene" path="res://assets/quaternius/ual2_standard.glb" id="2_mannequin"]
+[ext_resource type="PackedScene" path="res://assets/rocketbox/male_adult_12/Male_Adult_12.fbx" id="2_body"]
 [ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual1_standard.glb" id="3_animations"]
 [ext_resource type="Script" path="res://player/HideBonesModifier.cs" id="4_hide_bones"]
 [ext_resource type="Script" path="res://player/GripFingersModifier.cs" id="5_grip_fingers"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_skin"]
-albedo_color = Color(0.78, 0.6, 0.5, 1)
-roughness = 0.8
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_joints"]
-albedo_color = Color(0.4, 0.3, 0.26, 1)
-roughness = 0.9
 
 [node name="ViewHands" type="Node3D" node_paths=PackedStringArray("AnimationPlayer", "GripFingers", "LeftHandTarget", "RightHandTarget", "LeftRest", "RightRest")]
 script = ExtResource("1_view_hands")
 AnimationPlayer = NodePath("Body/AnimationPlayer")
 ExtraAnimations = ExtResource("3_animations")
-GripFingers = NodePath("Body/Armature/GeneralSkeleton/GripFingers")
+GripFingers = NodePath("Body/GeneralSkeleton/GripFingers")
 LeftHandTarget = NodePath("LeftHandTarget")
 RightHandTarget = NodePath("RightHandTarget")
 LeftRest = NodePath("LeftRest")
 RightRest = NodePath("RightRest")
 
-[node name="Body" parent="." instance=ExtResource("2_mannequin")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -1.63, -0.13)
+[node name="Body" parent="." instance=ExtResource("2_body")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -1.59, -0.1)
 
-[node name="Mannequin" parent="Body/Armature/GeneralSkeleton" index="0"]
+[node name="m007_hipoly_81_bones" parent="Body/GeneralSkeleton" index="1"]
 cast_shadow = 0
-surface_material_override/0 = SubResource("StandardMaterial3D_skin")
-surface_material_override/1 = SubResource("StandardMaterial3D_joints")
 
-[node name="ArmsIK" type="TwoBoneIK3D" parent="Body/Armature/GeneralSkeleton"]
+[node name="ArmsIK" type="TwoBoneIK3D" parent="Body/GeneralSkeleton"]
 setting_count = 2
-settings/0/target_node = NodePath("../../../../LeftHandTarget")
-settings/0/pole_node = NodePath("../../../../LeftElbowPole")
+settings/0/target_node = NodePath("../../../LeftHandTarget")
+settings/0/pole_node = NodePath("../../../LeftElbowPole")
 settings/0/root_bone_name = "LeftUpperArm"
 settings/0/middle_bone_name = "LeftLowerArm"
 settings/0/end_bone_name = "LeftHand"
-settings/1/target_node = NodePath("../../../../RightHandTarget")
-settings/1/pole_node = NodePath("../../../../RightElbowPole")
+settings/1/target_node = NodePath("../../../RightHandTarget")
+settings/1/pole_node = NodePath("../../../RightElbowPole")
 settings/1/root_bone_name = "RightUpperArm"
 settings/1/middle_bone_name = "RightLowerArm"
 settings/1/end_bone_name = "RightHand"
 
-[node name="HideHead" type="SkeletonModifier3D" parent="Body/Armature/GeneralSkeleton"]
+[node name="HideHead" type="SkeletonModifier3D" parent="Body/GeneralSkeleton"]
 script = ExtResource("4_hide_bones")
+BoneNames = PackedStringArray("Head")
 
-[node name="GripFingers" type="SkeletonModifier3D" parent="Body/Armature/GeneralSkeleton"]
+[node name="GripFingers" type="SkeletonModifier3D" parent="Body/GeneralSkeleton"]
 script = ExtResource("5_grip_fingers")
 
 [node name="LeftHandTarget" type="Marker3D" parent="."]
