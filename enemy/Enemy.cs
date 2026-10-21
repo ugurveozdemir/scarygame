@@ -4,19 +4,31 @@ using Godot;
 /// <summary>
 /// A stalker that walks a patrol route, investigates noises, chases the player on sight
 /// and searches where it lost them. Hiding right in front of it does not work.
+/// When it catches the player it strangles them.
 /// </summary>
 public partial class Enemy : CharacterBody3D
 {
-	public enum EnemyState { Patrol, Investigate, Chase }
+	public enum EnemyState { Patrol, Investigate, Chase, Strangling }
 
 	private const uint SightCollisionMask = 0b11; // world and player layers
 	private const float DestinationChangeThreshold = 0.3f;
+	private const string IdleAnimation = "Zombie_Idle";
+	private const string WalkAnimation = "Zombie_Walk_Fwd";
+	private const string JogAnimation = "ual1/Jog_Fwd";
+	private const string SprintAnimation = "ual1/Sprint";
+	private const string StrangleAnimation = "ual1/Idle"; // upright base pose; IK moves the arms
 
 	[ExportGroup("Movement")]
-	[Export] public float WalkSpeed { get; set; } = 1.6f;
-	[Export] public float InvestigateSpeed { get; set; } = 2.5f;
+	[Export] public float WalkSpeed { get; set; } = 1f;
+	[Export] public float InvestigateSpeed { get; set; } = 2.8f;
 	[Export] public float RunSpeed { get; set; } = 4.3f;
 	[Export] public float TurnSpeed { get; set; } = 8f;
+
+	[ExportGroup("Animation")]
+	[Export] public AnimationPlayer AnimationPlayer { get; set; }
+	/// <summary>Running animations from a second library, retargeted onto the same humanoid skeleton.</summary>
+	[Export] public AnimationLibrary ExtraAnimations { get; set; }
+	[Export] public float AnimationBlendSeconds { get; set; } = 0.3f;
 
 	[ExportGroup("Senses")]
 	[Export] public float SightRange { get; set; } = 14f;
@@ -37,6 +49,7 @@ public partial class Enemy : CharacterBody3D
 	[Export] public Node3D Eyes { get; set; }
 	[Export] public NavigationAgent3D NavigationAgent { get; set; }
 	[Export] public RayCast3D DoorCheck { get; set; }
+	[Export] public StrangleAttack StrangleAttack { get; set; }
 
 	public EnemyState State { get; private set; } = EnemyState.Patrol;
 
@@ -51,10 +64,15 @@ public partial class Enemy : CharacterBody3D
 	{
 		_patrolPoints = PatrolRoute.GetChildren().OfType<Node3D>().ToArray();
 		NavigationAgent.TargetPosition = GlobalPosition;
+		AnimationPlayer.AddAnimationLibrary("ual1", ExtraAnimations);
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
+		UpdateAnimation();
+		if (State == EnemyState.Strangling)
+			return;
+
 		float dt = (float)delta;
 		UpdateSenses(dt);
 
@@ -145,9 +163,27 @@ public partial class Enemy : CharacterBody3D
 
 		bool knowsWherePlayerIs = _secondsSincePlayerSeen == 0f || _sawPlayerHide;
 		if (knowsWherePlayerIs && GlobalPosition.DistanceTo(Player.GlobalPosition) <= CatchDistance)
-			Player.Die();
+			StartStrangling();
 		else if (!knowsWherePlayerIs && NavigationAgent.IsNavigationFinished())
 			StartInvestigating(_lastKnownPlayerPosition);
+	}
+
+	private void StartStrangling()
+	{
+		State = EnemyState.Strangling;
+		StopMoving();
+		StrangleAttack.Begin(Player);
+	}
+
+	private void UpdateAnimation()
+	{
+		bool isMoving = new Vector2(Velocity.X, Velocity.Z).Length() > 0.1f;
+		string animation = State == EnemyState.Strangling ? StrangleAnimation
+			: !isMoving ? IdleAnimation
+			: State == EnemyState.Chase ? SprintAnimation
+			: State == EnemyState.Investigate ? JogAnimation
+			: WalkAnimation;
+		AnimationPlayer.Play(animation, AnimationBlendSeconds);
 	}
 
 	private bool CanSeePlayer()

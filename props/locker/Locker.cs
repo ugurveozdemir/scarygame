@@ -8,17 +8,21 @@ public partial class Locker : StaticBody3D, IInteractable
 	[Export] public Marker3D HidePoint { get; set; }
 	[Export] public Marker3D ExitPoint { get; set; }
 
-	private bool _isOccupied;
+	private Player _occupant;
 
-	public string InteractionPrompt => _isOccupied ? "Leave" : "Hide";
+	private bool IsOccupied => _occupant is not null && _occupant.HidingSpot == this;
+
+	public string InteractionPrompt => IsOccupied ? "Leave" : "Hide";
 
 	public void Interact(Player player)
 	{
-		if (_isOccupied)
-			player.LeaveHidingSpot(ExitPoint.GlobalTransform);
-		else
-			player.EnterHidingSpot(this, HidePoint.GlobalTransform);
+		if (IsOccupied)
+		{
+			player.LeaveHidingSpot();
+			return;
+		}
 
-		_isOccupied = !_isOccupied;
+		_occupant = player;
+		player.EnterHidingSpot(this, HidePoint.GlobalTransform, ExitPoint.GlobalTransform);
 	}
 }

@@ -31,6 +31,17 @@ public partial class Player : CharacterBody3D
 	[ExportGroup("Hiding")]
 	[Export] public float HidingTransitionSeconds { get; set; } = 0.4f;
 
+	[ExportGroup("Being Grabbed")]
+	[Export] public float GrabbedTurnSpeed { get; set; } = 10f;
+	[Export] public float ShakeStrength { get; set; } = 0.03f;
+	[Export] public float ChokeShake { get; set; } = 0.5f;
+	[Export] public float ChokePitchDegrees { get; set; } = 12f;
+	[Export] public Node3D LeftShoulder { get; set; }
+	[Export] public Node3D RightShoulder { get; set; }
+	[Export] public Node3D ThroatLeft { get; set; }
+	[Export] public Node3D ThroatRight { get; set; }
+	[Export] public ColorRect ChokeOverlay { get; set; }
+
 	[ExportGroup("Nodes")]
 	[Export] public Node3D Head { get; set; }
 	[Export] public Camera3D Camera { get; set; }
@@ -44,6 +55,17 @@ public partial class Player : CharacterBody3D
 	public IInteractable HidingSpot { get; private set; }
 	public bool IsHiding => HidingSpot is not null;
 	public bool IsMovingToOrFromHidingSpot => _hidingTween is not null && _hidingTween.IsRunning();
+	public bool IsGrabbed => _attackerHead is not null;
+
+	/// <summary>
+	/// How violently the view shakes while grabbed, from 0 to 1.
+	/// </summary>
+	public float ShakeAmount { get; set; }
+
+	/// <summary>
+	/// How close to passing out the player is, from 0 to 1. Darkens the view and shakes it harder.
+	/// </summary>
+	public float ChokeAmount { get; set; }
 
 	/// <summary>
 	/// How far away enemies can hear the player's footsteps.
@@ -63,6 +85,9 @@ public partial class Player : CharacterBody3D
 	private uint _collisionLayer;
 	private uint _collisionMask;
 	private Tween _hidingTween;
+	private Transform3D _hidingExitPoint;
+	private Node3D _attackerHead;
+	private ShaderMaterial _chokeMaterial;
 
 	private float HorizontalSpeed => new Vector2(Velocity.X, Velocity.Z).Length();
 
@@ -74,11 +99,15 @@ public partial class Player : CharacterBody3D
 	{
 		_collisionLayer = CollisionLayer;
 		_collisionMask = CollisionMask;
+		_chokeMaterial = (ShaderMaterial)ChokeOverlay.Material;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
+		if (IsGrabbed)
+			return;
+
 		if (@event is InputEventMouseMotion motion && Input.MouseMode == Input.MouseModeEnum.Captured)
 			Look(motion.Relative);
 		else if (@event.IsActionPressed("ui_cancel"))
@@ -87,9 +116,15 @@ public partial class Player : CharacterBody3D
 			Input.MouseMode = Input.MouseModeEnum.Captured;
 	}
 
+	public override void _Process(double delta)
+	{
+		if (IsGrabbed)
+			UpdateGrabbedView((float)delta);
+	}
+
 	public override void _PhysicsProcess(double delta)
 	{
-		if (IsHiding)
+		if (IsHiding || IsGrabbed)
 			return;
 
 		float dt = (float)delta;
@@ -98,26 +133,67 @@ public partial class Player : CharacterBody3D
 		UpdateHeadBob(dt);
 	}
 
-	public void EnterHidingSpot(IInteractable spot, Transform3D hidePoint)
+	public void EnterHidingSpot(IInteractable spot, Transform3D hidePoint, Transform3D exitPoint)
 	{
 		HidingSpot = spot;
+		_hidingExitPoint = exitPoint;
 		Velocity = Vector3.Zero;
 		SetCollisionEnabled(false);
 		MoveSmoothlyTo(hidePoint);
 	}
 
-	public void LeaveHidingSpot(Transform3D exitPoint)
+	public void LeaveHidingSpot()
 	{
-		MoveSmoothlyTo(exitPoint).Finished += () =>
+		MoveSmoothlyTo(_hidingExitPoint).Finished += StopHiding;
+	}
+
+	/// <summary>
+	/// Hands control over to an attacker: the player can no longer move and keeps looking at the attacker's head.
+	/// </summary>
+	public void GetGrabbed(Node3D attackerHead)
+	{
+		if (IsHiding)
 		{
-			HidingSpot = null;
-			SetCollisionEnabled(true);
-		};
+			// Dragged out of the hiding spot.
+			_hidingTween?.Kill();
+			GlobalTransform = _hidingExitPoint;
+			StopHiding();
+		}
+
+		_attackerHead = attackerHead;
+		Velocity = Vector3.Zero;
 	}
 
 	public void Die()
 	{
 		DeathScreen.Play();
+	}
+
+	private void StopHiding()
+	{
+		HidingSpot = null;
+		SetCollisionEnabled(true);
+	}
+
+	private void UpdateGrabbedView(float delta)
+	{
+		// Keep looking at the attacker. Choking pushes the head back.
+		Vector3 toAttacker = _attackerHead.GlobalPosition - Head.GlobalPosition;
+		float targetYaw = Mathf.Atan2(-toAttacker.X, -toAttacker.Z);
+		float targetPitch = Mathf.Atan2(toAttacker.Y, new Vector2(toAttacker.X, toAttacker.Z).Length())
+			+ Mathf.DegToRad(ChokePitchDegrees) * ChokeAmount;
+		Rotation = new Vector3(0f, Mathf.LerpAngle(Rotation.Y, targetYaw, GrabbedTurnSpeed * delta), 0f);
+		Head.Rotation = new Vector3(Mathf.LerpAngle(Head.Rotation.X, targetPitch, GrabbedTurnSpeed * delta), 0f, 0f);
+
+		float shake = (ShakeAmount + ChokeAmount * ChokeShake) * ShakeStrength;
+		Camera.Position = RandomDirection() * shake;
+		Camera.Rotation = RandomDirection() * shake;
+		_chokeMaterial.SetShaderParameter("amount", ChokeAmount);
+	}
+
+	private static Vector3 RandomDirection()
+	{
+		return new Vector3(GD.Randf() - 0.5f, GD.Randf() - 0.5f, GD.Randf() - 0.5f) * 2f;
 	}
 
 	private Tween MoveSmoothlyTo(Transform3D target)
