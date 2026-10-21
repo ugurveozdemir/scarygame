@@ -1,0 +1,19 @@
+# Godot 4
+.godot/
+/android/
+
+# .NET
+bin/
+obj/
+*.user
+
+# IDE / OS
+.vs/
+.idea/
+.vscode/
+.DS_Store
+
+# AI assistant files and references
+CLAUDE.md
+.claude/
+references/
