@@ -1,0 +1,46 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://camcorder/Camcorder.cs" id="1_camcorder"]
+[ext_resource type="Script" path="res://camcorder/CamcorderHud.cs" id="2_hud"]
+[ext_resource type="Shader" path="res://camcorder/screen_effect.gdshader" id="3_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_screen"]
+shader = ExtResource("3_shader")
+
+[node name="Camcorder" type="Node3D" node_paths=PackedStringArray("InfraredLight", "ScreenEffect")]
+script = ExtResource("1_camcorder")
+InfraredLight = NodePath("InfraredLight")
+ScreenEffect = NodePath("ScreenEffectLayer/ScreenEffect")
+
+[node name="InfraredLight" type="SpotLight3D" parent="."]
+visible = false
+light_energy = 3.0
+spot_range = 15.0
+spot_angle = 70.0
+spot_angle_attenuation = 2.0
+
+[node name="ScreenEffectLayer" type="CanvasLayer" parent="."]
+
+[node name="ScreenEffect" type="ColorRect" parent="ScreenEffectLayer"]
+material = SubResource("ShaderMaterial_screen")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HudLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="Hud" type="Control" parent="HudLayer" node_paths=PackedStringArray("Camcorder")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_hud")
+Camcorder = NodePath("../..")

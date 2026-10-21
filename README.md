@@ -15,3 +15,15 @@ Open the project in the Godot editor and press **F5**, or from the terminal:
 dotnet build
 godot --path .
 ```
+
+## Controls
+
+| Action | Key |
+|---|---|
+| Move | W A S D |
+| Sprint | Shift |
+| Crouch | Ctrl or C (hold) |
+| Raise / lower camcorder | Right mouse button |
+| Night vision | F (camcorder raised) |
+| Replace battery | R |
+| Release mouse | Esc |
