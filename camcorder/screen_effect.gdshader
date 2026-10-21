@@ -11,7 +11,7 @@ uniform float scanline_count = 240.0;
 uniform float chromatic_aberration : hint_range(0.0, 0.01) = 0.0;
 uniform bool night_vision = false;
 uniform vec3 night_vision_tint : source_color = vec3(0.4, 1.0, 0.5);
-uniform float night_vision_gain = 2.0;
+uniform float night_vision_gain = 2.5;
 
 float random(vec2 uv) {
 	return fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);
@@ -26,8 +26,9 @@ void fragment() {
 		texture(screen_texture, uv - aberration).b);
 
 	if (night_vision) {
+		// A soft curve instead of a hard clamp keeps detail on brightly lit, close objects.
 		float luminance = dot(color, vec3(0.299, 0.587, 0.114));
-		color = night_vision_tint * clamp(luminance * night_vision_gain, 0.0, 1.0);
+		color = night_vision_tint * (1.0 - exp(-luminance * night_vision_gain));
 	}
 
 	color += (random(uv + fract(TIME)) - 0.5) * grain_amount;
