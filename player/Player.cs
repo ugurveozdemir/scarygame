@@ -270,7 +270,8 @@ public partial class Player : CharacterBody3D
 
 	private void Look(Vector2 mouseDelta)
 	{
-		RotateY(-mouseDelta.X * MouseSensitivity);
+		// Setting the angle instead of calling RotateY keeps rounding errors from building up in the basis.
+		Rotation = new Vector3(0f, Rotation.Y - mouseDelta.X * MouseSensitivity, 0f);
 
 		float maxPitch = Mathf.DegToRad(MaxPitchDegrees);
 		Vector3 headRotation = Head.Rotation;

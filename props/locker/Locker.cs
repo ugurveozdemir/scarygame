@@ -151,8 +151,10 @@ public partial class Locker : StaticBody3D, IInteractable
 			Vector3 position = (2f * t3 - 3f * t2 + 1f) * _walkStart.Origin
 				+ (t3 - 2f * t2 + t) * seconds * startVelocity
 				+ (3f * t2 - 2f * t3) * end.Origin;
-			Basis facing = _walkStart.Basis.Slerp(end.Basis, Mathf.SmoothStep(0f, 1f, t));
-			_player.GlobalTransform = new Transform3D(facing, position);
+			// The player only turns around the vertical axis, so blending the yaw is enough
+			// and always yields a clean rotation.
+			float yaw = Mathf.LerpAngle(_walkStart.Basis.GetEuler().Y, end.Basis.GetEuler().Y, Mathf.SmoothStep(0f, 1f, t));
+			_player.GlobalTransform = new Transform3D(new Basis(Vector3.Up, yaw), position);
 		}), 0f, 1f, seconds).SetDelay(start);
 		_sequence.TweenProperty(_player.Head, "rotation:x", Mathf.DegToRad(headPitchDegrees), seconds)
 			.SetDelay(start).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
