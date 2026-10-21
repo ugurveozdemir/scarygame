@@ -17,7 +17,7 @@ height = 1.8
 radius = 0.35
 height = 1.0
 
-[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "Camera", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "LeftShoulder", "RightShoulder", "ThroatLeft", "ThroatRight", "ChokeOverlay")]
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "Camera", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "GrabPoints", "LeftShoulder", "RightShoulder", "ThroatLeft", "ThroatRight", "ChokeOverlay")]
 collision_layer = 2
 script = ExtResource("1_player")
 Head = NodePath("Head")
@@ -27,10 +27,11 @@ CrouchingCollision = NodePath("CrouchingCollision")
 CeilingCheck = NodePath("CeilingCheck")
 Camcorder = NodePath("Head/Camera3D/Camcorder")
 DeathScreen = NodePath("Hud/DeathScreen")
-LeftShoulder = NodePath("Head/GrabPoints/LeftShoulder")
-RightShoulder = NodePath("Head/GrabPoints/RightShoulder")
-ThroatLeft = NodePath("Head/GrabPoints/ThroatLeft")
-ThroatRight = NodePath("Head/GrabPoints/ThroatRight")
+GrabPoints = NodePath("GrabPoints")
+LeftShoulder = NodePath("GrabPoints/LeftShoulder")
+RightShoulder = NodePath("GrabPoints/RightShoulder")
+ThroatLeft = NodePath("GrabPoints/ThroatLeft")
+ThroatRight = NodePath("GrabPoints/ThroatRight")
 ChokeOverlay = NodePath("Hud/ChokeOverlay")
 
 [node name="StandingCollision" type="CollisionShape3D" parent="."]
@@ -62,19 +63,19 @@ script = ExtResource("3_interactor")
 Player = NodePath("../../..")
 PromptLabel = NodePath("../../../Hud/PromptLabel")
 
-[node name="GrabPoints" type="Node3D" parent="Head"]
+[node name="GrabPoints" type="Node3D" parent="."]
 
-[node name="LeftShoulder" type="Marker3D" parent="Head/GrabPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, -0.28, 0)
+[node name="LeftShoulder" type="Marker3D" parent="GrabPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 1.4, 0.02)
 
-[node name="RightShoulder" type="Marker3D" parent="Head/GrabPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, -0.28, 0)
+[node name="RightShoulder" type="Marker3D" parent="GrabPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 1.4, 0.02)
 
-[node name="ThroatLeft" type="Marker3D" parent="Head/GrabPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, -0.22, -0.1)
+[node name="ThroatLeft" type="Marker3D" parent="GrabPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05, 1.43, -0.07)
 
-[node name="ThroatRight" type="Marker3D" parent="Head/GrabPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, -0.22, -0.1)
+[node name="ThroatRight" type="Marker3D" parent="GrabPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 1.43, -0.07)
 
 [node name="Hud" type="CanvasLayer" parent="."]
 layer = 3

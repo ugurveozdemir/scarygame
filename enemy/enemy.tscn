@@ -6,8 +6,8 @@
 [ext_resource type="Script" path="res://enemy/StrangleAttack.cs" id="4_strangle"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
-radius = 0.35
-height = 1.9
+radius = 0.38
+height = 2.15
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_skin"]
 albedo_color = Color(0.72, 0.69, 0.64, 1)
@@ -28,11 +28,11 @@ DoorCheck = NodePath("DoorCheck")
 StrangleAttack = NodePath("StrangleAttack")
 
 [node name="Collision" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.075, 0)
 shape = SubResource("CapsuleShape3D_body")
 
 [node name="Model" parent="." instance=ExtResource("2_mannequin")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+transform = Transform3D(-1.18, 0, 0, 0, 1.18, 0, 0, 0, -1.18, 0, 0, 0)
 
 [node name="Mannequin" parent="Model/Armature/GeneralSkeleton" index="0"]
 surface_material_override/0 = SubResource("StandardMaterial3D_skin")
@@ -52,8 +52,15 @@ settings/1/root_bone_name = "RightUpperArm"
 settings/1/middle_bone_name = "RightLowerArm"
 settings/1/end_bone_name = "RightHand"
 
+[node name="HeadLookAt" type="LookAtModifier3D" parent="Model/Armature/GeneralSkeleton"]
+influence = 0.0
+bone_name = "Head"
+
 [node name="Eyes" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.68, -0.12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.98, -0.14)
+
+[node name="VictimLookTarget" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.66, -0.1)
 
 [node name="LeftHandTarget" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 1, -0.35)
@@ -62,24 +69,26 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 1, -0.35)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 1, -0.35)
 
 [node name="LeftElbowPole" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0.9, 0.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 1.5, -0.1)
 
 [node name="RightElbowPole" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.9, 0.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 1.5, -0.1)
 
-[node name="StrangleAttack" type="Node" parent="." node_paths=PackedStringArray("Body", "Head", "ArmsIK", "LeftHandTarget", "RightHandTarget")]
+[node name="StrangleAttack" type="Node" parent="." node_paths=PackedStringArray("Body", "VictimLookTarget", "Skeleton", "ArmsIK", "HeadLookAt", "LeftHandTarget", "RightHandTarget")]
 script = ExtResource("4_strangle")
 Body = NodePath("..")
-Head = NodePath("../Eyes")
+VictimLookTarget = NodePath("../VictimLookTarget")
+Skeleton = NodePath("../Model/Armature/GeneralSkeleton")
 ArmsIK = NodePath("../Model/Armature/GeneralSkeleton/ArmsIK")
+HeadLookAt = NodePath("../Model/Armature/GeneralSkeleton/HeadLookAt")
 LeftHandTarget = NodePath("../LeftHandTarget")
 RightHandTarget = NodePath("../RightHandTarget")
 
 [node name="NavigationAgent" type="NavigationAgent3D" parent="."]
 path_desired_distance = 0.5
 target_desired_distance = 0.5
-height = 1.9
-radius = 0.35
+height = 2.15
+radius = 0.38
 
 [node name="DoorCheck" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

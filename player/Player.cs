@@ -32,10 +32,14 @@ public partial class Player : CharacterBody3D
 	[Export] public float HidingTransitionSeconds { get; set; } = 0.4f;
 
 	[ExportGroup("Being Grabbed")]
-	[Export] public float GrabbedTurnSpeed { get; set; } = 10f;
+	[Export] public float GrabbedTurnSpeed { get; set; } = 8f;
+	[Export] public float StaggerDeceleration { get; set; } = 6f;
 	[Export] public float ShakeStrength { get; set; } = 0.03f;
+	[Export] public float ShakeDecay { get; set; } = 2f;
 	[Export] public float ChokeShake { get; set; } = 0.5f;
-	[Export] public float ChokePitchDegrees { get; set; } = 12f;
+	[Export] public float ChokePitchDegrees { get; set; } = 5f;
+	/// <summary>Parent of the points an attacker grabs; it sways along with the head.</summary>
+	[Export] public Node3D GrabPoints { get; set; }
 	[Export] public Node3D LeftShoulder { get; set; }
 	[Export] public Node3D RightShoulder { get; set; }
 	[Export] public Node3D ThroatLeft { get; set; }
@@ -55,12 +59,17 @@ public partial class Player : CharacterBody3D
 	public IInteractable HidingSpot { get; private set; }
 	public bool IsHiding => HidingSpot is not null;
 	public bool IsMovingToOrFromHidingSpot => _hidingTween is not null && _hidingTween.IsRunning();
-	public bool IsGrabbed => _attackerHead is not null;
+	public bool IsGrabbed => _grabLookTarget is not null;
 
 	/// <summary>
-	/// How violently the view shakes while grabbed, from 0 to 1.
+	/// A jolt of camera shake from 0 to 1 that fades out by itself, e.g. on impact.
 	/// </summary>
 	public float ShakeAmount { get; set; }
+
+	/// <summary>
+	/// How far an attacker has pushed or pulled the player's upper body, in the player's own space.
+	/// </summary>
+	public Vector3 BodySway { get; set; }
 
 	/// <summary>
 	/// How close to passing out the player is, from 0 to 1. Darkens the view and shakes it harder.
@@ -86,7 +95,9 @@ public partial class Player : CharacterBody3D
 	private uint _collisionMask;
 	private Tween _hidingTween;
 	private Transform3D _hidingExitPoint;
-	private Node3D _attackerHead;
+	private float _headHeight;
+	private Node3D _grabLookTarget;
+	private Vector3 _staggerVelocity;
 	private ShaderMaterial _chokeMaterial;
 
 	private float HorizontalSpeed => new Vector2(Velocity.X, Velocity.Z).Length();
@@ -99,6 +110,7 @@ public partial class Player : CharacterBody3D
 	{
 		_collisionLayer = CollisionLayer;
 		_collisionMask = CollisionMask;
+		_headHeight = StandingHeadHeight;
 		_chokeMaterial = (ShaderMaterial)ChokeOverlay.Material;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 	}
@@ -124,10 +136,16 @@ public partial class Player : CharacterBody3D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (IsHiding || IsGrabbed)
+		if (IsHiding)
 			return;
 
 		float dt = (float)delta;
+		if (IsGrabbed)
+		{
+			Stagger(dt);
+			return;
+		}
+
 		UpdateCrouch(dt);
 		Move(dt);
 		UpdateHeadBob(dt);
@@ -148,9 +166,10 @@ public partial class Player : CharacterBody3D
 	}
 
 	/// <summary>
-	/// Hands control over to an attacker: the player can no longer move and keeps looking at the attacker's head.
+	/// Hands control over to an attacker: the player is knocked back by <paramref name="shove"/>,
+	/// can no longer move and keeps looking at <paramref name="lookTarget"/>.
 	/// </summary>
-	public void GetGrabbed(Node3D attackerHead)
+	public void GetGrabbed(Node3D lookTarget, Vector3 shove)
 	{
 		if (IsHiding)
 		{
@@ -160,8 +179,9 @@ public partial class Player : CharacterBody3D
 			StopHiding();
 		}
 
-		_attackerHead = attackerHead;
-		Velocity = Vector3.Zero;
+		_grabLookTarget = lookTarget;
+		_staggerVelocity = shove;
+		ShakeAmount = 1f;
 	}
 
 	public void Die()
@@ -175,16 +195,29 @@ public partial class Player : CharacterBody3D
 		SetCollisionEnabled(true);
 	}
 
+	private void Stagger(float delta)
+	{
+		Velocity = _staggerVelocity;
+		MoveAndSlide();
+		_staggerVelocity = _staggerVelocity.MoveToward(Vector3.Zero, StaggerDeceleration * delta);
+	}
+
 	private void UpdateGrabbedView(float delta)
 	{
 		// Keep looking at the attacker. Choking pushes the head back.
-		Vector3 toAttacker = _attackerHead.GlobalPosition - Head.GlobalPosition;
-		float targetYaw = Mathf.Atan2(-toAttacker.X, -toAttacker.Z);
-		float targetPitch = Mathf.Atan2(toAttacker.Y, new Vector2(toAttacker.X, toAttacker.Z).Length())
+		Vector3 toTarget = _grabLookTarget.GlobalPosition - Head.GlobalPosition;
+		float targetYaw = Mathf.Atan2(-toTarget.X, -toTarget.Z);
+		float targetPitch = Mathf.Atan2(toTarget.Y, new Vector2(toTarget.X, toTarget.Z).Length())
 			+ Mathf.DegToRad(ChokePitchDegrees) * ChokeAmount;
 		Rotation = new Vector3(0f, Mathf.LerpAngle(Rotation.Y, targetYaw, GrabbedTurnSpeed * delta), 0f);
 		Head.Rotation = new Vector3(Mathf.LerpAngle(Head.Rotation.X, targetPitch, GrabbedTurnSpeed * delta), 0f, 0f);
 
+		// A grabbed player is pulled upright, and the attacker rocks the head and grab points together.
+		_headHeight = Mathf.Lerp(_headHeight, StandingHeadHeight, CrouchTransitionSpeed * delta);
+		Head.Position = new Vector3(0f, _headHeight, 0f) + BodySway;
+		GrabPoints.Position = BodySway;
+
+		ShakeAmount = Mathf.MoveToward(ShakeAmount, 0f, ShakeDecay * delta);
 		float shake = (ShakeAmount + ChokeAmount * ChokeShake) * ShakeStrength;
 		Camera.Position = RandomDirection() * shake;
 		Camera.Rotation = RandomDirection() * shake;
@@ -244,9 +277,8 @@ public partial class Player : CharacterBody3D
 		CrouchingCollision.Disabled = !IsCrouching;
 
 		float targetHeight = IsCrouching ? CrouchingHeadHeight : StandingHeadHeight;
-		Vector3 headPosition = Head.Position;
-		headPosition.Y = Mathf.Lerp(headPosition.Y, targetHeight, CrouchTransitionSpeed * delta);
-		Head.Position = headPosition;
+		_headHeight = Mathf.Lerp(_headHeight, targetHeight, CrouchTransitionSpeed * delta);
+		Head.Position = new Vector3(0f, _headHeight, 0f);
 	}
 
 	private void UpdateHeadBob(float delta)

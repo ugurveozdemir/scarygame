@@ -58,8 +58,12 @@ The enemy is the Quaternius mannequin. Both Quaternius animation libraries are i
 `SkeletonProfileHumanoid` bone map (`assets/quaternius/*_bone_map.tres`), so every animation targets the
 standard humanoid skeleton and can play on any character imported the same way.
 
-The strangle attack (`enemy/StrangleAttack.cs`) is not a canned animation: a `TwoBoneIK3D` modifier moves
-the enemy's hands to grab points on the player (`Player/Head/GrabPoints`), so it fits wherever the player stands.
+The enemy model is scaled up to about 2.16 m. Its movement speeds are scaled with it so the feet don't slide.
+
+The strangle attack (`enemy/StrangleAttack.cs`) is not a canned animation. The enemy lunges in mid-sprint,
+grabs the player's shoulders and shakes them, then pushes them to arm's length and strangles them.
+A `TwoBoneIK3D` modifier moves the hands to grab points on the player (`Player/GrabPoints`) and a
+`LookAtModifier3D` turns the head towards the player's face, so the move fits wherever the player stands.
 The IK needs its elbow pole markers (`LeftElbowPole`, `RightElbowPole`) to solve.
 
 ## Level editing

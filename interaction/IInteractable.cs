@@ -1,4 +1,4 @@
-/// <summary>
+	/// <summary>
 /// Something the player can use by looking at it and pressing the interact key.
 /// </summary>
 public interface IInteractable

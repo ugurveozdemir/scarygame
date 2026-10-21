@@ -19,9 +19,9 @@ public partial class Enemy : CharacterBody3D
 	private const string StrangleAnimation = "ual1/Idle"; // upright base pose; IK moves the arms
 
 	[ExportGroup("Movement")]
-	[Export] public float WalkSpeed { get; set; } = 1f;
-	[Export] public float InvestigateSpeed { get; set; } = 2.8f;
-	[Export] public float RunSpeed { get; set; } = 4.3f;
+	[Export] public float WalkSpeed { get; set; } = 1.15f;
+	[Export] public float InvestigateSpeed { get; set; } = 3.2f;
+	[Export] public float RunSpeed { get; set; } = 4.6f;
 	[Export] public float TurnSpeed { get; set; } = 8f;
 
 	[ExportGroup("Animation")]
@@ -34,7 +34,8 @@ public partial class Enemy : CharacterBody3D
 	[Export] public float SightRange { get; set; } = 14f;
 	[Export] public float FieldOfViewDegrees { get; set; } = 110f;
 	[Export(PropertyHint.Range, "0,1")] public float CrouchedSightMultiplier { get; set; } = 0.5f;
-	[Export] public float CatchDistance { get; set; } = 1.2f;
+	/// <summary>Distance at which the enemy lunges at the player it is chasing.</summary>
+	[Export] public float CatchDistance { get; set; } = 1.5f;
 	/// <summary>A player who hides within this many seconds of being seen is caught in the hiding spot.</summary>
 	[Export] public float HidingWitnessSeconds { get; set; } = 1f;
 
@@ -178,7 +179,8 @@ public partial class Enemy : CharacterBody3D
 	private void UpdateAnimation()
 	{
 		bool isMoving = new Vector2(Velocity.X, Velocity.Z).Length() > 0.1f;
-		string animation = State == EnemyState.Strangling ? StrangleAnimation
+		// While lunging it keeps running into the grab instead of stopping dead.
+		string animation = State == EnemyState.Strangling ? (StrangleAttack.IsLunging ? SprintAnimation : StrangleAnimation)
 			: !isMoving ? IdleAnimation
 			: State == EnemyState.Chase ? SprintAnimation
 			: State == EnemyState.Investigate ? JogAnimation
