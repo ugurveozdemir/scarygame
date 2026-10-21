@@ -14,7 +14,16 @@ public partial class Camcorder : Node3D
 
 	[Export] public float BatteryLifeSeconds { get; set; } = 120f;
 	[Export] public int MaxSpareBatteries { get; set; } = 10;
+
+	[ExportGroup("Auto Gain")]
+	/// <summary>Closer than this, the infrared light is turned down so nearby things don't burn out.</summary>
+	[Export] public float AutoGainDistance { get; set; } = 2f;
+	[Export(PropertyHint.Range, "0,1")] public float MinimumGain { get; set; } = 0.08f;
+	[Export] public float GainAdjustSpeed { get; set; } = 8f;
+
+	[ExportGroup("Nodes")]
 	[Export] public Light3D InfraredLight { get; set; }
+	[Export] public RayCast3D AutoGainProbe { get; set; }
 	[Export] public ColorRect ScreenEffect { get; set; }
 
 	public bool IsRaised { get; private set; }
@@ -23,10 +32,14 @@ public partial class Camcorder : Node3D
 	public int SpareBatteries { get; private set; }
 
 	private ShaderMaterial _screenMaterial;
+	private float _infraredEnergy;
+	private float _gain = 1f;
 
 	public override void _Ready()
 	{
 		_screenMaterial = (ShaderMaterial)ScreenEffect.Material;
+		_infraredEnergy = InfraredLight.LightEnergy;
+		AutoGainProbe.TargetPosition = Vector3.Forward * AutoGainDistance;
 		UpdateEffects();
 	}
 
@@ -48,6 +61,8 @@ public partial class Camcorder : Node3D
 		Charge = Mathf.Max(Charge - (float)delta / BatteryLifeSeconds, 0f);
 		if (Charge == 0f)
 			SetNightVision(false);
+
+		UpdateAutoGain((float)delta);
 	}
 
 	public bool TryAddSpareBattery()
@@ -81,6 +96,17 @@ public partial class Camcorder : Node3D
 
 		SpareBatteries--;
 		Charge = 1f;
+	}
+
+	private void UpdateAutoGain(float delta)
+	{
+		// Like a real camera, turn the infrared light down when something is right in front of the lens.
+		float distance = AutoGainProbe.IsColliding()
+			? AutoGainProbe.GlobalPosition.DistanceTo(AutoGainProbe.GetCollisionPoint())
+			: AutoGainDistance;
+		float targetGain = Mathf.Clamp(Mathf.Pow(distance / AutoGainDistance, 2f), MinimumGain, 1f);
+		_gain = Mathf.Lerp(_gain, targetGain, GainAdjustSpeed * delta);
+		InfraredLight.LightEnergy = _infraredEnergy * _gain;
 	}
 
 	private void UpdateEffects()

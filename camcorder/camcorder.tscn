@@ -7,9 +7,10 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_screen"]
 shader = ExtResource("3_shader")
 
-[node name="Camcorder" type="Node3D" node_paths=PackedStringArray("InfraredLight", "ScreenEffect")]
+[node name="Camcorder" type="Node3D" node_paths=PackedStringArray("InfraredLight", "AutoGainProbe", "ScreenEffect")]
 script = ExtResource("1_camcorder")
 InfraredLight = NodePath("InfraredLight")
+AutoGainProbe = NodePath("AutoGainProbe")
 ScreenEffect = NodePath("ScreenEffectLayer/ScreenEffect")
 
 [node name="InfraredLight" type="SpotLight3D" parent="."]
@@ -18,6 +19,9 @@ light_energy = 3.0
 spot_range = 15.0
 spot_angle = 70.0
 spot_angle_attenuation = 2.0
+
+[node name="AutoGainProbe" type="RayCast3D" parent="."]
+collision_mask = 5
 
 [node name="ScreenEffectLayer" type="CanvasLayer" parent="."]
 
