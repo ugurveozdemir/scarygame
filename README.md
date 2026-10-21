@@ -28,3 +28,22 @@ godot --path .
 | Night vision | F (camcorder raised) |
 | Replace battery | R |
 | Release mouse | Esc |
+
+## Project structure
+
+Scenes and their scripts live together, grouped by feature.
+
+| Folder | Contents |
+|---|---|
+| `player/` | First-person controller (movement, crouch, hiding) |
+| `camcorder/` | Camcorder logic, recording HUD and the screen-effect shader |
+| `interaction/` | `IInteractable` interface and the look-at interactor |
+| `props/` | Interactable objects: doors, lockers, batteries |
+| `levels/` | Levels and their shared environment |
+| `lighting/` | Light behaviours such as flickering |
+| `greybox/` | Prototype materials, to be replaced by real art |
+
+## Status
+
+Greybox prototype: a dark test level to explore with the camcorder, doors to open and lockers to hide in.
+Next up: an enemy that patrols, hears and chases the player.
