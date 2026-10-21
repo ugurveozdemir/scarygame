@@ -1,0 +1,31 @@
+[gd_resource type="ShaderMaterial" load_steps=14 format=3]
+
+[ext_resource type="Shader" path="res://materials/asylum_interior.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/Tiles140/Tiles140_1K-JPG_Color.jpg" id="2_floor_albedo"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/Tiles140/Tiles140_1K-JPG_NormalGL.jpg" id="3_floor_normal"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/Tiles140/Tiles140_1K-JPG_Roughness.jpg" id="4_floor_roughness"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/OfficeCeiling006/OfficeCeiling006_1K-JPG_Color.jpg" id="5_ceiling_albedo"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/OfficeCeiling006/OfficeCeiling006_1K-JPG_NormalGL.jpg" id="6_ceiling_normal"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/OfficeCeiling006/OfficeCeiling006_1K-JPG_Roughness.jpg" id="7_ceiling_roughness"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/Tiles133D/Tiles133D_1K-JPG_Color.jpg" id="8_tiles_albedo"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/Tiles133D/Tiles133D_1K-JPG_NormalGL.jpg" id="9_tiles_normal"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/Tiles133D/Tiles133D_1K-JPG_Roughness.jpg" id="10_tiles_roughness"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/PaintedPlaster010/PaintedPlaster010_1K-JPG_Color.jpg" id="11_plaster_albedo"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/PaintedPlaster010/PaintedPlaster010_1K-JPG_NormalGL.jpg" id="12_plaster_normal"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/PaintedPlaster010/PaintedPlaster010_1K-JPG_Roughness.jpg" id="13_plaster_roughness"]
+
+[resource]
+resource_name = "Asylum interior"
+shader = ExtResource("1_shader")
+shader_parameter/floor_albedo = ExtResource("2_floor_albedo")
+shader_parameter/floor_normal = ExtResource("3_floor_normal")
+shader_parameter/floor_roughness = ExtResource("4_floor_roughness")
+shader_parameter/ceiling_albedo = ExtResource("5_ceiling_albedo")
+shader_parameter/ceiling_normal = ExtResource("6_ceiling_normal")
+shader_parameter/ceiling_roughness = ExtResource("7_ceiling_roughness")
+shader_parameter/tiles_albedo = ExtResource("8_tiles_albedo")
+shader_parameter/tiles_normal = ExtResource("9_tiles_normal")
+shader_parameter/tiles_roughness = ExtResource("10_tiles_roughness")
+shader_parameter/plaster_albedo = ExtResource("11_plaster_albedo")
+shader_parameter/plaster_normal = ExtResource("12_plaster_normal")
+shader_parameter/plaster_roughness = ExtResource("13_plaster_roughness")

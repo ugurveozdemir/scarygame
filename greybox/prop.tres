@@ -1,8 +1,0 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
-
-[ext_resource type="Texture2D" path="res://greybox/prototype_grid.png" id="1_grid"]
-
-[resource]
-albedo_color = Color(0.55, 0.48, 0.42, 1)
-albedo_texture = ExtResource("1_grid")
-uv1_triplanar = true

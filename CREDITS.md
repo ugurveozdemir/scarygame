@@ -6,5 +6,13 @@ Third-party assets used in this project.
 |---|---|---|---|
 | [Universal Animation Library (Standard)](https://quaternius.com/packs/universalanimationlibrary.html) | [Quaternius](https://quaternius.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Jog and sprint animations (`assets/quaternius/ual1_standard.glb`) |
 | [Universal Animation Library 2 (Standard)](https://quaternius.itch.io/universal-animation-library-2) | [Quaternius](https://quaternius.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Enemy mannequin model, zombie walk and idle animations (`assets/quaternius/ual2_standard.glb`) |
+| [Tiles140](https://ambientcg.com/view?id=Tiles140) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Floor tiles (`assets/ambientcg/Tiles140`) |
+| [OfficeCeiling006](https://ambientcg.com/view?id=OfficeCeiling006) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Suspended ceiling (`assets/ambientcg/OfficeCeiling006`) |
+| [Tiles133D](https://ambientcg.com/view?id=Tiles133D) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Glazed wall tiles (`assets/ambientcg/Tiles133D`) |
+| [PaintedPlaster010](https://ambientcg.com/view?id=PaintedPlaster010) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Peeling wall plaster (`assets/ambientcg/PaintedPlaster010`) |
+| [PaintedWood008B](https://ambientcg.com/view?id=PaintedWood008B) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Doors (`assets/ambientcg/PaintedWood008B`) |
+| [PaintedMetal006](https://ambientcg.com/view?id=PaintedMetal006) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Lockers (`assets/ambientcg/PaintedMetal006`) |
+| [PaintedMetal013](https://ambientcg.com/view?id=PaintedMetal013) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Beds, gurney and desk (`assets/ambientcg/PaintedMetal013`) |
 
-Both packs were downloaded from OpenGameArt and are unmodified; the enemy's colours are material overrides in `enemy/enemy.tscn`.
+The Quaternius packs were downloaded from OpenGameArt and the ambientCG textures at 1K resolution; all are unmodified.
+Colours and tints are applied in materials (`materials/`, `enemy/enemy.tscn`).

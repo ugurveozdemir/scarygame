@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ambientcg/PaintedMetal013/PaintedMetal013_1K-JPG_Color.jpg" id="1_PaintedMetal013_Color"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/PaintedMetal013/PaintedMetal013_1K-JPG_NormalGL.jpg" id="2_PaintedMetal013_NormalGL"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/PaintedMetal013/PaintedMetal013_1K-JPG_Roughness.jpg" id="3_PaintedMetal013_Roughness"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/PaintedMetal013/PaintedMetal013_1K-JPG_Metalness.jpg" id="4_PaintedMetal013_Metalness"]
+
+[resource]
+resource_name = "Hospital metal"
+albedo_texture = ExtResource("1_PaintedMetal013_Color")
+metallic = 1.0
+metallic_texture = ExtResource("4_PaintedMetal013_Metalness")
+roughness_texture = ExtResource("3_PaintedMetal013_Roughness")
+normal_enabled = true
+normal_texture = ExtResource("2_PaintedMetal013_NormalGL")
+uv1_triplanar = true
+uv1_world_triplanar = true
+uv1_scale = Vector3(1.0, 1.0, 1.0)
+texture_filter = 5

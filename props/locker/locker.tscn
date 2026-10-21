@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://props/locker/Locker.cs" id="1_locker"]
-[ext_resource type="Material" path="res://greybox/prop.tres" id="2_prop"]
+[ext_resource type="Material" path="res://materials/locker_metal.tres" id="2_prop"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_locker"]
 size = Vector3(0.7, 2.1, 0.6)

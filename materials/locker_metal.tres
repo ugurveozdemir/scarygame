@@ -1,0 +1,18 @@
+[gd_resource type="StandardMaterial3D" load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ambientcg/PaintedMetal006/PaintedMetal006_1K-JPG_Color.jpg" id="1_PaintedMetal006_Color"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/PaintedMetal006/PaintedMetal006_1K-JPG_NormalGL.jpg" id="2_PaintedMetal006_NormalGL"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/PaintedMetal006/PaintedMetal006_1K-JPG_Roughness.jpg" id="3_PaintedMetal006_Roughness"]
+[ext_resource type="Texture2D" path="res://assets/ambientcg/PaintedMetal006/PaintedMetal006_1K-JPG_Metalness.jpg" id="4_PaintedMetal006_Metalness"]
+
+[resource]
+resource_name = "Locker metal"
+albedo_texture = ExtResource("1_PaintedMetal006_Color")
+metallic = 1.0
+metallic_texture = ExtResource("4_PaintedMetal006_Metalness")
+roughness_texture = ExtResource("3_PaintedMetal006_Roughness")
+normal_enabled = true
+normal_texture = ExtResource("2_PaintedMetal006_NormalGL")
+uv1_triplanar = true
+uv1_scale = Vector3(1.0, 1.0, 1.0)
+texture_filter = 5
