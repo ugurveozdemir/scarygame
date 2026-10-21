@@ -5,6 +5,7 @@
 [ext_resource type="Shader" path="res://camcorder/screen_effect.gdshader" id="3_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_screen"]
+resource_local_to_scene = true
 shader = ExtResource("3_shader")
 
 [node name="Camcorder" type="Node3D" node_paths=PackedStringArray("InfraredLight", "AutoGainProbe", "ScreenEffect")]

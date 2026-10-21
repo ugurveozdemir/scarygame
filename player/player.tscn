@@ -7,6 +7,7 @@
 [ext_resource type="Shader" path="res://player/choke_overlay.gdshader" id="5_choke_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_choke"]
+resource_local_to_scene = true
 shader = ExtResource("5_choke_shader")
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_standing"]

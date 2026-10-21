@@ -74,7 +74,15 @@ public partial class Player : CharacterBody3D
 	/// <summary>
 	/// How close to passing out the player is, from 0 to 1. Darkens the view and shakes it harder.
 	/// </summary>
-	public float ChokeAmount { get; set; }
+	public float ChokeAmount
+	{
+		get => _chokeAmount;
+		set
+		{
+			_chokeAmount = value;
+			_chokeMaterial.SetShaderParameter("amount", value);
+		}
+	}
 
 	/// <summary>
 	/// How far away enemies can hear the player's footsteps.
@@ -98,6 +106,7 @@ public partial class Player : CharacterBody3D
 	private float _headHeight;
 	private Node3D _grabLookTarget;
 	private Vector3 _staggerVelocity;
+	private float _chokeAmount;
 	private ShaderMaterial _chokeMaterial;
 
 	private float HorizontalSpeed => new Vector2(Velocity.X, Velocity.Z).Length();
@@ -112,6 +121,7 @@ public partial class Player : CharacterBody3D
 		_collisionMask = CollisionMask;
 		_headHeight = StandingHeadHeight;
 		_chokeMaterial = (ShaderMaterial)ChokeOverlay.Material;
+		ChokeAmount = 0f;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 	}
 
@@ -221,7 +231,6 @@ public partial class Player : CharacterBody3D
 		float shake = (ShakeAmount + ChokeAmount * ChokeShake) * ShakeStrength;
 		Camera.Position = RandomDirection() * shake;
 		Camera.Rotation = RandomDirection() * shake;
-		_chokeMaterial.SetShaderParameter("amount", ChokeAmount);
 	}
 
 	private static Vector3 RandomDirection()
