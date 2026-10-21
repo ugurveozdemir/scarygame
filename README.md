@@ -35,7 +35,7 @@ Scenes and their scripts live together, grouped by feature.
 
 | Folder | Contents |
 |---|---|
-| `player/` | First-person controller (movement, crouch, hiding, being grabbed) |
+| `player/` | First-person controller (movement, crouch, hiding, being grabbed) and first-person hands |
 | `camcorder/` | Camcorder logic, recording HUD and the screen-effect shader |
 | `interaction/` | `IInteractable` interface and the look-at interactor |
 | `enemy/` | Stalker AI (patrol, hearing, sight, chase, search) and its strangle attack |
@@ -65,6 +65,10 @@ grabs the player's shoulders and shakes them, then pushes them to arm's length a
 A `TwoBoneIK3D` modifier moves the hands to grab points on the player (`Player/GrabPoints`) and a
 `LookAtModifier3D` turns the head towards the player's face, so the move fits wherever the player stands.
 The IK needs its elbow pole markers (`LeftElbowPole`, `RightElbowPole`) to solve.
+
+The player's own hands (`player/view_hands.tscn`) only appear while reaching for something, such as a
+locker door. They belong to the same mannequin placed around the camera, with its head shrunk away by
+`HideBonesModifier`; `GripFingersModifier` curls the fingers into a grip and IK places the hand on a grip point.
 
 ## Level editing
 

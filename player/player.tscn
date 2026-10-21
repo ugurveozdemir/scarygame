@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://player/Player.cs" id="1_player"]
 [ext_resource type="PackedScene" path="res://camcorder/camcorder.tscn" id="2_camcorder"]
 [ext_resource type="Script" path="res://interaction/Interactor.cs" id="3_interactor"]
 [ext_resource type="Script" path="res://player/DeathScreen.cs" id="4_death_screen"]
 [ext_resource type="Shader" path="res://player/choke_overlay.gdshader" id="5_choke_shader"]
+[ext_resource type="PackedScene" path="res://player/view_hands.tscn" id="6_view_hands"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_choke"]
 resource_local_to_scene = true
@@ -18,7 +19,7 @@ height = 1.8
 radius = 0.35
 height = 1.0
 
-[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "Camera", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "GrabPoints", "LeftShoulder", "RightShoulder", "ThroatLeft", "ThroatRight", "ChokeOverlay")]
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "Camera", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "GrabPoints", "LeftShoulder", "RightShoulder", "ThroatLeft", "ThroatRight", "ChokeOverlay", "Hands")]
 collision_layer = 2
 script = ExtResource("1_player")
 Head = NodePath("Head")
@@ -34,6 +35,7 @@ RightShoulder = NodePath("GrabPoints/RightShoulder")
 ThroatLeft = NodePath("GrabPoints/ThroatLeft")
 ThroatRight = NodePath("GrabPoints/ThroatRight")
 ChokeOverlay = NodePath("Hud/ChokeOverlay")
+Hands = NodePath("Head/Camera3D/ViewHands")
 
 [node name="StandingCollision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
@@ -56,6 +58,8 @@ current = true
 fov = 75.0
 
 [node name="Camcorder" parent="Head/Camera3D" instance=ExtResource("2_camcorder")]
+
+[node name="ViewHands" parent="Head/Camera3D" instance=ExtResource("6_view_hands")]
 
 [node name="Interactor" type="RayCast3D" parent="Head/Camera3D" node_paths=PackedStringArray("Player", "PromptLabel")]
 target_position = Vector3(0, 0, -2)

@@ -1,7 +1,7 @@
 using Godot;
 
 /// <summary>
-/// First-person controller: mouse look, walking, sprinting, crouching, head bob and hiding.
+/// First-person controller: mouse look, walking, sprinting, crouching, head bob, hiding and being grabbed.
 /// </summary>
 public partial class Player : CharacterBody3D
 {
@@ -28,9 +28,6 @@ public partial class Player : CharacterBody3D
 	[Export] public float BobFrequency { get; set; } = 4.5f;
 	[Export] public float BobAmplitude { get; set; } = 0.04f;
 
-	[ExportGroup("Hiding")]
-	[Export] public float HidingTransitionSeconds { get; set; } = 0.4f;
-
 	[ExportGroup("Being Grabbed")]
 	[Export] public float GrabbedTurnSpeed { get; set; } = 8f;
 	[Export] public float StaggerDeceleration { get; set; } = 6f;
@@ -54,12 +51,17 @@ public partial class Player : CharacterBody3D
 	[Export] public RayCast3D CeilingCheck { get; set; }
 	[Export] public Camcorder Camcorder { get; set; }
 	[Export] public DeathScreen DeathScreen { get; set; }
+	[Export] public ViewHands Hands { get; set; }
 
 	public bool IsCrouching { get; private set; }
 	public IInteractable HidingSpot { get; private set; }
 	public bool IsHiding => HidingSpot is not null;
-	public bool IsMovingToOrFromHidingSpot => _hidingTween is not null && _hidingTween.IsRunning();
 	public bool IsGrabbed => _grabLookTarget is not null;
+
+	/// <summary>
+	/// True while something else, like a locker, is moving the player. They can't walk, look or interact.
+	/// </summary>
+	public bool AreControlsLocked { get; private set; }
 
 	/// <summary>
 	/// A jolt of camera shake from 0 to 1 that fades out by itself, e.g. on impact.
@@ -101,7 +103,7 @@ public partial class Player : CharacterBody3D
 	private float _bobPhase;
 	private uint _collisionLayer;
 	private uint _collisionMask;
-	private Tween _hidingTween;
+	private Tween _moveTween;
 	private Transform3D _hidingExitPoint;
 	private float _headHeight;
 	private Node3D _grabLookTarget;
@@ -127,7 +129,7 @@ public partial class Player : CharacterBody3D
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if (IsGrabbed)
+		if (IsGrabbed || AreControlsLocked)
 			return;
 
 		if (@event is InputEventMouseMotion motion && Input.MouseMode == Input.MouseModeEnum.Captured)
@@ -140,15 +142,14 @@ public partial class Player : CharacterBody3D
 
 	public override void _Process(double delta)
 	{
+		float dt = (float)delta;
+		UpdateHeadPosition(dt);
 		if (IsGrabbed)
-			UpdateGrabbedView((float)delta);
+			UpdateGrabbedView(dt);
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (IsHiding)
-			return;
-
 		float dt = (float)delta;
 		if (IsGrabbed)
 		{
@@ -156,23 +157,52 @@ public partial class Player : CharacterBody3D
 			return;
 		}
 
-		UpdateCrouch(dt);
+		if (IsHiding || AreControlsLocked)
+			return;
+
+		UpdateCrouch();
 		Move(dt);
 		UpdateHeadBob(dt);
 	}
 
-	public void EnterHidingSpot(IInteractable spot, Transform3D hidePoint, Transform3D exitPoint)
+	public void LockControls()
+	{
+		AreControlsLocked = true;
+		Velocity = Vector3.Zero;
+		StandUp();
+	}
+
+	public void UnlockControls()
+	{
+		AreControlsLocked = false;
+	}
+
+	/// <summary>
+	/// Smoothly walks the player to <paramref name="target"/> and tilts the view to <paramref name="headPitchDegrees"/>.
+	/// </summary>
+	public SignalAwaiter MoveTo(Transform3D target, float headPitchDegrees, float seconds)
+	{
+		_moveTween?.Kill();
+		_moveTween = CreateTween().SetParallel().SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
+		_moveTween.TweenProperty(this, "global_transform", target, seconds);
+		_moveTween.TweenProperty(Head, "rotation:x", Mathf.DegToRad(headPitchDegrees), seconds);
+		return ToSignal(_moveTween, Tween.SignalName.Finished);
+	}
+
+	/// <summary>
+	/// The player is now inside <paramref name="spot"/>: they can't move or be seen until they stop hiding.
+	/// </summary>
+	public void StartHiding(IInteractable spot, Transform3D exitPoint)
 	{
 		HidingSpot = spot;
 		_hidingExitPoint = exitPoint;
-		Velocity = Vector3.Zero;
 		SetCollisionEnabled(false);
-		MoveSmoothlyTo(hidePoint);
 	}
 
-	public void LeaveHidingSpot()
+	public void StopHiding()
 	{
-		MoveSmoothlyTo(_hidingExitPoint).Finished += StopHiding;
+		HidingSpot = null;
+		SetCollisionEnabled(true);
 	}
 
 	/// <summary>
@@ -181,10 +211,13 @@ public partial class Player : CharacterBody3D
 	/// </summary>
 	public void GetGrabbed(Node3D lookTarget, Vector3 shove)
 	{
+		_moveTween?.Kill();
+		Hands.HideImmediately();
+		AreControlsLocked = false;
+		StandUp();
 		if (IsHiding)
 		{
 			// Dragged out of the hiding spot.
-			_hidingTween?.Kill();
 			GlobalTransform = _hidingExitPoint;
 			StopHiding();
 		}
@@ -197,12 +230,6 @@ public partial class Player : CharacterBody3D
 	public void Die()
 	{
 		DeathScreen.Play();
-	}
-
-	private void StopHiding()
-	{
-		HidingSpot = null;
-		SetCollisionEnabled(true);
 	}
 
 	private void Stagger(float delta)
@@ -222,11 +249,6 @@ public partial class Player : CharacterBody3D
 		Rotation = new Vector3(0f, Mathf.LerpAngle(Rotation.Y, targetYaw, GrabbedTurnSpeed * delta), 0f);
 		Head.Rotation = new Vector3(Mathf.LerpAngle(Head.Rotation.X, targetPitch, GrabbedTurnSpeed * delta), 0f, 0f);
 
-		// A grabbed player is pulled upright, and the attacker rocks the head and grab points together.
-		_headHeight = Mathf.Lerp(_headHeight, StandingHeadHeight, CrouchTransitionSpeed * delta);
-		Head.Position = new Vector3(0f, _headHeight, 0f) + BodySway;
-		GrabPoints.Position = BodySway;
-
 		ShakeAmount = Mathf.MoveToward(ShakeAmount, 0f, ShakeDecay * delta);
 		float shake = (ShakeAmount + ChokeAmount * ChokeShake) * ShakeStrength;
 		Camera.Position = RandomDirection() * shake;
@@ -236,13 +258,6 @@ public partial class Player : CharacterBody3D
 	private static Vector3 RandomDirection()
 	{
 		return new Vector3(GD.Randf() - 0.5f, GD.Randf() - 0.5f, GD.Randf() - 0.5f) * 2f;
-	}
-
-	private Tween MoveSmoothlyTo(Transform3D target)
-	{
-		_hidingTween = CreateTween().SetTrans(Tween.TransitionType.Sine);
-		_hidingTween.TweenProperty(this, "global_transform", target, HidingTransitionSeconds);
-		return _hidingTween;
 	}
 
 	private void SetCollisionEnabled(bool enabled)
@@ -278,16 +293,31 @@ public partial class Player : CharacterBody3D
 		MoveAndSlide();
 	}
 
-	private void UpdateCrouch(float delta)
+	private void UpdateCrouch()
 	{
 		// Stay crouched while something is above the head, even if the key is released.
-		IsCrouching = Input.IsActionPressed("crouch") || (IsCrouching && CeilingCheck.IsColliding());
-		StandingCollision.Disabled = IsCrouching;
-		CrouchingCollision.Disabled = !IsCrouching;
+		SetCrouching(Input.IsActionPressed("crouch") || (IsCrouching && CeilingCheck.IsColliding()));
+	}
 
+	private void StandUp()
+	{
+		SetCrouching(false);
+	}
+
+	private void SetCrouching(bool crouching)
+	{
+		IsCrouching = crouching;
+		StandingCollision.Disabled = crouching;
+		CrouchingCollision.Disabled = !crouching;
+	}
+
+	private void UpdateHeadPosition(float delta)
+	{
+		// The head eases between standing and crouching height. An attacker can sway the head and grab points.
 		float targetHeight = IsCrouching ? CrouchingHeadHeight : StandingHeadHeight;
 		_headHeight = Mathf.Lerp(_headHeight, targetHeight, CrouchTransitionSpeed * delta);
-		Head.Position = new Vector3(0f, _headHeight, 0f);
+		Head.Position = new Vector3(0f, _headHeight, 0f) + BodySway;
+		GrabPoints.Position = BodySway;
 	}
 
 	private void UpdateHeadBob(float delta)
