@@ -1,0 +1,58 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://enemy/Enemy.cs" id="1_enemy"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.35
+height = 1.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_skin"]
+albedo_color = Color(0.25, 0.2, 0.18, 1)
+roughness = 0.9
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+material = SubResource("StandardMaterial3D_skin")
+radius = 0.35
+height = 1.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eyes"]
+albedo_color = Color(0, 0, 0, 1)
+emission_enabled = true
+emission = Color(1, 0.85, 0.6, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_eyes"]
+material = SubResource("StandardMaterial3D_eyes")
+size = Vector3(0.22, 0.04, 0.05)
+
+[node name="Enemy" type="CharacterBody3D" node_paths=PackedStringArray("Eyes", "NavigationAgent", "DoorCheck")]
+collision_layer = 4
+script = ExtResource("1_enemy")
+Eyes = NodePath("Eyes")
+NavigationAgent = NodePath("NavigationAgent")
+DoorCheck = NodePath("DoorCheck")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="Eyes" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, -0.33)
+
+[node name="EyeGlow" type="MeshInstance3D" parent="Eyes"]
+mesh = SubResource("BoxMesh_eyes")
+
+[node name="NavigationAgent" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.5
+target_desired_distance = 0.5
+height = 1.9
+radius = 0.35
+
+[node name="DoorCheck" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+target_position = Vector3(0, 0, -1)
+collision_mask = 8

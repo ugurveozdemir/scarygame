@@ -11,6 +11,10 @@ public partial class Player : CharacterBody3D
 	[Export] public float CrouchSpeed { get; set; } = 1.3f;
 	[Export] public float Acceleration { get; set; } = 10f;
 
+	[ExportGroup("Noise")]
+	[Export] public float WalkNoiseRadius { get; set; } = 3f;
+	[Export] public float SprintNoiseRadius { get; set; } = 10f;
+
 	[ExportGroup("Look")]
 	[Export] public float MouseSensitivity { get; set; } = 0.002f;
 	[Export] public float MaxPitchDegrees { get; set; } = 85f;
@@ -34,18 +38,35 @@ public partial class Player : CharacterBody3D
 	[Export] public CollisionShape3D CrouchingCollision { get; set; }
 	[Export] public RayCast3D CeilingCheck { get; set; }
 	[Export] public Camcorder Camcorder { get; set; }
+	[Export] public DeathScreen DeathScreen { get; set; }
 
+	public bool IsCrouching { get; private set; }
 	public IInteractable HidingSpot { get; private set; }
 	public bool IsHiding => HidingSpot is not null;
 	public bool IsMovingToOrFromHidingSpot => _hidingTween is not null && _hidingTween.IsRunning();
 
-	private bool _isCrouching;
+	/// <summary>
+	/// How far away enemies can hear the player's footsteps.
+	/// </summary>
+	public float NoiseRadius
+	{
+		get
+		{
+			if (IsHiding || IsCrouching || HorizontalSpeed < 1f)
+				return 0f;
+
+			return HorizontalSpeed > WalkSpeed + 0.5f ? SprintNoiseRadius : WalkNoiseRadius;
+		}
+	}
+
 	private float _bobPhase;
 	private uint _collisionLayer;
 	private uint _collisionMask;
 	private Tween _hidingTween;
 
-	private float CurrentSpeed => _isCrouching ? CrouchSpeed
+	private float HorizontalSpeed => new Vector2(Velocity.X, Velocity.Z).Length();
+
+	private float CurrentSpeed => IsCrouching ? CrouchSpeed
 		: Input.IsActionPressed("sprint") ? SprintSpeed
 		: WalkSpeed;
 
@@ -94,6 +115,11 @@ public partial class Player : CharacterBody3D
 		};
 	}
 
+	public void Die()
+	{
+		DeathScreen.Play();
+	}
+
 	private Tween MoveSmoothlyTo(Transform3D target)
 	{
 		_hidingTween = CreateTween().SetTrans(Tween.TransitionType.Sine);
@@ -137,11 +163,11 @@ public partial class Player : CharacterBody3D
 	private void UpdateCrouch(float delta)
 	{
 		// Stay crouched while something is above the head, even if the key is released.
-		_isCrouching = Input.IsActionPressed("crouch") || (_isCrouching && CeilingCheck.IsColliding());
-		StandingCollision.Disabled = _isCrouching;
-		CrouchingCollision.Disabled = !_isCrouching;
+		IsCrouching = Input.IsActionPressed("crouch") || (IsCrouching && CeilingCheck.IsColliding());
+		StandingCollision.Disabled = IsCrouching;
+		CrouchingCollision.Disabled = !IsCrouching;
 
-		float targetHeight = _isCrouching ? CrouchingHeadHeight : StandingHeadHeight;
+		float targetHeight = IsCrouching ? CrouchingHeadHeight : StandingHeadHeight;
 		Vector3 headPosition = Head.Position;
 		headPosition.Y = Mathf.Lerp(headPosition.Y, targetHeight, CrouchTransitionSpeed * delta);
 		Head.Position = headPosition;
@@ -149,9 +175,8 @@ public partial class Player : CharacterBody3D
 
 	private void UpdateHeadBob(float delta)
 	{
-		float speed = new Vector2(Velocity.X, Velocity.Z).Length();
-		bool isWalking = IsOnFloor() && speed > 0.1f;
-		_bobPhase += speed * BobFrequency * delta;
+		bool isWalking = IsOnFloor() && HorizontalSpeed > 0.1f;
+		_bobPhase += HorizontalSpeed * BobFrequency * delta;
 
 		Vector3 targetOffset = isWalking
 			? new Vector3(Mathf.Cos(_bobPhase * 0.5f) * BobAmplitude * 0.5f, Mathf.Sin(_bobPhase) * BobAmplitude, 0f)
