@@ -70,39 +70,39 @@ size = Vector3(6, 3, 6.4)
 material = ExtResource("2_wall")
 
 [node name="DoorwayLeft1" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 1.1, -6.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 1.225, -6.7)
 operation = 2
-size = Vector3(0.4, 2.2, 1.1)
+size = Vector3(0.4, 2.45, 1.1)
 material = ExtResource("2_wall")
 
 [node name="DoorwayLeft2" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 1.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 1.225, 0)
 operation = 2
-size = Vector3(0.4, 2.2, 1.1)
+size = Vector3(0.4, 2.45, 1.1)
 material = ExtResource("2_wall")
 
 [node name="DoorwayLeft3" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 1.1, 6.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 1.225, 6.7)
 operation = 2
-size = Vector3(0.4, 2.2, 1.1)
+size = Vector3(0.4, 2.45, 1.1)
 material = ExtResource("2_wall")
 
 [node name="DoorwayRight1" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 1.1, -6.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 1.225, -6.7)
 operation = 2
-size = Vector3(0.4, 2.2, 1.1)
+size = Vector3(0.4, 2.45, 1.1)
 material = ExtResource("2_wall")
 
 [node name="DoorwayRight2" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 1.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 1.225, 0)
 operation = 2
-size = Vector3(0.4, 2.2, 1.1)
+size = Vector3(0.4, 2.45, 1.1)
 material = ExtResource("2_wall")
 
 [node name="DoorwayRight3" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 1.1, 6.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 1.225, 6.7)
 operation = 2
-size = Vector3(0.4, 2.2, 1.1)
+size = Vector3(0.4, 2.45, 1.1)
 material = ExtResource("2_wall")
 
 [node name="BedLeft1" type="CSGBox3D" parent="Navigation/Building"]
