@@ -1,9 +1,10 @@
 using Godot;
 
 /// <summary>
-/// The player's own arms, seen in first person only while a hand reaches for something, like a locker door.
+/// The player's own arms, seen in first person only while a hand reaches for something, like a door.
 /// The arms belong to a headless body around the camera. IK moves a hand from below the view to a grip point
-/// and keeps it there, so the hand follows the grip as it moves.
+/// and keeps it there, so the hand follows the grip as it moves. A hand always starts from where it is,
+/// so moving between grips never jumps.
 /// </summary>
 public partial class ViewHands : Node3D
 {
@@ -13,13 +14,16 @@ public partial class ViewHands : Node3D
 	{
 		public Node3D Target;
 		public Node3D Rest;
-		public Node3D Grip;
-		public float Weight;
+		/// <summary>Where the current move started, in this node's space so it moves along with the view.</summary>
+		public Vector3 From;
+		public Node3D To;
+		public float Progress = 1f;
+		public bool IsOut;
 		public Tween Tween;
 	}
 
 	[Export] public float ReachSeconds { get; set; } = 0.3f;
-	[Export] public float WithdrawSeconds { get; set; } = 0.25f;
+	[Export] public float WithdrawSeconds { get; set; } = 0.3f;
 	[Export] public string BaseAnimation { get; set; } = "ual1/Idle";
 	/// <summary>Animation whose first frame provides the curled, gripping finger pose.</summary>
 	[Export] public string GripAnimation { get; set; } = "ual1/Idle_Torch";
@@ -39,8 +43,8 @@ public partial class ViewHands : Node3D
 
 	public override void _Ready()
 	{
-		_left = new Hand { Target = LeftHandTarget, Rest = LeftRest };
-		_right = new Hand { Target = RightHandTarget, Rest = RightRest };
+		_left = new Hand { Target = LeftHandTarget, Rest = LeftRest, To = LeftRest };
+		_right = new Hand { Target = RightHandTarget, Rest = RightRest, To = RightRest };
 		AnimationPlayer.AddAnimationLibrary("ual1", ExtraAnimations);
 		AnimationPlayer.Play(BaseAnimation);
 		GripFingers.UsePose(AnimationPlayer.GetAnimation(GripAnimation));
@@ -51,21 +55,24 @@ public partial class ViewHands : Node3D
 	{
 		PlaceHand(_left);
 		PlaceHand(_right);
-		Visible = _left.Weight > 0f || _right.Weight > 0f;
+		Visible = _left.IsOut || _right.IsOut;
 	}
 
-	/// <summary>Raises a hand into view until it holds <paramref name="grip"/>, then keeps following it.</summary>
-	public SignalAwaiter Reach(Side side, Node3D grip)
+	/// <summary>Moves a hand into view until it holds <paramref name="grip"/>, then keeps following it.</summary>
+	public SignalAwaiter Reach(Side side, Node3D grip, float? seconds = null)
 	{
 		Hand hand = HandOn(side);
-		hand.Grip = grip;
-		return MoveHand(hand, 1f, ReachSeconds);
+		hand.IsOut = true;
+		return MoveHand(hand, grip, seconds ?? ReachSeconds);
 	}
 
 	/// <summary>Lowers a hand back out of view.</summary>
-	public SignalAwaiter Withdraw(Side side)
+	public SignalAwaiter Withdraw(Side side, float? seconds = null)
 	{
-		return MoveHand(HandOn(side), 0f, WithdrawSeconds);
+		Hand hand = HandOn(side);
+		SignalAwaiter finished = MoveHand(hand, hand.Rest, seconds ?? WithdrawSeconds);
+		hand.Tween.TweenCallback(Callable.From(() => { hand.IsOut = false; }));
+		return finished;
 	}
 
 	public void HideImmediately()
@@ -73,7 +80,9 @@ public partial class ViewHands : Node3D
 		foreach (Hand hand in new[] { _left, _right })
 		{
 			hand.Tween?.Kill();
-			hand.Weight = 0f;
+			hand.To = hand.Rest;
+			hand.Progress = 1f;
+			hand.IsOut = false;
 		}
 	}
 
@@ -84,15 +93,17 @@ public partial class ViewHands : Node3D
 
 	private void PlaceHand(Hand hand)
 	{
-		Vector3 grip = hand.Grip?.GlobalPosition ?? hand.Rest.GlobalPosition;
-		hand.Target.GlobalPosition = hand.Rest.GlobalPosition.Lerp(grip, hand.Weight);
+		hand.Target.Position = hand.From.Lerp(ToLocal(hand.To.GlobalPosition), hand.Progress);
 	}
 
-	private SignalAwaiter MoveHand(Hand hand, float weight, float seconds)
+	private SignalAwaiter MoveHand(Hand hand, Node3D destination, float seconds)
 	{
+		hand.From = hand.Target.Position;
+		hand.To = destination;
+		hand.Progress = 0f;
 		hand.Tween?.Kill();
 		hand.Tween = CreateTween().SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
-		hand.Tween.TweenMethod(Callable.From<float>(value => hand.Weight = value), hand.Weight, weight, seconds);
+		hand.Tween.TweenMethod(Callable.From<float>(value => hand.Progress = value), 0f, 1f, seconds);
 		return ToSignal(hand.Tween, Tween.SignalName.Finished);
 	}
 }

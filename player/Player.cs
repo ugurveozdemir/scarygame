@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 /// <summary>
@@ -64,6 +65,11 @@ public partial class Player : CharacterBody3D
 	public bool AreControlsLocked { get; private set; }
 
 	/// <summary>
+	/// Raised when an attacker grabs the player, so whatever was moving them can stop.
+	/// </summary>
+	public event Action Grabbed;
+
+	/// <summary>
 	/// A jolt of camera shake from 0 to 1 that fades out by itself, e.g. on impact.
 	/// </summary>
 	public float ShakeAmount { get; set; }
@@ -103,7 +109,7 @@ public partial class Player : CharacterBody3D
 	private float _bobPhase;
 	private uint _collisionLayer;
 	private uint _collisionMask;
-	private Tween _moveTween;
+	private Vector3 _previousPosition;
 	private Transform3D _hidingExitPoint;
 	private float _headHeight;
 	private Node3D _grabLookTarget;
@@ -122,6 +128,7 @@ public partial class Player : CharacterBody3D
 		_collisionLayer = CollisionLayer;
 		_collisionMask = CollisionMask;
 		_headHeight = StandingHeadHeight;
+		_previousPosition = GlobalPosition;
 		_chokeMaterial = (ShaderMaterial)ChokeOverlay.Material;
 		ChokeAmount = 0f;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
@@ -158,35 +165,29 @@ public partial class Player : CharacterBody3D
 		}
 
 		if (IsHiding || AreControlsLocked)
+		{
+			// Something else moves the player now; walking in a scripted move still bobs the head.
+			Velocity = (GlobalPosition - _previousPosition) / dt;
+			_previousPosition = GlobalPosition;
+			UpdateHeadBob(dt);
 			return;
+		}
 
 		UpdateCrouch();
 		Move(dt);
 		UpdateHeadBob(dt);
+		_previousPosition = GlobalPosition;
 	}
 
 	public void LockControls()
 	{
 		AreControlsLocked = true;
-		Velocity = Vector3.Zero;
 		StandUp();
 	}
 
 	public void UnlockControls()
 	{
 		AreControlsLocked = false;
-	}
-
-	/// <summary>
-	/// Smoothly walks the player to <paramref name="target"/> and tilts the view to <paramref name="headPitchDegrees"/>.
-	/// </summary>
-	public SignalAwaiter MoveTo(Transform3D target, float headPitchDegrees, float seconds)
-	{
-		_moveTween?.Kill();
-		_moveTween = CreateTween().SetParallel().SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
-		_moveTween.TweenProperty(this, "global_transform", target, seconds);
-		_moveTween.TweenProperty(Head, "rotation:x", Mathf.DegToRad(headPitchDegrees), seconds);
-		return ToSignal(_moveTween, Tween.SignalName.Finished);
 	}
 
 	/// <summary>
@@ -211,7 +212,7 @@ public partial class Player : CharacterBody3D
 	/// </summary>
 	public void GetGrabbed(Node3D lookTarget, Vector3 shove)
 	{
-		_moveTween?.Kill();
+		Grabbed?.Invoke();
 		Hands.HideImmediately();
 		AreControlsLocked = false;
 		StandUp();

@@ -66,9 +66,14 @@ A `TwoBoneIK3D` modifier moves the hands to grab points on the player (`Player/G
 `LookAtModifier3D` turns the head towards the player's face, so the move fits wherever the player stands.
 The IK needs its elbow pole markers (`LeftElbowPole`, `RightElbowPole`) to solve.
 
-The player's own hands (`player/view_hands.tscn`) only appear while reaching for something, such as a
-locker door. They belong to the same mannequin placed around the camera, with its head shrunk away by
+The player's own hands (`player/view_hands.tscn`) only appear while reaching for something: opening
+or closing a door or locker. They belong to the same mannequin placed around the camera, with its head shrunk away by
 `HideBonesModifier`; `GripFingersModifier` curls the fingers into a grip and IK places the hand on a grip point.
+
+Interactions never stop the player abruptly. Doors don't lock the controls at all: the hand pushes the
+door and the player keeps walking. Getting into a locker is one timeline of overlapping steps
+(`Locker.cs`); the walk up to it starts from the player's current velocity along a curve, so it blends
+in from however the player was moving.
 
 ## Level editing
 
