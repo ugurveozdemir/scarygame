@@ -56,7 +56,7 @@ Scenes and their scripts live together, grouped by feature.
 ## Status
 
 Prototype: a dark, textured test level to explore with the camcorder, doors to open and lockers to hide in,
-and an animated mannequin that patrols, hears footsteps, chases on sight and catches players it sees hiding.
+and a masked surgeon that patrols, hears footsteps, chases on sight and catches players it sees hiding.
 When it catches you it grabs you by the shoulders and strangles you.
 Next up: sound, an objective and an exit.
 
