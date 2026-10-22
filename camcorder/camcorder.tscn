@@ -20,6 +20,7 @@ light_energy = 3.0
 spot_range = 15.0
 spot_angle = 70.0
 spot_angle_attenuation = 2.0
+shadow_enabled = true
 
 [node name="AutoGainProbe" type="RayCast3D" parent="."]
 collision_mask = 5

@@ -37,6 +37,13 @@ when strafing, a slightly wider field of view while sprinting, and a small roll 
 view. Getting grabbed adds a shake impulse and the strangle adds a continuous shake. The view hands, the
 camcorder and the interaction ray are children of the camera, so they all move with these effects.
 
+## Rendering
+
+The game renders at native resolution with 4x MSAA, 8x anisotropic filtering and high-quality soft shadows,
+and textures are imported with mipmaps and high-quality VRAM compression. The asylum adds SSAO, screen-space
+reflections, volumetric fog and a few dim room lights so the PBR materials stay readable in the dark.
+The camcorder's infrared light casts shadows too, which keeps it from leaking through walls.
+
 ## Project structure
 
 Scenes and their scripts live together, grouped by feature.
