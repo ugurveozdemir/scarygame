@@ -2,7 +2,7 @@ using System;
 using Godot;
 
 /// <summary>
-/// First-person controller: mouse look, walking, sprinting, crouching, head bob, hiding and being grabbed.
+/// First-person controller: mouse look, walking, sprinting, crouching, hiding and being grabbed.
 /// </summary>
 public partial class Player : CharacterBody3D
 {
@@ -25,16 +25,9 @@ public partial class Player : CharacterBody3D
 	[Export] public float CrouchingHeadHeight { get; set; } = 0.9f;
 	[Export] public float CrouchTransitionSpeed { get; set; } = 8f;
 
-	[ExportGroup("Head Bob")]
-	[Export] public float BobFrequency { get; set; } = 4.5f;
-	[Export] public float BobAmplitude { get; set; } = 0.04f;
-
 	[ExportGroup("Being Grabbed")]
 	[Export] public float GrabbedTurnSpeed { get; set; } = 8f;
 	[Export] public float StaggerDeceleration { get; set; } = 6f;
-	[Export] public float ShakeStrength { get; set; } = 0.03f;
-	[Export] public float ShakeDecay { get; set; } = 2f;
-	[Export] public float ChokeShake { get; set; } = 0.5f;
 	[Export] public float ChokePitchDegrees { get; set; } = 5f;
 	/// <summary>Parent of the points an attacker grabs; it sways along with the head.</summary>
 	[Export] public Node3D GrabPoints { get; set; }
@@ -46,7 +39,7 @@ public partial class Player : CharacterBody3D
 
 	[ExportGroup("Nodes")]
 	[Export] public Node3D Head { get; set; }
-	[Export] public Camera3D Camera { get; set; }
+	[Export] public PlayerCamera CameraRig { get; set; }
 	[Export] public CollisionShape3D StandingCollision { get; set; }
 	[Export] public CollisionShape3D CrouchingCollision { get; set; }
 	[Export] public RayCast3D CeilingCheck { get; set; }
@@ -68,11 +61,6 @@ public partial class Player : CharacterBody3D
 	/// Raised when an attacker grabs the player, so whatever was moving them can stop.
 	/// </summary>
 	public event Action Grabbed;
-
-	/// <summary>
-	/// A jolt of camera shake from 0 to 1 that fades out by itself, e.g. on impact.
-	/// </summary>
-	public float ShakeAmount { get; set; }
 
 	/// <summary>
 	/// How far an attacker has pushed or pulled the player's upper body, in the player's own space.
@@ -106,7 +94,6 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	private float _bobPhase;
 	private uint _collisionLayer;
 	private uint _collisionMask;
 	private Vector3 _previousPosition;
@@ -117,7 +104,7 @@ public partial class Player : CharacterBody3D
 	private float _chokeAmount;
 	private ShaderMaterial _chokeMaterial;
 
-	private float HorizontalSpeed => new Vector2(Velocity.X, Velocity.Z).Length();
+	public float HorizontalSpeed => new Vector2(Velocity.X, Velocity.Z).Length();
 
 	private float CurrentSpeed => IsCrouching ? CrouchSpeed
 		: Input.IsActionPressed("sprint") ? SprintSpeed
@@ -153,6 +140,7 @@ public partial class Player : CharacterBody3D
 		UpdateHeadPosition(dt);
 		if (IsGrabbed)
 			UpdateGrabbedView(dt);
+		CameraRig.UpdateCamera(dt);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -166,16 +154,14 @@ public partial class Player : CharacterBody3D
 
 		if (IsHiding || AreControlsLocked)
 		{
-			// Something else moves the player now; walking in a scripted move still bobs the head.
+			// Something else moves the player now; the camera still follows the scripted move.
 			Velocity = (GlobalPosition - _previousPosition) / dt;
 			_previousPosition = GlobalPosition;
-			UpdateHeadBob(dt);
 			return;
 		}
 
 		UpdateCrouch();
 		Move(dt);
-		UpdateHeadBob(dt);
 		_previousPosition = GlobalPosition;
 	}
 
@@ -225,7 +211,7 @@ public partial class Player : CharacterBody3D
 
 		_grabLookTarget = lookTarget;
 		_staggerVelocity = shove;
-		ShakeAmount = 1f;
+		CameraRig.AddShake(1f);
 	}
 
 	public void Die()
@@ -249,16 +235,6 @@ public partial class Player : CharacterBody3D
 			+ Mathf.DegToRad(ChokePitchDegrees) * ChokeAmount;
 		Rotation = new Vector3(0f, Mathf.LerpAngle(Rotation.Y, targetYaw, GrabbedTurnSpeed * delta), 0f);
 		Head.Rotation = new Vector3(Mathf.LerpAngle(Head.Rotation.X, targetPitch, GrabbedTurnSpeed * delta), 0f, 0f);
-
-		ShakeAmount = Mathf.MoveToward(ShakeAmount, 0f, ShakeDecay * delta);
-		float shake = (ShakeAmount + ChokeAmount * ChokeShake) * ShakeStrength;
-		Camera.Position = RandomDirection() * shake;
-		Camera.Rotation = RandomDirection() * shake;
-	}
-
-	private static Vector3 RandomDirection()
-	{
-		return new Vector3(GD.Randf() - 0.5f, GD.Randf() - 0.5f, GD.Randf() - 0.5f) * 2f;
 	}
 
 	private void SetCollisionEnabled(bool enabled)
@@ -320,16 +296,5 @@ public partial class Player : CharacterBody3D
 		_headHeight = Mathf.Lerp(_headHeight, targetHeight, CrouchTransitionSpeed * delta);
 		Head.Position = new Vector3(0f, _headHeight, 0f) + BodySway;
 		GrabPoints.Position = BodySway;
-	}
-
-	private void UpdateHeadBob(float delta)
-	{
-		bool isWalking = IsOnFloor() && HorizontalSpeed > 0.1f;
-		_bobPhase += HorizontalSpeed * BobFrequency * delta;
-
-		Vector3 targetOffset = isWalking
-			? new Vector3(Mathf.Cos(_bobPhase * 0.5f) * BobAmplitude * 0.5f, Mathf.Sin(_bobPhase) * BobAmplitude, 0f)
-			: Vector3.Zero;
-		Camera.Position = Camera.Position.Lerp(targetOffset, 10f * delta);
 	}
 }

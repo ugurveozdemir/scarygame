@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://player/Player.cs" id="1_player"]
 [ext_resource type="PackedScene" path="res://camcorder/camcorder.tscn" id="2_camcorder"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://player/DeathScreen.cs" id="4_death_screen"]
 [ext_resource type="Shader" path="res://player/choke_overlay.gdshader" id="5_choke_shader"]
 [ext_resource type="PackedScene" path="res://player/view_hands.tscn" id="6_view_hands"]
+[ext_resource type="Script" path="res://player/PlayerCamera.cs" id="7_camera"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_choke"]
 resource_local_to_scene = true
@@ -19,15 +20,15 @@ height = 1.8
 radius = 0.35
 height = 1.0
 
-[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "Camera", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "GrabPoints", "LeftShoulder", "RightShoulder", "ThroatLeft", "ThroatRight", "ChokeOverlay", "Hands")]
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "CameraRig", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "GrabPoints", "LeftShoulder", "RightShoulder", "ThroatLeft", "ThroatRight", "ChokeOverlay", "Hands")]
 collision_layer = 2
 script = ExtResource("1_player")
 Head = NodePath("Head")
-Camera = NodePath("Head/Camera3D")
+CameraRig = NodePath("Head/CameraRig")
 StandingCollision = NodePath("StandingCollision")
 CrouchingCollision = NodePath("CrouchingCollision")
 CeilingCheck = NodePath("CeilingCheck")
-Camcorder = NodePath("Head/Camera3D/Camcorder")
+Camcorder = NodePath("Head/CameraRig/Camera3D/Camcorder")
 DeathScreen = NodePath("Hud/DeathScreen")
 GrabPoints = NodePath("GrabPoints")
 LeftShoulder = NodePath("GrabPoints/LeftShoulder")
@@ -35,7 +36,7 @@ RightShoulder = NodePath("GrabPoints/RightShoulder")
 ThroatLeft = NodePath("GrabPoints/ThroatLeft")
 ThroatRight = NodePath("GrabPoints/ThroatRight")
 ChokeOverlay = NodePath("Hud/ChokeOverlay")
-Hands = NodePath("Head/Camera3D/ViewHands")
+Hands = NodePath("Head/CameraRig/Camera3D/ViewHands")
 
 [node name="StandingCollision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
@@ -53,20 +54,25 @@ target_position = Vector3(0, 0.9, 0)
 [node name="Head" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
-[node name="Camera3D" type="Camera3D" parent="Head"]
+[node name="CameraRig" type="Node3D" parent="Head" node_paths=PackedStringArray("Player", "Camera")]
+script = ExtResource("7_camera")
+Player = NodePath("../..")
+Camera = NodePath("Camera3D")
+
+[node name="Camera3D" type="Camera3D" parent="Head/CameraRig"]
 current = true
 fov = 75.0
 
-[node name="Camcorder" parent="Head/Camera3D" instance=ExtResource("2_camcorder")]
+[node name="Camcorder" parent="Head/CameraRig/Camera3D" instance=ExtResource("2_camcorder")]
 
-[node name="ViewHands" parent="Head/Camera3D" instance=ExtResource("6_view_hands")]
+[node name="ViewHands" parent="Head/CameraRig/Camera3D" instance=ExtResource("6_view_hands")]
 
-[node name="Interactor" type="RayCast3D" parent="Head/Camera3D" node_paths=PackedStringArray("Player", "PromptLabel")]
+[node name="Interactor" type="RayCast3D" parent="Head/CameraRig/Camera3D" node_paths=PackedStringArray("Player", "PromptLabel")]
 target_position = Vector3(0, 0, -1.6)
 collision_mask = 9
 script = ExtResource("3_interactor")
-Player = NodePath("../../..")
-PromptLabel = NodePath("../../../Hud/PromptLabel")
+Player = NodePath("../../../..")
+PromptLabel = NodePath("../../../../Hud/PromptLabel")
 
 [node name="GrabPoints" type="Node3D" parent="."]
 

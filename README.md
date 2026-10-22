@@ -29,13 +29,21 @@ godot --path .
 | Replace battery | R |
 | Release mouse | Esc |
 
+## Camera
+
+The first-person view sits on a small camera rig (`player/PlayerCamera.cs`) between the head and the camera.
+It adds the procedural movement that makes the view feel handheld: a step bob that scales with speed, a lean
+when strafing, a slightly wider field of view while sprinting, and a small roll and yaw lag when turning the
+view. Getting grabbed adds a shake impulse and the strangle adds a continuous shake. The view hands, the
+camcorder and the interaction ray are children of the camera, so they all move with these effects.
+
 ## Project structure
 
 Scenes and their scripts live together, grouped by feature.
 
 | Folder | Contents |
 |---|---|
-| `player/` | First-person controller (movement, crouch, hiding, being grabbed) and first-person hands |
+| `player/` | First-person controller (movement, crouch, hiding, being grabbed), procedural camera effects and first-person hands |
 | `camcorder/` | Camcorder logic, recording HUD and the screen-effect shader |
 | `interaction/` | `IInteractable` interface and the look-at interactor |
 | `enemy/` | Stalker AI (patrol, hearing, sight, chase, search) and its strangle attack |
