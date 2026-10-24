@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/polyhaven/metal_trash_can/metal_trash_can.gltf" id="1_model"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
+height = 1.0
+radius = 0.3
+
+[node name="TrashCan" type="StaticBody3D"]
+
+[node name="Model" parent="." instance=ExtResource("1_model")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0)
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("CylinderShape3D_body")
+
+[node name="metal_trash_can" parent="Model"]
+visible = false
+
+[node name="metal_trash_can_lid" parent="Model"]
+visible = false
+
+[node name="metal_trash_can_handle_left" parent="Model"]
+visible = false
+
+[node name="metal_trash_can_handle_right" parent="Model"]
+visible = false
+
+[editable path="Model"]

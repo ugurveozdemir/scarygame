@@ -54,10 +54,10 @@ Scenes and their scripts live together, grouped by feature.
 | `camcorder/` | Camcorder logic, recording HUD and the screen-effect shader |
 | `interaction/` | `IInteractable` interface and the look-at interactor |
 | `enemy/` | Stalker AI (patrol, hearing, sight, chase, search) and its strangle attack |
-| `props/` | Interactable objects (doors, lockers, batteries) and furniture (beds, tables, chairs, a TV) |
+| `props/` | Interactable objects (doors, lockers, batteries), furniture (beds, tables, chairs, a TV) and the grounds' props (trees, fountain, lamps, cars, fence) |
 | `levels/` | Levels and their shared environment |
 | `lighting/` | Light behaviours such as flickering |
-| `materials/` | PBR materials and the asylum interior shader |
+| `materials/` | PBR materials, the asylum interior shader and the exterior materials (brick, concrete, asphalt, paving, lawn, fountain water) |
 | `assets/` | Third-party models, animations and textures, see [CREDITS.md](CREDITS.md) |
 
 ## Status
@@ -65,7 +65,11 @@ Scenes and their scripts live together, grouped by feature.
 Prototype: a dark, textured asylum to explore with the camcorder. A 28 m corridor with six 9 x 9 m rooms leads
 north into a second wing: a day room with tables, a TV and a nurse station, a ward with four beds, a shower room
 and a balcony outside the day room's barred windows. Two crawl-only ventilation ducts link the first side rooms
-to the ward and the showers; crouch to get through them, the enemy can't follow. There are doors to open,
+to the ward and the showers; crouch to get through them, the enemy can't follow.
+Behind the spawn point a door opens onto stairs down to the asylum grounds at night: a lawn with trees, a fountain
+on a paved plaza, benches and street lamps, a parking lot of cars under tarps, and a road out to a locked iron
+gate in the chain-link fence around it all. The building stands on a 3 m concrete base, so the balcony overlooks
+the grounds. There are doors to open,
 lockers to hide in and spare batteries lying around,
 and a masked surgeon that patrols, hears footsteps, chases on sight and catches players it sees hiding.
 When it catches you it grabs you by the shoulders and strangles you.
@@ -109,10 +113,25 @@ door and the player keeps walking. Getting into a locker is one timeline of over
 (`Locker.cs`); the walk up to it starts from the player's current velocity along a curve, so it blends
 in from however the player was moving.
 
+## Grounds
+
+The outdoor models are photoscanned Poly Haven assets and the ground textures come from ambientCG (see
+[CREDITS.md](CREDITS.md)). The scanned trees have millions of triangles, so their game versions in
+`assets/polyhaven/` were reduced in Blender: a share of the leaves is kept and scaled up to keep the canopy full,
+and leaves, branches and trunk are decimated to about 55k triangles per tree, with alpha-clipped leaves.
+`Tree.cs` fades trees out in the fog and the ones beyond the fence cast no shadows.
+
+The lawn shader (`materials/exterior/lawn.gdshader`) blends two scales of the grass texture with noise and adds
+dry patches, so the texture doesn't visibly repeat. `Fence.cs` builds the chain-link fence along its corner
+points with multimeshes and solid walls. The stairs have an invisible ramp over them so walking up and down is
+smooth. The night sky is the `kloppenheim_02` HDRI and a directional moon light; the street lamps cast no
+shadows, which keeps the grounds above 30 FPS.
+
 ## Level editing
 
 The enemy walks on the level's navigation mesh. After changing walls or lockers, select the
 `Navigation` node in the level and press **Bake NavigationMesh** in the editor toolbar.
 Doors are deliberately kept outside the `Navigation` node so the enemy can path through them.
-Furniture and lockers go inside it, so the enemy walks around them. The vents are lower than the enemy's
+Furniture, lockers, trees and the grounds' props go inside it, so the enemy walks around them, and the bake
+covers the grounds too, down the stairs. The vents are lower than the enemy's
 navigation agent, so the bake leaves them out and they stay a safe route for the player.

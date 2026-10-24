@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://props/outdoor/Tree.cs" id="2_tree"]
+[ext_resource type="PackedScene" path="res://assets/polyhaven/tree_small_02/tree_small_02.gltf" id="1_model"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
+height = 2.0
+radius = 0.12
+
+[node name="SmallTree" type="StaticBody3D"]
+script = ExtResource("2_tree")
+
+[node name="Model" parent="." instance=ExtResource("1_model")]
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_body")
