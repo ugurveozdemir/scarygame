@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Godot;
 
@@ -55,6 +56,8 @@ public partial class Enemy : CharacterBody3D
 
 	public EnemyState State { get; private set; } = EnemyState.Patrol;
 
+	public event Action<EnemyState> StateChanged;
+
 	private Node3D[] _patrolPoints;
 	private int _patrolIndex;
 	private float _waitTimeLeft;
@@ -104,7 +107,7 @@ public partial class Enemy : CharacterBody3D
 		{
 			_secondsSincePlayerSeen = 0f;
 			_lastKnownPlayerPosition = Player.GlobalPosition;
-			State = EnemyState.Chase;
+			ChangeState(EnemyState.Chase);
 			return;
 		}
 
@@ -137,7 +140,7 @@ public partial class Enemy : CharacterBody3D
 
 	private void StartInvestigating(Vector3 position)
 	{
-		State = EnemyState.Investigate;
+		ChangeState(EnemyState.Investigate);
 		SetDestination(position);
 		_waitTimeLeft = LookAroundSeconds;
 	}
@@ -155,7 +158,7 @@ public partial class Enemy : CharacterBody3D
 		RotateY(LookAroundTurnSpeed * delta);
 		_waitTimeLeft -= delta;
 		if (_waitTimeLeft <= 0f)
-			State = EnemyState.Patrol;
+			ChangeState(EnemyState.Patrol);
 	}
 
 	private void Chase(float delta)
@@ -173,9 +176,18 @@ public partial class Enemy : CharacterBody3D
 
 	private void StartStrangling()
 	{
-		State = EnemyState.Strangling;
+		ChangeState(EnemyState.Strangling);
 		StopMoving();
 		StrangleAttack.Begin(Player);
+	}
+
+	private void ChangeState(EnemyState state)
+	{
+		if (state == State)
+			return;
+
+		State = state;
+		StateChanged?.Invoke(state);
 	}
 
 	private void UpdateAnimation()
@@ -217,7 +229,7 @@ public partial class Enemy : CharacterBody3D
 	private void OpenDoorsInTheWay()
 	{
 		if (DoorCheck.GetCollider() is Door { IsOpen: false } door)
-			door.Open(this);
+			door.Open(this, burst: State == EnemyState.Chase);
 	}
 
 	private void MoveTowards(Vector3 destination, float speed, float delta)

@@ -1,0 +1,26 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://audio/Footsteps.cs" id="1_footsteps"]
+[ext_resource type="AudioStream" path="res://assets/sounds/footsteps/tile.tres" id="2_tile"]
+[ext_resource type="AudioStream" path="res://assets/sounds/footsteps/duct.tres" id="3_duct"]
+[ext_resource type="AudioStream" path="res://assets/sounds/footsteps/concrete.tres" id="4_concrete"]
+[ext_resource type="AudioStream" path="res://assets/sounds/footsteps/stairs.tres" id="5_stairs"]
+[ext_resource type="AudioStream" path="res://assets/sounds/footsteps/grass.tres" id="6_grass"]
+[ext_resource type="AudioStream" path="res://assets/sounds/footsteps/paving.tres" id="7_paving"]
+[ext_resource type="AudioStream" path="res://assets/sounds/footsteps/asphalt.tres" id="8_asphalt"]
+
+[node name="Footsteps" type="AudioStreamPlayer3D"]
+unit_size = 3.0
+max_distance = 30.0
+max_polyphony = 3
+bus = &"Sfx"
+script = ExtResource("1_footsteps")
+Surfaces = Dictionary[StringName, AudioStream]({
+&"asphalt": ExtResource("8_asphalt"),
+&"concrete": ExtResource("4_concrete"),
+&"duct": ExtResource("3_duct"),
+&"grass": ExtResource("6_grass"),
+&"paving": ExtResource("7_paving"),
+&"stairs": ExtResource("5_stairs"),
+&"tile": ExtResource("2_tile")
+})

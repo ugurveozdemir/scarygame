@@ -41,3 +41,43 @@ The Quaternius packs were downloaded from OpenGameArt, the ambientCG textures at
 models as 1K glTF. The two trees were reduced in Blender, and the fence's wire texture got its alpha map baked in.
 The Rocketbox textures were scaled down to 1K, and their specular maps inverted into roughness maps.
 Colours and tints are applied in materials (`materials/`, `enemy/enemy.tscn`).
+
+## Sounds
+
+The sounds in `assets/sounds` are cut, cleaned up and mixed from these recordings.
+
+| Sound | Author | License | Used for |
+|---|---|---|---|
+| [Fast Steps on Concrete](https://bigsoundbank.com/s1318.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Concrete, tile and asphalt footsteps |
+| [Step, Shoe on Stone Staircase](https://bigsoundbank.com/s0606.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Stair and paving footsteps |
+| [Steps in the Grass, Slow](https://bigsoundbank.com/s1253.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Grass footsteps |
+| [Steps in the Grass, Quick](https://bigsoundbank.com/s1254.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Grass footsteps |
+| [Light Door](https://bigsoundbank.com/s0224.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Door latches |
+| [Creaking Door #2](https://bigsoundbank.com/s3205.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Door hinges |
+| [Creaking Door #3](https://bigsoundbank.com/s3206.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Door hinges |
+| [Door Slamming #1](https://bigsoundbank.com/s0103.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | A door burst open |
+| [Metal Filing Cabinet](https://bigsoundbank.com/s0773.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Locker door shutting |
+| [Creaking Metallic Door](https://bigsoundbank.com/s0616.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Locker hinges and the locker torn open |
+| [Video Tape](https://bigsoundbank.com/s0199.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The camcorder's tape transport |
+| [Man Breathing](https://bigsoundbank.com/s2195.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The enemy's slow breathing |
+| [Breathless Man](https://bigsoundbank.com/s1103.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The enemy's breathing while it hunts |
+| [Zombie #1](https://bigsoundbank.com/s2106.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The enemy's roars |
+| [Strangled Man #1](https://bigsoundbank.com/s1639.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Choking |
+| [Strangled Man #2](https://bigsoundbank.com/s1640.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Choking and gasps while being shaken |
+| [Synthetic Coat Rubbed](https://bigsoundbank.com/s1104.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Clothes jostled while being shaken |
+| [Heart Beat](https://bigsoundbank.com/s0218.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The last heartbeats |
+| [Campaign at Night #4](https://bigsoundbank.com/s1880.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Night ambience |
+| [Fountain of a Japanese Temple](https://bigsoundbank.com/s0913.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The fountain |
+| [Flashing Light Bulb #1](https://bigsoundbank.com/s2143.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Flickering lamps |
+| [Flashing Light Bulb #4](https://bigsoundbank.com/s2146.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Flickering lamps |
+| [Neon or Transformer #1](https://bigsoundbank.com/s2118.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Flickering lamps' buzz |
+| [Ventilation #5](https://bigsoundbank.com/s3598.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The building's hum |
+| [Impact Sounds](https://kenney.nl/assets/impact-sounds) | [Kenney](https://kenney.nl) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Vent crawling, the grab and the locker torn open |
+| [RPG Audio](https://kenney.nl/assets/rpg-audio) | [Kenney](https://kenney.nl) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Clothes, locker latches and battery handling |
+| [UI Audio](https://kenney.nl/assets/ui-audio) | [Kenney](https://kenney.nl) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Camcorder switches |
+| [Horror Hit Soundpack 1](https://opengameart.org/content/horror-hit-soundpack-1) | psychhead_ | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The sting when the enemy spots you |
+| [The typical horror strings](https://ende.app/song/17-the-typical-horror-strings) | Sascha Ende, [ende.app](https://ende.app) | [CC BY 4.0](https://ende.app/standard-license) | Chase music |
+
+The chase music is "The typical horror strings" by Sascha Ende (ende.app), licensed under CC BY 4.0.
+The camcorder's beeps and night vision whine, the death screen's static and the ringing in the ears are
+synthesized for this project.

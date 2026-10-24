@@ -15,6 +15,10 @@ public partial class Camcorder : Node3D
 	[Export] public float BatteryLifeSeconds { get; set; } = 120f;
 	[Export] public int MaxSpareBatteries { get; set; } = 10;
 
+	/// <summary>Below this charge the camcorder beeps every <see cref="LowBatteryBeepSeconds"/>.</summary>
+	[Export(PropertyHint.Range, "0,1")] public float LowCharge { get; set; } = 0.25f;
+	[Export] public float LowBatteryBeepSeconds { get; set; } = 8f;
+
 	[ExportGroup("Auto Gain")]
 	/// <summary>Closer than this, the infrared light is turned down so nearby things don't burn out.</summary>
 	[Export] public float AutoGainDistance { get; set; } = 2f;
@@ -26,6 +30,17 @@ public partial class Camcorder : Node3D
 	[Export] public RayCast3D AutoGainProbe { get; set; }
 	[Export] public ColorRect ScreenEffect { get; set; }
 
+	[ExportGroup("Sounds")]
+	[Export] public AudioStreamPlayer RaiseSound { get; set; }
+	[Export] public AudioStreamPlayer LowerSound { get; set; }
+	[Export] public AudioStreamPlayer NightVisionOnSound { get; set; }
+	[Export] public AudioStreamPlayer NightVisionOffSound { get; set; }
+	[Export] public AudioStreamPlayer LowBatterySound { get; set; }
+	/// <summary>The night vision dying when the battery runs out.</summary>
+	[Export] public AudioStreamPlayer BatteryDeadSound { get; set; }
+	[Export] public AudioStreamPlayer ReloadSound { get; set; }
+	[Export] public AudioStreamPlayer PickUpBatterySound { get; set; }
+
 	public bool IsRaised { get; private set; }
 	public bool IsNightVisionOn { get; private set; }
 	public float Charge { get; private set; } = 1f;
@@ -34,6 +49,7 @@ public partial class Camcorder : Node3D
 	private ShaderMaterial _screenMaterial;
 	private float _infraredEnergy;
 	private float _gain = 1f;
+	private float _lowBatteryBeepTimeLeft;
 
 	public override void _Ready()
 	{
@@ -60,8 +76,13 @@ public partial class Camcorder : Node3D
 
 		Charge = Mathf.Max(Charge - (float)delta / BatteryLifeSeconds, 0f);
 		if (Charge == 0f)
-			SetNightVision(false);
+		{
+			BatteryDeadSound.Play();
+			SetNightVision(false, playSound: false);
+			return;
+		}
 
+		WarnOfLowBattery((float)delta);
 		UpdateAutoGain((float)delta);
 	}
 
@@ -71,6 +92,7 @@ public partial class Camcorder : Node3D
 			return false;
 
 		SpareBatteries++;
+		PickUpBatterySound.Play();
 		return true;
 	}
 
@@ -79,13 +101,17 @@ public partial class Camcorder : Node3D
 		IsRaised = raised;
 		if (!IsRaised)
 			IsNightVisionOn = false;
+		(IsRaised ? RaiseSound : LowerSound).Play();
 		UpdateEffects();
 	}
 
-	private void SetNightVision(bool enabled)
+	private void SetNightVision(bool enabled, bool playSound = true)
 	{
 		// Night vision only works through the raised camcorder and needs charge.
+		bool wasOn = IsNightVisionOn;
 		IsNightVisionOn = enabled && IsRaised && Charge > 0f;
+		if (playSound && IsNightVisionOn != wasOn)
+			(IsNightVisionOn ? NightVisionOnSound : NightVisionOffSound).Play();
 		UpdateEffects();
 	}
 
@@ -96,6 +122,22 @@ public partial class Camcorder : Node3D
 
 		SpareBatteries--;
 		Charge = 1f;
+		_lowBatteryBeepTimeLeft = 0f;
+		ReloadSound.Play();
+	}
+
+	private void WarnOfLowBattery(float delta)
+	{
+		if (Charge > LowCharge)
+			return;
+
+		// The first beep comes as soon as the charge gets low.
+		_lowBatteryBeepTimeLeft -= delta;
+		if (_lowBatteryBeepTimeLeft <= 0f)
+		{
+			LowBatterySound.Play();
+			_lowBatteryBeepTimeLeft = LowBatteryBeepSeconds;
+		}
 	}
 
 	private void UpdateAutoGain(float delta)

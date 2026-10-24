@@ -1,18 +1,34 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://camcorder/Camcorder.cs" id="1_camcorder"]
 [ext_resource type="Script" path="res://camcorder/CamcorderHud.cs" id="2_hud"]
 [ext_resource type="Shader" path="res://camcorder/screen_effect.gdshader" id="3_shader"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/raise.wav" id="4_raise"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/lower.wav" id="5_lower"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/night_vision_on.wav" id="6_night_vision_on"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/night_vision_off.wav" id="7_night_vision_off"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/low_battery.wav" id="8_low_battery"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/battery_dead.wav" id="9_battery_dead"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/reload.wav" id="10_reload"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/pick_up_battery.wav" id="11_pick_up_battery"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_screen"]
 resource_local_to_scene = true
 shader = ExtResource("3_shader")
 
-[node name="Camcorder" type="Node3D" node_paths=PackedStringArray("InfraredLight", "AutoGainProbe", "ScreenEffect")]
+[node name="Camcorder" type="Node3D" node_paths=PackedStringArray("InfraredLight", "AutoGainProbe", "ScreenEffect", "RaiseSound", "LowerSound", "NightVisionOnSound", "NightVisionOffSound", "LowBatterySound", "BatteryDeadSound", "ReloadSound", "PickUpBatterySound")]
 script = ExtResource("1_camcorder")
 InfraredLight = NodePath("InfraredLight")
 AutoGainProbe = NodePath("AutoGainProbe")
 ScreenEffect = NodePath("ScreenEffectLayer/ScreenEffect")
+RaiseSound = NodePath("Sounds/RaiseSound")
+LowerSound = NodePath("Sounds/LowerSound")
+NightVisionOnSound = NodePath("Sounds/NightVisionOnSound")
+NightVisionOffSound = NodePath("Sounds/NightVisionOffSound")
+LowBatterySound = NodePath("Sounds/LowBatterySound")
+BatteryDeadSound = NodePath("Sounds/BatteryDeadSound")
+ReloadSound = NodePath("Sounds/ReloadSound")
+PickUpBatterySound = NodePath("Sounds/PickUpBatterySound")
 
 [node name="InfraredLight" type="SpotLight3D" parent="."]
 visible = false
@@ -50,3 +66,37 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("2_hud")
 Camcorder = NodePath("../..")
+
+[node name="Sounds" type="Node" parent="."]
+
+[node name="RaiseSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("4_raise")
+bus = &"Sfx"
+
+[node name="LowerSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("5_lower")
+bus = &"Sfx"
+
+[node name="NightVisionOnSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("6_night_vision_on")
+bus = &"Sfx"
+
+[node name="NightVisionOffSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("7_night_vision_off")
+bus = &"Sfx"
+
+[node name="LowBatterySound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("8_low_battery")
+bus = &"Sfx"
+
+[node name="BatteryDeadSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("9_battery_dead")
+bus = &"Sfx"
+
+[node name="ReloadSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("10_reload")
+bus = &"Sfx"
+
+[node name="PickUpBatterySound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("11_pick_up_battery")
+bus = &"Sfx"

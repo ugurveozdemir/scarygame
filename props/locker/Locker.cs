@@ -5,7 +5,7 @@ using Godot;
 /// A locker the player can hide in, looking out through the slits in its door.
 /// Getting in and out is one continuous motion with overlapping steps: the player walks up while reaching
 /// for the handle, pulls the door open while stepping out of its way, steps in turning around and pulls
-/// the door shut behind them.
+/// the door shut behind them. An enemy who drags the player out tears the door open.
 /// </summary>
 public partial class Locker : StaticBody3D, IInteractable
 {
@@ -27,6 +27,7 @@ public partial class Locker : StaticBody3D, IInteractable
 	[Export] public float SwingOpenSeconds { get; set; } = 0.5f;
 	[Export] public float CloseSeconds { get; set; } = 0.55f;
 	[Export] public float PushOpenSeconds { get; set; } = 0.5f;
+	[Export] public float TearOpenSeconds { get; set; } = 0.15f;
 
 	/// <summary>How tightly the fingers close around the handle and the door's edge, from 0 for an open hand to 1 for a fist.</summary>
 	[Export(PropertyHint.Range, "0,1")] public float HandleCurl { get; set; } = 0.7f;
@@ -37,6 +38,14 @@ public partial class Locker : StaticBody3D, IInteractable
 	[Export] public float MinApproachSeconds { get; set; } = 0.3f;
 	[Export] public float StepInSeconds { get; set; } = 0.75f;
 	[Export] public float StepOutSeconds { get; set; } = 0.65f;
+
+	[ExportGroup("Sounds")]
+	[Export] public AudioStreamPlayer3D LatchSound { get; set; }
+	[Export] public AudioStreamPlayer3D CreakSound { get; set; }
+	/// <summary>The door clicking shut, pulled closed gently from inside.</summary>
+	[Export] public AudioStreamPlayer3D ShutSound { get; set; }
+	/// <summary>The door torn open and slamming into the locker next to it.</summary>
+	[Export] public AudioStreamPlayer3D TearOpenSound { get; set; }
 
 	[ExportGroup("Nodes")]
 	[Export] public Node3D Door { get; set; }
@@ -74,6 +83,7 @@ public partial class Locker : StaticBody3D, IInteractable
 	private void TakeIn(Player player)
 	{
 		BeginSequence(player);
+		player.Grabbed += OnGrabbed;
 		float time = 0f;
 		if (_doorOpenness == 0f)
 		{
@@ -87,6 +97,11 @@ public partial class Locker : StaticBody3D, IInteractable
 
 			// Pull the door while stepping out of its way, then let it swing open by itself.
 			Walk(PullPoint, ApproachPitchDegrees, time, PullSeconds);
+			At(time, () =>
+			{
+				LatchSound.Play();
+				CreakSound.Play();
+			});
 			SwingDoor(DoorPullAmount, time, PullSeconds);
 			time += PullSeconds;
 			At(time, () => player.Hands.Withdraw(ViewHands.Side.Right));
@@ -106,8 +121,10 @@ public partial class Locker : StaticBody3D, IInteractable
 			_occupant = player;
 			player.StartHiding(this, ExitPoint.GlobalTransform);
 		});
+		At(time, () => CreakSound.Play());
 		SwingDoor(0f, time, CloseSeconds);
 		time += CloseSeconds;
+		At(time, () => ShutSound.Play());
 		At(time, () => player.Hands.Withdraw(ViewHands.Side.Right));
 		At(time, FinishSequence);
 	}
@@ -123,34 +140,48 @@ public partial class Locker : StaticBody3D, IInteractable
 		});
 
 		// Push the door open and step out right behind it.
+		At(reach, () =>
+		{
+			LatchSound.Play();
+			CreakSound.Play();
+		});
 		SwingDoor(1f, reach, PushOpenSeconds);
 		At(reach + PushOpenSeconds * 0.4f, () => player.Hands.Withdraw(ViewHands.Side.Right));
 		float stepOut = reach + PushOpenSeconds * 0.3f;
 		At(stepOut, player.StopHiding);
 		Walk(ExitPoint, ExitPitchDegrees, stepOut, StepOutSeconds);
 		At(stepOut + StepOutSeconds, FinishSequence);
+		At(stepOut + StepOutSeconds, () => player.Grabbed -= OnGrabbed);
 	}
 
 	private void BeginSequence(Player player)
 	{
 		_player = player;
 		player.LockControls();
-		player.Grabbed += AbortSequence;
 		// A parallel tween is a timeline: every step starts after its own delay, so steps can overlap.
 		_sequence = CreateTween().SetParallel().SetProcessMode(Tween.TweenProcessMode.Physics);
 	}
 
 	private void FinishSequence()
 	{
-		_player.Grabbed -= AbortSequence;
 		_player.UnlockControls();
 	}
 
-	private void AbortSequence()
+	/// <summary>
+	/// The enemy grabbed the player between getting in and getting out, and takes over from here.
+	/// A player still inside is dragged out, so the door is torn open.
+	/// </summary>
+	private void OnGrabbed()
 	{
-		// The enemy grabbed the player and takes over from here.
 		_sequence.Kill();
-		_player.Grabbed -= AbortSequence;
+		_player.Grabbed -= OnGrabbed;
+		if (!IsOccupied)
+			return;
+
+		TearOpenSound.Play();
+		_doorOpenness = 1f;
+		CreateTween().SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out)
+			.TweenProperty(Door, "rotation:y", -Mathf.DegToRad(DoorOpenAngleDegrees), TearOpenSeconds);
 	}
 
 	private void At(float time, Action action)

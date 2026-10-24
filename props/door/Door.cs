@@ -3,12 +3,22 @@ using Godot;
 /// <summary>
 /// A hinged door that swings open away from whoever opens it. The body's origin is the hinge.
 /// The player opens and closes it by hand without stopping: the hand pushes or pulls the door
-/// and rides along for a moment while the door starts to move.
+/// and rides along for a moment while the door starts to move. Someone in a hurry bursts it open.
 /// </summary>
 public partial class Door : AnimatableBody3D, IInteractable
 {
 	[Export] public float OpenAngleDegrees { get; set; } = 100f;
 	[Export] public float SwingSeconds { get; set; } = 0.6f;
+	[Export] public float BurstSeconds { get; set; } = 0.3f;
+
+	[ExportGroup("Sounds")]
+	[Export] public AudioStreamPlayer3D UnlatchSound { get; set; }
+	[Export] public AudioStreamPlayer3D CreakSound { get; set; }
+	/// <summary>The latch clicking shut when the door closes.</summary>
+	[Export] public AudioStreamPlayer3D ShutSound { get; set; }
+	[Export] public AudioStreamPlayer3D BurstSound { get; set; }
+	/// <summary>Each door's hinges creak a little higher or lower than the others.</summary>
+	[Export] public float CreakPitchVariation { get; set; } = 0.12f;
 
 	[ExportGroup("Hand")]
 	[Export] public float HandReachSeconds { get; set; } = 0.25f;
@@ -32,6 +42,7 @@ public partial class Door : AnimatableBody3D, IInteractable
 	public override void _Ready()
 	{
 		_closedBasis = Basis;
+		CreakSound.PitchScale = 1f + (float)GD.RandRange(-CreakPitchVariation, CreakPitchVariation);
 	}
 
 	public void Interact(Player player)
@@ -56,16 +67,28 @@ public partial class Door : AnimatableBody3D, IInteractable
 		_handTween.TweenCallback(Callable.From(() => { _ = player.Hands.Withdraw(side); }));
 	}
 
-	public void Open(Node3D opener)
+	/// <summary>Opens the door away from <paramref name="opener"/>, flinging it open if they <paramref name="burst"/> through.</summary>
+	public void Open(Node3D opener, bool burst = false)
 	{
 		IsOpen = true;
-		SwingTo(Mathf.DegToRad(OpenAngleDegrees) * SwingDirectionAwayFrom(opener));
+		if (burst)
+		{
+			BurstSound.Play();
+		}
+		else
+		{
+			UnlatchSound.Play();
+			CreakSound.Play();
+		}
+		SwingTo(Mathf.DegToRad(OpenAngleDegrees) * SwingDirectionAwayFrom(opener), burst ? BurstSeconds : SwingSeconds);
 	}
 
 	public void Close()
 	{
 		IsOpen = false;
-		SwingTo(0f);
+		CreakSound.Play();
+		SwingTo(0f, SwingSeconds);
+		_swingTween.TweenCallback(Callable.From(() => ShutSound.Play()));
 	}
 
 	/// <summary>
@@ -100,13 +123,13 @@ public partial class Door : AnimatableBody3D, IInteractable
 		return gripIsOnPlayersLeft ? ViewHands.Side.Left : ViewHands.Side.Right;
 	}
 
-	private void SwingTo(float targetAngle)
+	private void SwingTo(float targetAngle, float seconds)
 	{
 		_swingTween?.Kill();
 		_swingTween = CreateTween()
 			.SetProcessMode(Tween.TweenProcessMode.Physics)
 			.SetTrans(Tween.TransitionType.Sine);
-		_swingTween.TweenMethod(Callable.From<float>(SetOpenAngle), _openAngle, targetAngle, SwingSeconds);
+		_swingTween.TweenMethod(Callable.From<float>(SetOpenAngle), _openAngle, targetAngle, seconds);
 	}
 
 	private float SwingDirectionAwayFrom(Node3D opener)

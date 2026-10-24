@@ -6,6 +6,8 @@ using Godot;
 /// </summary>
 public partial class Player : CharacterBody3D
 {
+	private const float FullHearingHz = 20000f;
+
 	[ExportGroup("Movement")]
 	[Export] public float WalkSpeed { get; set; } = 2.5f;
 	[Export] public float SprintSpeed { get; set; } = 5f;
@@ -15,6 +17,11 @@ public partial class Player : CharacterBody3D
 	[ExportGroup("Noise")]
 	[Export] public float WalkNoiseRadius { get; set; } = 3f;
 	[Export] public float SprintNoiseRadius { get; set; } = 10f;
+
+	[ExportGroup("Footsteps")]
+	[Export] public float WalkStepVolumeDb { get; set; } = -6f;
+	[Export] public float SprintStepVolumeDb { get; set; } = 0f;
+	[Export] public float CrouchStepVolumeDb { get; set; } = -15f;
 
 	[ExportGroup("Look")]
 	[Export] public float MouseSensitivity { get; set; } = 0.002f;
@@ -36,6 +43,10 @@ public partial class Player : CharacterBody3D
 	[Export] public Node3D ThroatLeft { get; set; }
 	[Export] public Node3D ThroatRight { get; set; }
 	[Export] public ColorRect ChokeOverlay { get; set; }
+	/// <summary>Ringing in the ears, as loud as the player is close to passing out.</summary>
+	[Export] public AudioStreamPlayer EarRing { get; set; }
+	/// <summary>The low-pass cutoff that muffles the world's sounds just before the player passes out.</summary>
+	[Export] public float PassingOutHearingHz { get; set; } = 400f;
 
 	[ExportGroup("Nodes")]
 	[Export] public Node3D Head { get; set; }
@@ -46,8 +57,10 @@ public partial class Player : CharacterBody3D
 	[Export] public Camcorder Camcorder { get; set; }
 	[Export] public DeathScreen DeathScreen { get; set; }
 	[Export] public ViewHands Hands { get; set; }
+	[Export] public Footsteps Footsteps { get; set; }
 
 	public bool IsCrouching { get; private set; }
+	public bool IsSprinting => !IsCrouching && HorizontalSpeed > WalkSpeed + 0.5f;
 	public IInteractable HidingSpot { get; private set; }
 	public bool IsHiding => HidingSpot is not null;
 	public bool IsGrabbed => _grabLookTarget is not null;
@@ -77,6 +90,11 @@ public partial class Player : CharacterBody3D
 		{
 			_chokeAmount = value;
 			_chokeMaterial.SetShaderParameter("amount", value);
+
+			// Hearing fades along with the view: the world's sounds get muffled and the ears start to ring.
+			// The cutoff moves in octaves rather than hertz, so the muffling grows evenly.
+			_worldMuffle.CutoffHz = Mathf.Exp(Mathf.Lerp(Mathf.Log(FullHearingHz), Mathf.Log(PassingOutHearingHz), value));
+			EarRing.VolumeLinear = _earRingVolume * value;
 		}
 	}
 
@@ -90,7 +108,7 @@ public partial class Player : CharacterBody3D
 			if (IsHiding || IsCrouching || HorizontalSpeed < 1f)
 				return 0f;
 
-			return HorizontalSpeed > WalkSpeed + 0.5f ? SprintNoiseRadius : WalkNoiseRadius;
+			return IsSprinting ? SprintNoiseRadius : WalkNoiseRadius;
 		}
 	}
 
@@ -103,6 +121,8 @@ public partial class Player : CharacterBody3D
 	private Vector3 _staggerVelocity;
 	private float _chokeAmount;
 	private ShaderMaterial _chokeMaterial;
+	private AudioEffectLowPassFilter _worldMuffle;
+	private float _earRingVolume;
 
 	public float HorizontalSpeed => new Vector2(Velocity.X, Velocity.Z).Length();
 
@@ -117,7 +137,10 @@ public partial class Player : CharacterBody3D
 		_headHeight = StandingHeadHeight;
 		_previousPosition = GlobalPosition;
 		_chokeMaterial = (ShaderMaterial)ChokeOverlay.Material;
+		_worldMuffle = (AudioEffectLowPassFilter)AudioServer.GetBusEffect(AudioServer.GetBusIndex("World"), 0);
+		_earRingVolume = EarRing.VolumeLinear;
 		ChokeAmount = 0f;
+		CameraRig.Stepped += OnStepped;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 	}
 
@@ -217,6 +240,14 @@ public partial class Player : CharacterBody3D
 	public void Die()
 	{
 		DeathScreen.Play();
+	}
+
+	private void OnStepped()
+	{
+		float volumeDb = IsCrouching ? CrouchStepVolumeDb
+			: IsSprinting ? SprintStepVolumeDb
+			: WalkStepVolumeDb;
+		Footsteps.Step(volumeDb);
 	}
 
 	private void Stagger(float delta)

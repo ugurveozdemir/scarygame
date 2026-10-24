@@ -1,7 +1,8 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Material" path="res://materials/exterior/concrete.tres" id="1_stone"]
 [ext_resource type="Material" path="res://materials/exterior/fountain_water.tres" id="2_water"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/fountain.ogg" id="3_water_sound"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_basin_water"]
 material = ExtResource("2_water")
@@ -170,3 +171,11 @@ lifetime = 0.5
 visibility_aabb = AABB(-1.4, -1.4, -1.4, 2.8, 1.6, 2.8)
 process_material = SubResource("ParticleProcessMaterial_overflow")
 draw_pass_1 = SubResource("QuadMesh_drop")
+
+[node name="WaterSound" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+stream = ExtResource("3_water_sound")
+unit_size = 4.0
+max_distance = 40.0
+autoplay = true
+bus = &"Ambience"

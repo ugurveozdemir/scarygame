@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 /// <summary>
@@ -8,6 +9,9 @@ using Godot;
 /// </summary>
 public partial class PlayerCamera : Node3D
 {
+	/// <summary>Raised when a foot lands, which is when the bob reaches its lowest point.</summary>
+	public event Action Stepped;
+
 	[ExportGroup("Nodes")]
 	[Export] public Player Player { get; set; }
 	[Export] public Camera3D Camera { get; set; }
@@ -77,7 +81,10 @@ public partial class PlayerCamera : Node3D
 	private void UpdateBob(float delta)
 	{
 		bool isWalking = !Player.IsGrabbed && Player.IsOnFloor() && Player.HorizontalSpeed > 0.1f;
+		int steps = StepCount(_bobPhase);
 		_bobPhase += Player.HorizontalSpeed * BobFrequency * delta;
+		if (isWalking && StepCount(_bobPhase) != steps)
+			Stepped?.Invoke();
 
 		// Bob and sway grow with speed, so walking is calm and sprinting is pronounced.
 		float weight = Mathf.Clamp(Player.HorizontalSpeed / Player.SprintSpeed, 0f, 1f);
@@ -124,8 +131,7 @@ public partial class PlayerCamera : Node3D
 
 	private void UpdateFov(float delta)
 	{
-		bool isSprinting = !Player.IsGrabbed && !Player.AreControlsLocked
-			&& !Player.IsCrouching && Player.HorizontalSpeed > Player.WalkSpeed + 0.5f;
+		bool isSprinting = !Player.IsGrabbed && !Player.AreControlsLocked && Player.IsSprinting;
 		float targetFov = _baseFov + (isSprinting ? SprintFovBoost : 0f);
 		Camera.Fov = Mathf.Lerp(Camera.Fov, targetFov, Smoothing(FovSmoothSpeed, delta));
 	}
@@ -150,6 +156,12 @@ public partial class PlayerCamera : Node3D
 		float roll = Mathf.DegToRad(_bobRoll + _lookWeight * LookRollDegrees) + shakeZ * shake;
 		float yaw = Mathf.DegToRad(-_lookWeight * LookYawLagDegrees) + shakeX * shake;
 		Rotation = _baseRotation + new Vector3(shakeY * shake, yaw, roll);
+	}
+
+	/// <summary>How many times the bob has passed its lowest point, where sin(phase) is -1.</summary>
+	private static int StepCount(float phase)
+	{
+		return Mathf.FloorToInt((phase + Mathf.Pi / 2f) / Mathf.Tau);
 	}
 
 	private static float Smoothing(float speed, float delta)

@@ -33,6 +33,15 @@ public partial class StrangleAttack : Node
 	[Export] public Node3D LeftHandTarget { get; set; }
 	[Export] public Node3D RightHandTarget { get; set; }
 
+	[ExportGroup("Sounds")]
+	[Export] public AudioStreamPlayer3D LungeSound { get; set; }
+	/// <summary>The hands slamming into the victim's shoulders.</summary>
+	[Export] public AudioStreamPlayer3D GrabSound { get; set; }
+	/// <summary>Clothes and bodies jostling while the victim is shaken.</summary>
+	[Export] public AudioStreamPlayer3D ShakeSound { get; set; }
+	/// <summary>The victim choking, from the hands reaching the throat until they pass out.</summary>
+	[Export] public AudioStreamPlayer3D ChokeSound { get; set; }
+
 	public bool IsLunging { get; private set; }
 
 	private Player _victim;
@@ -68,12 +77,15 @@ public partial class StrangleAttack : Node
 		// Facing each other, the enemy's left hand grabs the player's right side and vice versa.
 		ReachFor(victim.RightShoulder, victim.LeftShoulder);
 		IsLunging = true;
+		LungeSound.Play();
 		Tween lunge = CreateTween().SetParallel().SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
 		lunge.TweenMethod(Callable.From<float>(weight => _lungeWeight = _handWeight = weight), 0f, 1f, LungeSeconds);
 		lunge.TweenProperty(ArmsIK, "influence", 1f, LungeSeconds);
 		lunge.TweenProperty(HeadLookAt, "influence", 1f, LungeSeconds);
 		await ToSignal(lunge, Tween.SignalName.Finished);
 		IsLunging = false;
+		GrabSound.Play();
+		ShakeSound.Play();
 
 		await Animate(progress =>
 		{
@@ -83,6 +95,7 @@ public partial class StrangleAttack : Node
 		}, ShakeSeconds);
 
 		ReachFor(victim.ThroatRight, victim.ThroatLeft);
+		ChokeSound.Play();
 		await Animate(progress =>
 		{
 			_handWeight = Mathf.SmoothStep(0f, 1f, progress);

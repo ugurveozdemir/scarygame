@@ -53,12 +53,13 @@ Scenes and their scripts live together, grouped by feature.
 | `player/` | First-person controller (movement, crouch, hiding, being grabbed), procedural camera effects and first-person hands |
 | `camcorder/` | Camcorder logic, recording HUD and the screen-effect shader |
 | `interaction/` | `IInteractable` interface and the look-at interactor |
-| `enemy/` | Stalker AI (patrol, hearing, sight, chase, search) and its strangle attack |
+| `enemy/` | Stalker AI (patrol, hearing, sight, chase, search), its voice and its strangle attack |
 | `props/` | Interactable objects (doors, lockers, batteries), furniture (beds, tables, chairs, a TV) and the grounds' props (trees, fountain, lamps, cars, fence) |
 | `levels/` | Levels and their shared environment |
-| `lighting/` | Light behaviours such as flickering |
+| `lighting/` | Light behaviours such as flickering, with its buzz |
+| `audio/` | Footsteps and the surfaces they sound on, the ambience and the chase music |
 | `materials/` | PBR materials, the asylum interior shader and the exterior materials (brick, concrete, asphalt, paving, lawn, fountain water) |
-| `assets/` | Third-party models, animations and textures, see [CREDITS.md](CREDITS.md) |
+| `assets/` | Third-party models, animations, textures and sounds, see [CREDITS.md](CREDITS.md) |
 
 ## Status
 
@@ -73,7 +74,41 @@ the grounds. There are doors to open,
 lockers to hide in and spare batteries lying around,
 and a masked surgeon that patrols, hears footsteps, chases on sight and catches players it sees hiding.
 When it catches you it grabs you by the shoulders and strangles you.
-Next up: sound, an objective and an exit.
+Everything that matters for the feel has a sound: footsteps on every surface, doors, lockers, the camcorder,
+the enemy's breathing, steps and roar, the strangling, flickering lamps, the fountain, the building's hum and
+the night outside, and chase music.
+Next up: an objective and an exit.
+
+## Sound
+
+The sounds are field recordings, most of them from BigSoundBank, cut into variations and mixed in
+`assets/sounds` (see [CREDITS.md](CREDITS.md)). Short sounds are WAV and loops are OGG Vorbis, imported with
+looping on. Sounds with variations are `AudioStreamRandomizer` resources, which pick a different take each time
+and vary pitch and volume a little. Every sound is an audio player in the scene of whatever makes it, set up there
+with its level and range; scripts only start and fade them.
+
+Buses (`default_bus_layout.tres`):
+
+| Bus | Sends to | Contents |
+|---|---|---|
+| Master | | A hard limiter, so the loudest moments never clip |
+| World | Master | Everything heard from outside the player's head. A low-pass filter muffles it as the player passes out |
+| Sfx | World | Footsteps, doors, lockers, the camcorder, the enemy |
+| Ambience | World | The building's hum, the night, the fountain, buzzing lamps |
+| Reverb | World | The room reverb of sounds made inside the building |
+| Player | Master | The player's own body: choking, the ringing ears, the death sound |
+| Music | Master | The chase music and the sting |
+
+Footsteps (`audio/Footsteps.cs`, `audio/footsteps.tscn`) play the sound of the ground under the feet. A floor body
+says what it is made of with a `surface` metadata entry (the building is `tile`, the stairs `stairs`, the lawn
+`grass`), and a `SurfaceZone` area on the "zones" physics layer overrides it where one body has several surfaces:
+the vents, the balcony, the paths, the parking lot and the road. The player steps at the bottom of each head bob, so
+the steps match the camera. The enemy steps whenever one of its animated feet lands (`audio/SkeletonFootsteps.cs`),
+which keeps the steps in time with every animation and blend.
+
+The `Indoors` area covers the building: it sends the sounds made inside it to the reverb bus, and `audio/Ambience.cs`
+uses it to fade between the building's hum and the night. `audio/ChaseMusic.cs` follows the enemy: a sting when it
+spots the player, then music until it loses them.
 
 ## Animation
 
@@ -135,3 +170,7 @@ Doors are deliberately kept outside the `Navigation` node so the enemy can path 
 Furniture, lockers, trees and the grounds' props go inside it, so the enemy walks around them, and the bake
 covers the grounds too, down the stairs. The vents are lower than the enemy's
 navigation agent, so the bake leaves them out and they stay a safe route for the player.
+
+A new floor needs a `surface` metadata entry on its body, or a `SurfaceZone` under `SoundZones` where it shares a
+body with other surfaces; otherwise its footsteps sound like concrete. A new room in the building needs to stay
+inside the `Indoors` area for its reverb and hum.

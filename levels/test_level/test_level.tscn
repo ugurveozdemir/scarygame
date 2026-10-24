@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=3]
+[gd_scene load_steps=66 format=3]
 
 [ext_resource type="Environment" path="res://levels/asylum_environment.tres" id="1_env"]
 [ext_resource type="Material" path="res://materials/asylum_interior.tres" id="2_wall"]
@@ -39,6 +39,14 @@
 [ext_resource type="PackedScene" path="res://assets/polyhaven/shrub_02/shrub_02.gltf" id="37_shrub"]
 [ext_resource type="PackedScene" path="res://assets/polyhaven/old_tyre/old_tyre.gltf" id="38_tyre"]
 [ext_resource type="PackedScene" path="res://assets/polyhaven/water_manhole_cover/water_manhole_cover.gltf" id="39_manhole"]
+[ext_resource type="PackedScene" path="res://lighting/flicker_sound.tscn" id="40_flicker_sound"]
+[ext_resource type="Script" path="res://audio/Ambience.cs" id="41_ambience"]
+[ext_resource type="Script" path="res://audio/ChaseMusic.cs" id="42_chase_music"]
+[ext_resource type="Script" path="res://audio/SurfaceZone.cs" id="43_surface_zone"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/building_tone.ogg" id="44_building_tone"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/night.ogg" id="45_night"]
+[ext_resource type="AudioStream" path="res://assets/sounds/music/chase.ogg" id="46_chase"]
+[ext_resource type="AudioStream" path="res://assets/sounds/music/sting.wav" id="47_sting"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_stair_ramp"]
 size = Vector3(3, 0.2, 5.92)
@@ -74,6 +82,37 @@ size = Vector3(32, 0.04, 16)
 material = ExtResource("18_asphalt")
 size = Vector3(7, 0.04, 34)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_indoors"]
+size = Vector3(23.2, 3.4, 40.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vent_entry"]
+size = Vector3(0.9, 1.1, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vent_run"]
+size = Vector3(5.9, 1.1, 0.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vent_exit"]
+size = Vector3(0.9, 1.1, 0.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_balcony"]
+size = Vector3(10, 1.2, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_path_stairs"]
+size = Vector3(3, 1.2, 8.8)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_plaza"]
+height = 1.2
+radius = 7.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_path_parking"]
+size = Vector3(3, 1.2, 7.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_parking"]
+size = Vector3(32, 1.2, 16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_road"]
+size = Vector3(7, 1.2, 34)
+
 [sub_resource type="BoxMesh" id="BoxMesh_bay_line"]
 material = ExtResource("21_paint")
 size = Vector3(0.1, 0.01, 4.6)
@@ -88,6 +127,7 @@ navigation_mesh = ExtResource("9_navmesh")
 
 [node name="Building" type="CSGCombiner3D" parent="Navigation"]
 use_collision = true
+metadata/surface = &"tile"
 
 [node name="Shell" type="CSGBox3D" parent="Navigation/Building"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -6.05)
@@ -840,6 +880,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, -16.3)
 
 [node name="Exterior" type="CSGCombiner3D" parent="Navigation"]
 use_collision = true
+metadata/surface = &"concrete"
 
 [node name="Foundation" type="CSGBox3D" parent="Navigation/Exterior"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.65, -6.05)
@@ -1013,12 +1054,14 @@ material = ExtResource("3_prop")
 
 [node name="StairRamp" type="StaticBody3D" parent="Navigation"]
 transform = Transform3D(1, 0, 0, 0, 0.862, -0.507, 0, 0.507, 0.862, 0, -1.586, 18.299)
+metadata/surface = &"stairs"
 
 [node name="Collision" type="CollisionShape3D" parent="Navigation/StairRamp"]
 shape = SubResource("BoxShape3D_stair_ramp")
 
 [node name="Ground" type="StaticBody3D" parent="Navigation"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.0, 15)
+metadata/surface = &"grass"
 
 [node name="Collision" type="CollisionShape3D" parent="Navigation/Ground"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
@@ -1122,8 +1165,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, -3.0, 40.8)
 [node name="LampParkingWest" parent="Navigation" instance=ExtResource("32_lamp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.8, -3.0, 58)
 
-[node name="Light" parent="Navigation/LampParkingWest"]
+[node name="Light" parent="Navigation/LampParkingWest" node_paths=PackedStringArray("Buzz", "Crackle")]
 script = ExtResource("4_flicker")
+Buzz = NodePath("FlickerSound/Buzz")
+Crackle = NodePath("FlickerSound/Crackle")
+
+[node name="FlickerSound" parent="Navigation/LampParkingWest/Light" instance=ExtResource("40_flicker_sound")]
 
 [node name="LampParkingEast" parent="Navigation" instance=ExtResource("32_lamp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.8, -3.0, 58)
@@ -1463,14 +1510,18 @@ light_energy = 1.2
 shadow_enabled = true
 omni_range = 10.0
 
-[node name="CorridorLightMiddle" type="OmniLight3D" parent="."]
+[node name="CorridorLightMiddle" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
 light_color = Color(0.85, 0.92, 1, 1)
 light_energy = 1.2
 shadow_enabled = true
 omni_range = 10.0
 script = ExtResource("4_flicker")
+Buzz = NodePath("FlickerSound/Buzz")
+Crackle = NodePath("FlickerSound/Crackle")
 
+
+[node name="FlickerSound" parent="CorridorLightMiddle" instance=ExtResource("40_flicker_sound")]
 [node name="RoomRight3Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 2.7, 9.3)
 light_color = Color(1, 0.8, 0.6, 1)
@@ -1513,14 +1564,18 @@ light_energy = 0.55
 shadow_enabled = true
 omni_range = 8.0
 
-[node name="DayRoomLight" type="OmniLight3D" parent="."]
+[node name="DayRoomLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, -21)
 light_color = Color(0.85, 0.92, 1, 1)
 light_energy = 1.0
 shadow_enabled = true
 omni_range = 11.0
 script = ExtResource("4_flicker")
+Buzz = NodePath("FlickerSound/Buzz")
+Crackle = NodePath("FlickerSound/Crackle")
 
+
+[node name="FlickerSound" parent="DayRoomLight" instance=ExtResource("40_flicker_sound")]
 [node name="WardLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.8, 2.7, -21)
 light_color = Color(1, 0.86, 0.72, 1)
@@ -1528,14 +1583,18 @@ light_energy = 0.5
 shadow_enabled = true
 omni_range = 8.0
 
-[node name="ShowersLight" type="OmniLight3D" parent="."]
+[node name="ShowersLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8, 2.7, -21)
 light_color = Color(0.8, 0.95, 0.85, 1)
 light_energy = 0.6
 shadow_enabled = true
 omni_range = 8.0
 script = ExtResource("4_flicker")
+Buzz = NodePath("FlickerSound/Buzz")
+Crackle = NodePath("FlickerSound/Crackle")
 
+
+[node name="FlickerSound" parent="ShowersLight" instance=ExtResource("40_flicker_sound")]
 [node name="Moon" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.862, 0.313, -0.399, 0.0, 0.786, 0.618, 0.507, -0.533, 0.678, 0, 30, 0)
 light_color = Color(0.6, 0.7, 0.95, 1)
@@ -1635,6 +1694,141 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.0, 31)
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, -12.5)
 Player = NodePath("../Player")
 PatrolRoute = NodePath("../PatrolRoute")
+
+
+[node name="SoundZones" type="Node3D" parent="."]
+
+[node name="Indoors" type="Area3D" parent="SoundZones"]
+collision_layer = 17
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.35
+reverb_bus_uniformity = 0.5
+
+[node name="Shape" type="CollisionShape3D" parent="SoundZones/Indoors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -6.05)
+shape = SubResource("BoxShape3D_indoors")
+
+[node name="VentWest" type="Area3D" parent="SoundZones"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("43_surface_zone")
+Surface = &"duct"
+
+[node name="Entry" type="CollisionShape3D" parent="SoundZones/VentWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.55, -14.75)
+shape = SubResource("BoxShape3D_vent_entry")
+
+[node name="Run" type="CollisionShape3D" parent="SoundZones/VentWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 0.55, -15.3)
+shape = SubResource("BoxShape3D_vent_run")
+
+[node name="Exit" type="CollisionShape3D" parent="SoundZones/VentWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0.55, -15.9)
+shape = SubResource("BoxShape3D_vent_exit")
+
+[node name="VentEast" type="Area3D" parent="SoundZones"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("43_surface_zone")
+Surface = &"duct"
+
+[node name="Entry" type="CollisionShape3D" parent="SoundZones/VentEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.55, -14.75)
+shape = SubResource("BoxShape3D_vent_entry")
+
+[node name="Run" type="CollisionShape3D" parent="SoundZones/VentEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 0.55, -15.3)
+shape = SubResource("BoxShape3D_vent_run")
+
+[node name="Exit" type="CollisionShape3D" parent="SoundZones/VentEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.55, -15.9)
+shape = SubResource("BoxShape3D_vent_exit")
+
+[node name="Balcony" type="Area3D" parent="SoundZones"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("43_surface_zone")
+Surface = &"concrete"
+
+[node name="Floor" type="CollisionShape3D" parent="SoundZones/Balcony"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -27.9)
+shape = SubResource("BoxShape3D_balcony")
+
+[node name="Paving" type="Area3D" parent="SoundZones"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("43_surface_zone")
+Surface = &"paving"
+
+[node name="PathFromStairs" type="CollisionShape3D" parent="SoundZones/Paving"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.5, 25)
+shape = SubResource("BoxShape3D_path_stairs")
+
+[node name="Plaza" type="CollisionShape3D" parent="SoundZones/Paving"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.5, 36)
+shape = SubResource("CylinderShape3D_plaza")
+
+[node name="PathToParking" type="CollisionShape3D" parent="SoundZones/Paving"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.5, 46.4)
+shape = SubResource("BoxShape3D_path_parking")
+
+[node name="Asphalt" type="Area3D" parent="SoundZones"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("43_surface_zone")
+Surface = &"asphalt"
+
+[node name="ParkingLot" type="CollisionShape3D" parent="SoundZones/Asphalt"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.5, 58)
+shape = SubResource("BoxShape3D_parking")
+
+[node name="Road" type="CollisionShape3D" parent="SoundZones/Asphalt"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.5, 83)
+shape = SubResource("BoxShape3D_road")
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="Ambience" type="Node" parent="Audio" node_paths=PackedStringArray("Indoors", "BuildingTone", "Night")]
+script = ExtResource("41_ambience")
+Indoors = NodePath("../../SoundZones/Indoors")
+BuildingTone = NodePath("BuildingTone")
+Night = NodePath("Night")
+
+[node name="BuildingTone" type="AudioStreamPlayer" parent="Audio/Ambience"]
+stream = ExtResource("44_building_tone")
+volume_db = -10.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="Night" type="AudioStreamPlayer" parent="Audio/Ambience"]
+stream = ExtResource("45_night")
+volume_db = -6.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="ChaseMusic" type="Node" parent="Audio" node_paths=PackedStringArray("Enemy", "Music", "Sting")]
+script = ExtResource("42_chase_music")
+Enemy = NodePath("../../Enemy")
+Music = NodePath("Music")
+Sting = NodePath("Sting")
+
+[node name="Music" type="AudioStreamPlayer" parent="Audio/ChaseMusic"]
+stream = ExtResource("46_chase")
+volume_db = -14.0
+bus = &"Music"
+
+[node name="Sting" type="AudioStreamPlayer" parent="Audio/ChaseMusic"]
+stream = ExtResource("47_sting")
+volume_db = -10.0
+bus = &"Music"
 
 [editable path="Navigation/LampParkingWest"]
 [editable path="Navigation/LampRoad"]
