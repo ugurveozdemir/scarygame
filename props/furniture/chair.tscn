@@ -1,0 +1,60 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Material" path="res://materials/hospital_metal.tres" id="1_metal"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_seat"]
+material = ExtResource("1_metal")
+size = Vector3(0.44, 0.03, 0.42)
+
+[sub_resource type="BoxMesh" id="BoxMesh_back"]
+material = ExtResource("1_metal")
+size = Vector3(0.44, 0.3, 0.03)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_leg"]
+material = ExtResource("1_metal")
+top_radius = 0.014
+bottom_radius = 0.014
+height = 0.45
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_back_leg"]
+material = ExtResource("1_metal")
+top_radius = 0.014
+bottom_radius = 0.014
+height = 0.8
+radial_segments = 6
+rings = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_chair"]
+size = Vector3(0.44, 0.88, 0.44)
+
+[node name="Chair" type="StaticBody3D"]
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.44, 0)
+shape = SubResource("BoxShape3D_chair")
+
+[node name="Seat" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
+mesh = SubResource("BoxMesh_seat")
+
+[node name="Back" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.985, 0.17, 0, -0.17, 0.985, 0, 0.72, 0.2)
+mesh = SubResource("BoxMesh_back")
+
+[node name="LegFrontLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.19, 0.225, -0.18)
+mesh = SubResource("CylinderMesh_leg")
+
+[node name="LegFrontRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19, 0.225, -0.18)
+mesh = SubResource("CylinderMesh_leg")
+
+[node name="LegBackLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.19, 0.4, 0.19)
+mesh = SubResource("CylinderMesh_back_leg")
+
+[node name="LegBackRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19, 0.4, 0.19)
+mesh = SubResource("CylinderMesh_back_leg")

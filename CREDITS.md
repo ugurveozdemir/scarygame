@@ -12,9 +12,9 @@ Third-party assets used in this project.
 | [OfficeCeiling006](https://ambientcg.com/view?id=OfficeCeiling006) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Suspended ceiling (`assets/ambientcg/OfficeCeiling006`) |
 | [Tiles133D](https://ambientcg.com/view?id=Tiles133D) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Glazed wall tiles (`assets/ambientcg/Tiles133D`) |
 | [PaintedPlaster010](https://ambientcg.com/view?id=PaintedPlaster010) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Peeling wall plaster (`assets/ambientcg/PaintedPlaster010`) |
-| [PaintedWood008B](https://ambientcg.com/view?id=PaintedWood008B) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Doors (`assets/ambientcg/PaintedWood008B`) |
+| [PaintedWood008B](https://ambientcg.com/view?id=PaintedWood008B) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Doors and table tops (`assets/ambientcg/PaintedWood008B`) |
 | [PaintedMetal006](https://ambientcg.com/view?id=PaintedMetal006) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Lockers (`assets/ambientcg/PaintedMetal006`) |
-| [PaintedMetal013](https://ambientcg.com/view?id=PaintedMetal013) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Beds, gurney and desk (`assets/ambientcg/PaintedMetal013`) |
+| [PaintedMetal013](https://ambientcg.com/view?id=PaintedMetal013) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Beds, furniture, railings and vent ducts (`assets/ambientcg/PaintedMetal013`) |
 
 The Quaternius packs were downloaded from OpenGameArt and the ambientCG textures at 1K resolution.
 The Rocketbox textures were scaled down to 1K, and their specular maps inverted into roughness maps.

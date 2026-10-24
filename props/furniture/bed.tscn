@@ -1,0 +1,89 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Material" path="res://materials/hospital_metal.tres" id="1_metal"]
+[ext_resource type="Material" path="res://materials/stained_fabric.tres" id="2_fabric"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_mattress"]
+material = ExtResource("2_fabric")
+size = Vector3(0.88, 0.16, 1.92)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pillow"]
+material = ExtResource("2_fabric")
+size = Vector3(0.6, 0.1, 0.35)
+
+[sub_resource type="BoxMesh" id="BoxMesh_base"]
+material = ExtResource("1_metal")
+size = Vector3(0.94, 0.06, 2)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_head_post"]
+material = ExtResource("1_metal")
+top_radius = 0.022
+bottom_radius = 0.022
+height = 1.0
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_foot_post"]
+material = ExtResource("1_metal")
+top_radius = 0.022
+bottom_radius = 0.022
+height = 0.75
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_rail"]
+material = ExtResource("1_metal")
+top_radius = 0.016
+bottom_radius = 0.016
+height = 0.88
+radial_segments = 8
+rings = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bed"]
+size = Vector3(0.94, 0.6, 2)
+
+[node name="Bed" type="StaticBody3D"]
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+shape = SubResource("BoxShape3D_bed")
+
+[node name="Mattress" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52, 0)
+mesh = SubResource("BoxMesh_mattress")
+
+[node name="Pillow" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.995, 0, -0.1, 0, 1, 0, 0.1, 0, 0.995, 0.03, 0.65, -0.72)
+mesh = SubResource("BoxMesh_pillow")
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.41, 0)
+mesh = SubResource("BoxMesh_base")
+
+[node name="HeadPostLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.5, -0.98)
+mesh = SubResource("CylinderMesh_head_post")
+
+[node name="HeadPostRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.5, -0.98)
+mesh = SubResource("CylinderMesh_head_post")
+
+[node name="HeadRailTop" type="MeshInstance3D" parent="."]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 0.97, -0.98)
+mesh = SubResource("CylinderMesh_rail")
+
+[node name="HeadRailLow" type="MeshInstance3D" parent="."]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 0.78, -0.98)
+mesh = SubResource("CylinderMesh_rail")
+
+[node name="FootPostLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.375, 0.98)
+mesh = SubResource("CylinderMesh_foot_post")
+
+[node name="FootPostRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.375, 0.98)
+mesh = SubResource("CylinderMesh_foot_post")
+
+[node name="FootRail" type="MeshInstance3D" parent="."]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 0.72, 0.98)
+mesh = SubResource("CylinderMesh_rail")

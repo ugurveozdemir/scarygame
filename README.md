@@ -54,7 +54,7 @@ Scenes and their scripts live together, grouped by feature.
 | `camcorder/` | Camcorder logic, recording HUD and the screen-effect shader |
 | `interaction/` | `IInteractable` interface and the look-at interactor |
 | `enemy/` | Stalker AI (patrol, hearing, sight, chase, search) and its strangle attack |
-| `props/` | Interactable objects: doors, lockers, batteries |
+| `props/` | Interactable objects (doors, lockers, batteries) and furniture (beds, tables, chairs, a TV) |
 | `levels/` | Levels and their shared environment |
 | `lighting/` | Light behaviours such as flickering |
 | `materials/` | PBR materials and the asylum interior shader |
@@ -62,8 +62,11 @@ Scenes and their scripts live together, grouped by feature.
 
 ## Status
 
-Prototype: a dark, textured test level (a 28 m corridor with six 9 x 9 m rooms) to explore with the camcorder,
-doors to open and lockers to hide in,
+Prototype: a dark, textured asylum to explore with the camcorder. A 28 m corridor with six 9 x 9 m rooms leads
+north into a second wing: a day room with tables, a TV and a nurse station, a ward with four beds, a shower room
+and a balcony outside the day room's barred windows. Two crawl-only ventilation ducts link the first side rooms
+to the ward and the showers; crouch to get through them, the enemy can't follow. There are doors to open,
+lockers to hide in and spare batteries lying around,
 and a masked surgeon that patrols, hears footsteps, chases on sight and catches players it sees hiding.
 When it catches you it grabs you by the shoulders and strangles you.
 Next up: sound, an objective and an exit.
@@ -111,3 +114,5 @@ in from however the player was moving.
 The enemy walks on the level's navigation mesh. After changing walls or lockers, select the
 `Navigation` node in the level and press **Bake NavigationMesh** in the editor toolbar.
 Doors are deliberately kept outside the `Navigation` node so the enemy can path through them.
+Furniture and lockers go inside it, so the enemy walks around them. The vents are lower than the enemy's
+navigation agent, so the bake leaves them out and they stay a safe route for the player.

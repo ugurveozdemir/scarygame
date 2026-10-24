@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Material" path="res://materials/hospital_metal.tres" id="1_metal"]
+[ext_resource type="Material" path="res://materials/door_wood.tres" id="2_wood"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_top"]
+material = ExtResource("2_wood")
+size = Vector3(1.2, 0.04, 0.8)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_leg"]
+material = ExtResource("1_metal")
+top_radius = 0.02
+bottom_radius = 0.02
+height = 0.72
+radial_segments = 8
+rings = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_table"]
+size = Vector3(1.2, 0.76, 0.8)
+
+[node name="Table" type="StaticBody3D"]
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, 0)
+shape = SubResource("BoxShape3D_table")
+
+[node name="Top" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74, 0)
+mesh = SubResource("BoxMesh_top")
+
+[node name="LegFrontLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.54, 0.36, 0.34)
+mesh = SubResource("CylinderMesh_leg")
+
+[node name="LegFrontRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.54, 0.36, 0.34)
+mesh = SubResource("CylinderMesh_leg")
+
+[node name="LegBackLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.54, 0.36, -0.34)
+mesh = SubResource("CylinderMesh_leg")
+
+[node name="LegBackRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.54, 0.36, -0.34)
+mesh = SubResource("CylinderMesh_leg")
