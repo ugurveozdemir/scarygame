@@ -62,7 +62,8 @@ Scenes and their scripts live together, grouped by feature.
 
 ## Status
 
-Prototype: a dark, textured test level to explore with the camcorder, doors to open and lockers to hide in,
+Prototype: a dark, textured test level (a 28 m corridor with six 9 x 9 m rooms) to explore with the camcorder,
+doors to open and lockers to hide in,
 and a masked surgeon that patrols, hears footsteps, chases on sight and catches players it sees hiding.
 When it catches you it grabs you by the shoulders and strangles you.
 Next up: sound, an objective and an exit.
