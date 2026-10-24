@@ -7,11 +7,11 @@
 [ext_resource type="Script" path="res://player/GripFingersModifier.cs" id="5_grip_fingers"]
 [ext_resource type="Script" path="res://player/HandAimModifier.cs" id="6_hand_aim"]
 
-[node name="ViewHands" type="Node3D" node_paths=PackedStringArray("AnimationPlayer", "Skeleton", "GripFingers", "LeftHandTarget", "RightHandTarget", "LeftRest", "RightRest")]
+[node name="ViewHands" type="Node3D" node_paths=PackedStringArray("Skeleton", "GripFingers", "LeftHandTarget", "RightHandTarget", "LeftRest", "RightRest")]
+top_level = true
 script = ExtResource("1_view_hands")
-AnimationPlayer = NodePath("Body/AnimationPlayer")
 Skeleton = NodePath("Body/GeneralSkeleton")
-ExtraAnimations = ExtResource("3_animations")
+Animations = ExtResource("3_animations")
 GripFingers = NodePath("Body/GeneralSkeleton/GripFingers")
 LeftHandTarget = NodePath("LeftHandTarget")
 RightHandTarget = NodePath("RightHandTarget")
@@ -19,7 +19,7 @@ LeftRest = NodePath("LeftRest")
 RightRest = NodePath("RightRest")
 
 [node name="Body" parent="." instance=ExtResource("2_body")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -1.59, -0.1)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -1.71, 0.04)
 
 [node name="m007_hipoly_81_bones" parent="Body/GeneralSkeleton" index="1"]
 cast_shadow = 0
@@ -54,10 +54,10 @@ script = ExtResource("5_grip_fingers")
 [node name="RightHandTarget" type="Marker3D" parent="."]
 
 [node name="LeftRest" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, -0.6, -0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.21, -0.91, 0.02)
 
 [node name="RightRest" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, -0.6, -0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.21, -0.91, 0.02)
 
 [node name="LeftElbowPole" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, -0.9, 0.1)

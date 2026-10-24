@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://props/door/Door.cs" id="1_door"]
 [ext_resource type="Material" path="res://materials/door_wood.tres" id="2_prop"]
@@ -11,18 +11,40 @@ size = Vector3(1, 2.4, 0.05)
 size = Vector3(1, 2.4, 0.05)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_handle"]
-albedo_color = Color(0.15, 0.15, 0.15, 1)
-metallic = 0.8
-roughness = 0.4
+albedo_color = Color(0.45, 0.44, 0.42, 1)
+metallic = 0.9
+roughness = 0.45
 
-[sub_resource type="BoxMesh" id="BoxMesh_handle"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_rose"]
 material = SubResource("StandardMaterial3D_handle")
-size = Vector3(0.12, 0.025, 0.03)
+top_radius = 0.028
+bottom_radius = 0.028
+height = 0.01
+radial_segments = 24
+rings = 1
 
-[node name="Door" type="AnimatableBody3D" node_paths=PackedStringArray("GripPoint")]
+[sub_resource type="CylinderMesh" id="CylinderMesh_neck"]
+material = SubResource("StandardMaterial3D_handle")
+top_radius = 0.009
+bottom_radius = 0.009
+height = 0.05
+radial_segments = 12
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_lever"]
+material = SubResource("StandardMaterial3D_handle")
+top_radius = 0.01
+bottom_radius = 0.01
+height = 0.13
+radial_segments = 12
+rings = 1
+
+[node name="Door" type="AnimatableBody3D" node_paths=PackedStringArray("FrontGrip", "BackGrip", "PushPoint")]
 collision_layer = 9
 script = ExtResource("1_door")
-GripPoint = NodePath("GripPoint")
+FrontGrip = NodePath("FrontLever/Grip")
+BackGrip = NodePath("BackLever/Grip")
+PushPoint = NodePath("PushPoint")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.2, 0)
@@ -32,12 +54,40 @@ mesh = SubResource("BoxMesh_panel")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.2, 0)
 shape = SubResource("BoxShape3D_panel")
 
-[node name="FrontHandle" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.84, 1.05, -0.045)
-mesh = SubResource("BoxMesh_handle")
+[node name="FrontLever" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.93, 1.05, -0.025)
 
-[node name="BackHandle" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.84, 1.05, 0.045)
-mesh = SubResource("BoxMesh_handle")
+[node name="Rose" type="MeshInstance3D" parent="FrontLever"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, -0.005)
+mesh = SubResource("CylinderMesh_rose")
 
-[node name="GripPoint" type="Marker3D" parent="."]
+[node name="Neck" type="MeshInstance3D" parent="FrontLever"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, -0.03)
+mesh = SubResource("CylinderMesh_neck")
+
+[node name="Lever" type="MeshInstance3D" parent="FrontLever"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -0.055, 0, -0.055)
+mesh = SubResource("CylinderMesh_lever")
+
+[node name="Grip" type="Marker3D" parent="FrontLever"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.065, 0, -0.055)
+
+[node name="BackLever" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.93, 1.05, 0.025)
+
+[node name="Rose" type="MeshInstance3D" parent="BackLever"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.005)
+mesh = SubResource("CylinderMesh_rose")
+
+[node name="Neck" type="MeshInstance3D" parent="BackLever"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0.03)
+mesh = SubResource("CylinderMesh_neck")
+
+[node name="Lever" type="MeshInstance3D" parent="BackLever"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -0.055, 0, 0.055)
+mesh = SubResource("CylinderMesh_lever")
+
+[node name="Grip" type="Marker3D" parent="BackLever"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.065, 0, 0.055)
+
+[node name="PushPoint" type="Marker3D" parent="."]

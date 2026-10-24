@@ -34,6 +34,6 @@ public partial class Interactor : RayCast3D
 		if (Player.IsHiding)
 			return Player.HidingSpot;
 
-		return GetCollider() as IInteractable;
+		return GetCollider() is IInteractable target && target.CanInteract(Player) ? target : null;
 	}
 }
