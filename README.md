@@ -75,8 +75,9 @@ lockers to hide in and spare batteries lying around,
 and a masked surgeon that patrols, hears footsteps, chases on sight and catches players it sees hiding.
 When it catches you it grabs you by the shoulders and strangles you.
 Everything that matters for the feel has a sound: footsteps on every surface, doors, lockers, the camcorder,
-the enemy's breathing, steps and roar, the strangling, flickering lamps, the fountain, the building's hum and
-the night outside, and chase music.
+the enemy's breathing, steps, roars and grunts, the strangling, the player's breathing and racing heart, humming
+lamps, a television left on, dripping showers, wind in the vents, windows and trees, owls and a dog far off, the
+fountain, the building's hum and the night outside, a tension drone and chase music.
 Next up: an objective and an exit.
 
 ## Sound
@@ -96,8 +97,8 @@ Buses (`default_bus_layout.tres`):
 | Sfx | World | Footsteps, doors, lockers, the camcorder, the enemy |
 | Ambience | World | The building's hum, the night, the fountain, buzzing lamps |
 | Reverb | World | The room reverb of sounds made inside the building |
-| Player | Master | The player's own body: choking, the ringing ears, the death sound |
-| Music | Master | The chase music and the sting |
+| Player | Master | The player's own body: breathing, heartbeat, choking, the ringing ears, the death sound |
+| Music | Master | The tension drone, the chase music and the sting |
 
 Footsteps (`audio/Footsteps.cs`, `audio/footsteps.tscn`) play the sound of the ground under the feet. A floor body
 says what it is made of with a `surface` metadata entry (the building is `tile`, the stairs `stairs`, the lawn
@@ -108,7 +109,14 @@ which keeps the steps in time with every animation and blend.
 
 The `Indoors` area covers the building: it sends the sounds made inside it to the reverb bus, and `audio/Ambience.cs`
 uses it to fade between the building's hum and the night. `audio/ChaseMusic.cs` follows the enemy: a sting when it
-spots the player, then music until it loses them.
+spots the player, then music until it loses them. `audio/TensionDrone.cs` keeps a low drone under everything that
+swells while the enemy searches nearby. Fixed sound sources like the dripping showers and the wind in the vents,
+windows and trees are players under `SoundEmitters` in the level.
+
+The player's fear is heard from inside their head (`player/Dread.cs`): the closer the enemy and the more it hunts
+them, the faster their heart beats, one sampled beat at a time, and the harder they breathe (`player/Breathing.cs`,
+which also gets heavier from sprinting). Hiding in a locker muffles the world through the same low-pass filter that
+choking uses.
 
 ## Animation
 

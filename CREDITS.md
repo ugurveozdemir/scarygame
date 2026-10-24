@@ -72,12 +72,27 @@ The sounds in `assets/sounds` are cut, cleaned up and mixed from these recording
 | [Flashing Light Bulb #4](https://bigsoundbank.com/s2146.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Flickering lamps |
 | [Neon or Transformer #1](https://bigsoundbank.com/s2118.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Flickering lamps' buzz |
 | [Ventilation #5](https://bigsoundbank.com/s3598.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The building's hum |
+| [Forest Wind in the Trees](https://bigsoundbank.com/s0904.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Wind in the trees |
+| [Whistling of the Wind #1](https://bigsoundbank.com/s0147.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Wind at the windows |
+| [Whistling of the Wind #2](https://bigsoundbank.com/s0155.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Wind in the vents |
+| [Tawny Owl #1](https://bigsoundbank.com/s1763.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Distant owls |
+| [Tawny Owl #2](https://bigsoundbank.com/s1764.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Distant owls |
+| [Barking Dog](https://bigsoundbank.com/s0916.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | A distant dog |
+| [Drops of Water #1](https://bigsoundbank.com/s1384.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Dripping showers |
+| [Drops of Water #3](https://bigsoundbank.com/s1386.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Dripping showers |
+| [Zombie #2](https://bigsoundbank.com/s2107.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The enemy's grunts and growls |
+| [Zombie #3](https://bigsoundbank.com/s2108.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The enemy's grunts and growls |
+| [Zombie #4](https://bigsoundbank.com/s2109.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The enemy's grunts |
+| [Zombie #5](https://bigsoundbank.com/s2110.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The enemy's grunts |
+| [Neon or Transformer #2](https://bigsoundbank.com/s2119.html) | Joseph Sardin, [BigSoundBank](https://bigsoundbank.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Ceiling lights' hum |
 | [Impact Sounds](https://kenney.nl/assets/impact-sounds) | [Kenney](https://kenney.nl) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Vent crawling, the grab and the locker torn open |
 | [RPG Audio](https://kenney.nl/assets/rpg-audio) | [Kenney](https://kenney.nl) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Clothes, locker latches and battery handling |
 | [UI Audio](https://kenney.nl/assets/ui-audio) | [Kenney](https://kenney.nl) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Camcorder switches |
 | [Horror Hit Soundpack 1](https://opengameart.org/content/horror-hit-soundpack-1) | psychhead_ | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | The sting when the enemy spots you |
 | [The typical horror strings](https://ende.app/song/17-the-typical-horror-strings) | Sascha Ende, [ende.app](https://ende.app) | [CC BY 4.0](https://ende.app/standard-license) | Chase music |
+| [Halloween 2026 Vol. 7](https://ende.app/en/song/13928-halloween-2026-vol-7) | Sascha Ende, [ende.app](https://ende.app) | [CC BY 4.0](https://ende.app/standard-license) | The tension drone |
 
-The chase music is "The typical horror strings" by Sascha Ende (ende.app), licensed under CC BY 4.0.
-The camcorder's beeps and night vision whine, the death screen's static and the ringing in the ears are
-synthesized for this project.
+The chase music is "The typical horror strings" and the tension drone is "Halloween 2026 Vol. 7", both by
+Sascha Ende (ende.app), licensed under CC BY 4.0.
+The camcorder's beeps and night vision whine, the television's hum, the death screen's static and the ringing
+in the ears are synthesized for this project.

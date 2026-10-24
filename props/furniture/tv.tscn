@@ -1,6 +1,7 @@
 [gd_scene load_steps=8 format=3]
 
 [ext_resource type="Material" path="res://materials/hospital_metal.tres" id="1_metal"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/tv.ogg" id="2_hum"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_plastic"]
 albedo_color = Color(0.07, 0.065, 0.06, 1)
@@ -45,3 +46,12 @@ mesh = SubResource("BoxMesh_tv")
 [node name="Screen" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, -0.235)
 mesh = SubResource("BoxMesh_screen")
+
+[node name="Hum" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, -0.2)
+stream = ExtResource("2_hum")
+volume_db = -8.0
+unit_size = 1.5
+max_distance = 14.0
+autoplay = true
+bus = &"Ambience"

@@ -17,6 +17,8 @@ public partial class Door : AnimatableBody3D, IInteractable
 	/// <summary>The latch clicking shut when the door closes.</summary>
 	[Export] public AudioStreamPlayer3D ShutSound { get; set; }
 	[Export] public AudioStreamPlayer3D BurstSound { get; set; }
+	/// <summary>A flat hand thumping against the wood when the door is pushed instead of opened by the handle.</summary>
+	[Export] public AudioStreamPlayer3D PushSound { get; set; }
 	/// <summary>Each door's hinges creak a little higher or lower than the others.</summary>
 	[Export] public float CreakPitchVariation { get; set; } = 0.12f;
 
@@ -58,6 +60,10 @@ public partial class Door : AnimatableBody3D, IInteractable
 		_handTween.TweenInterval(HandReachSeconds * 0.8f);
 		_handTween.TweenCallback(Callable.From(() =>
 		{
+			bool isFlatHand = curl == 0f;
+			if (isFlatHand)
+				PushSound.Play();
+
 			if (IsOpen)
 				Close();
 			else

@@ -35,6 +35,8 @@ public partial class Camcorder : Node3D
 	[Export] public AudioStreamPlayer LowerSound { get; set; }
 	[Export] public AudioStreamPlayer NightVisionOnSound { get; set; }
 	[Export] public AudioStreamPlayer NightVisionOffSound { get; set; }
+	/// <summary>The faint whine of the night vision while it is on.</summary>
+	[Export] public AudioStreamPlayer NightVisionHum { get; set; }
 	[Export] public AudioStreamPlayer LowBatterySound { get; set; }
 	/// <summary>The night vision dying when the battery runs out.</summary>
 	[Export] public AudioStreamPlayer BatteryDeadSound { get; set; }
@@ -154,6 +156,10 @@ public partial class Camcorder : Node3D
 	private void UpdateEffects()
 	{
 		InfraredLight.Visible = IsNightVisionOn;
+		if (IsNightVisionOn && !NightVisionHum.Playing)
+			NightVisionHum.Play();
+		else if (!IsNightVisionOn)
+			NightVisionHum.Stop();
 
 		ScreenLook look = IsNightVisionOn ? NightVisionLook
 			: IsRaised ? CamcorderLook

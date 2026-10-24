@@ -6,6 +6,7 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/locker/creak.tres" id="4_creak"]
 [ext_resource type="AudioStream" path="res://assets/sounds/locker/shut.tres" id="5_shut"]
 [ext_resource type="AudioStream" path="res://assets/sounds/locker/tear_open.wav" id="6_tearopen"]
+[ext_resource type="AudioStream" path="res://assets/sounds/locker/bump.wav" id="7_bump"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_locker"]
 size = Vector3(0.7, 2.1, 0.6)
@@ -19,13 +20,14 @@ roughness = 0.4
 material = SubResource("StandardMaterial3D_handle")
 size = Vector3(0.025, 0.15, 0.03)
 
-[node name="Locker" type="StaticBody3D" node_paths=PackedStringArray("LatchSound", "CreakSound", "ShutSound", "TearOpenSound", "Door", "OutsideHandle", "InsideGrip", "ApproachPoint", "PullPoint", "HidePoint", "ExitPoint")]
+[node name="Locker" type="StaticBody3D" node_paths=PackedStringArray("LatchSound", "CreakSound", "ShutSound", "TearOpenSound", "BumpSound", "Door", "OutsideHandle", "InsideGrip", "ApproachPoint", "PullPoint", "HidePoint", "ExitPoint")]
 collision_layer = 9
 script = ExtResource("1_locker")
 LatchSound = NodePath("Sounds/LatchSound")
 CreakSound = NodePath("Sounds/CreakSound")
 ShutSound = NodePath("Sounds/ShutSound")
 TearOpenSound = NodePath("Sounds/TearOpenSound")
+BumpSound = NodePath("Sounds/BumpSound")
 Door = NodePath("Door")
 OutsideHandle = NodePath("Door/OutsideHandle")
 InsideGrip = NodePath("Door/InsideGrip")
@@ -141,4 +143,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -0.3)
 stream = ExtResource("6_tearopen")
 unit_size = 5.0
 max_distance = 40.0
+bus = &"Sfx"
+
+[node name="BumpSound" type="AudioStreamPlayer3D" parent="Sounds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+stream = ExtResource("7_bump")
+unit_size = 3.0
+max_distance = 25.0
 bus = &"Sfx"

@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/light_hum.ogg" id="1_hum"]
+
+[node name="LightHum" type="AudioStreamPlayer3D"]
+stream = ExtResource("1_hum")
+volume_db = -14.0
+unit_size = 1.2
+max_distance = 10.0
+autoplay = true
+bus = &"Ambience"

@@ -6,6 +6,7 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/doors/creak.tres" id="4_creak"]
 [ext_resource type="AudioStream" path="res://assets/sounds/doors/shut.tres" id="5_shut"]
 [ext_resource type="AudioStream" path="res://assets/sounds/doors/burst.wav" id="6_burst"]
+[ext_resource type="AudioStream" path="res://assets/sounds/doors/push.wav" id="7_push"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_panel"]
 material = ExtResource("2_prop")
@@ -23,7 +24,7 @@ roughness = 0.4
 material = SubResource("StandardMaterial3D_handle")
 size = Vector3(0.12, 0.025, 0.03)
 
-[node name="Door" type="AnimatableBody3D" node_paths=PackedStringArray("GripPoint", "UnlatchSound", "CreakSound", "ShutSound", "BurstSound")]
+[node name="Door" type="AnimatableBody3D" node_paths=PackedStringArray("GripPoint", "UnlatchSound", "CreakSound", "ShutSound", "BurstSound", "PushSound")]
 collision_layer = 9
 script = ExtResource("1_door")
 GripPoint = NodePath("GripPoint")
@@ -31,6 +32,7 @@ UnlatchSound = NodePath("Sounds/UnlatchSound")
 CreakSound = NodePath("Sounds/CreakSound")
 ShutSound = NodePath("Sounds/ShutSound")
 BurstSound = NodePath("Sounds/BurstSound")
+PushSound = NodePath("Sounds/PushSound")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.2, 0)
@@ -78,4 +80,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.2, 0)
 stream = ExtResource("6_burst")
 unit_size = 5.0
 max_distance = 45.0
+bus = &"Sfx"
+
+[node name="PushSound" type="AudioStreamPlayer3D" parent="Sounds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.2, 0)
+stream = ExtResource("7_push")
+unit_size = 3.0
+max_distance = 25.0
 bus = &"Sfx"

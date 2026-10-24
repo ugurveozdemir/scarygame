@@ -47,6 +47,15 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/ambience/night.ogg" id="45_night"]
 [ext_resource type="AudioStream" path="res://assets/sounds/music/chase.ogg" id="46_chase"]
 [ext_resource type="AudioStream" path="res://assets/sounds/music/sting.wav" id="47_sting"]
+[ext_resource type="PackedScene" path="res://lighting/light_hum.tscn" id="48_light_hum"]
+[ext_resource type="Script" path="res://audio/TensionDrone.cs" id="49_tension_drone"]
+[ext_resource type="AudioStream" path="res://assets/sounds/music/tension.ogg" id="50_tension"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/distant_call.tres" id="51_distant_call"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/drips_01.ogg" id="52_drips_01"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/drips_02.ogg" id="53_drips_02"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/wind_trees.ogg" id="54_wind_trees"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/wind_window.ogg" id="55_wind_window"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/wind_vent.ogg" id="56_wind_vent"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_stair_ramp"]
 size = Vector3(3, 0.2, 5.92)
@@ -1696,6 +1705,9 @@ Player = NodePath("../Player")
 PatrolRoute = NodePath("../PatrolRoute")
 
 
+[node name="Dread" parent="Player" node_paths=PackedStringArray("Enemy")]
+Enemy = NodePath("../../Enemy")
+
 [node name="SoundZones" type="Node3D" parent="."]
 
 [node name="Indoors" type="Area3D" parent="SoundZones"]
@@ -1796,11 +1808,12 @@ shape = SubResource("BoxShape3D_road")
 
 [node name="Audio" type="Node" parent="."]
 
-[node name="Ambience" type="Node" parent="Audio" node_paths=PackedStringArray("Indoors", "BuildingTone", "Night")]
+[node name="Ambience" type="Node" parent="Audio" node_paths=PackedStringArray("Indoors", "BuildingTone", "Night", "DistantCall")]
 script = ExtResource("41_ambience")
 Indoors = NodePath("../../SoundZones/Indoors")
 BuildingTone = NodePath("BuildingTone")
 Night = NodePath("Night")
+DistantCall = NodePath("DistantCall")
 
 [node name="BuildingTone" type="AudioStreamPlayer" parent="Audio/Ambience"]
 stream = ExtResource("44_building_tone")
@@ -1828,6 +1841,301 @@ bus = &"Music"
 [node name="Sting" type="AudioStreamPlayer" parent="Audio/ChaseMusic"]
 stream = ExtResource("47_sting")
 volume_db = -10.0
+bus = &"Music"
+
+[node name="Hum" parent="CorridorLightNear" instance=ExtResource("48_light_hum")]
+pitch_scale = 1.0
+
+[node name="Hum" parent="RoomRight3Light" instance=ExtResource("48_light_hum")]
+pitch_scale = 0.94
+
+[node name="Hum" parent="RoomLeft1Light" instance=ExtResource("48_light_hum")]
+pitch_scale = 1.05
+
+[node name="Hum" parent="RoomLeft2Light" instance=ExtResource("48_light_hum")]
+pitch_scale = 0.97
+
+[node name="Hum" parent="RoomLeft3Light" instance=ExtResource("48_light_hum")]
+pitch_scale = 1.08
+
+[node name="Hum" parent="RoomRight1Light" instance=ExtResource("48_light_hum")]
+pitch_scale = 0.92
+
+[node name="Hum" parent="RoomRight2Light" instance=ExtResource("48_light_hum")]
+pitch_scale = 1.03
+
+[node name="Hum" parent="WardLight" instance=ExtResource("48_light_hum")]
+pitch_scale = 0.99
+
+[node name="SoundEmitters" type="Node3D" parent="."]
+
+[node name="ShowerDripsNorth" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 2, -24.2)
+stream = ExtResource("52_drips_01")
+volume_db = -6.0
+unit_size = 1.5
+max_distance = 12.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="ShowerDripsSouth" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 2, -20.6)
+stream = ExtResource("53_drips_02")
+volume_db = -6.0
+unit_size = 1.5
+max_distance = 12.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindVentWestRoomMouth" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.55, -13.9)
+stream = ExtResource("56_wind_vent")
+volume_db = -8.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindVentWestWardMouth" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0.55, -16)
+stream = ExtResource("56_wind_vent")
+volume_db = -8.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindVentWestDuct" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 0.55, -15.3)
+stream = ExtResource("56_wind_vent")
+volume_db = -8.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindVentEastRoomMouth" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.55, -13.9)
+stream = ExtResource("56_wind_vent")
+volume_db = -8.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindVentEastShowersMouth" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.55, -16)
+stream = ExtResource("56_wind_vent")
+volume_db = -8.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindVentEastDuct" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 0.55, -15.3)
+stream = ExtResource("56_wind_vent")
+volume_db = -8.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindWindowDayRoomWest" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 1.6, -25.9)
+stream = ExtResource("55_wind_window")
+volume_db = -10.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindWindowDayRoomEast" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 1.6, -25.9)
+stream = ExtResource("55_wind_window")
+volume_db = -10.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindWindowRoomLeft1" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.7, -9.3)
+stream = ExtResource("55_wind_window")
+volume_db = -10.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindWindowRoomLeft2" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.7, 0)
+stream = ExtResource("55_wind_window")
+volume_db = -10.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindWindowRoomLeft3" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.7, 9.3)
+stream = ExtResource("55_wind_window")
+volume_db = -10.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindWindowWard" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.1, 1.7, -21.3)
+stream = ExtResource("55_wind_window")
+volume_db = -10.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindWindowRoomRight1" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1.7, -9.3)
+stream = ExtResource("55_wind_window")
+volume_db = -10.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindWindowRoomRight2" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1.7, 0)
+stream = ExtResource("55_wind_window")
+volume_db = -10.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindWindowRoomRight3" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1.7, 9.3)
+stream = ExtResource("55_wind_window")
+volume_db = -10.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindWindowRoomLeft3South" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 1.7, 13.8)
+stream = ExtResource("55_wind_window")
+volume_db = -10.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindWindowRoomRight3South" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 1.7, 13.8)
+stream = ExtResource("55_wind_window")
+volume_db = -10.0
+unit_size = 1.2
+max_distance = 8.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindTreesPlazaWest" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 2, 30)
+stream = ExtResource("54_wind_trees")
+volume_db = -6.0
+unit_size = 6.0
+max_distance = 32.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindTreesPlazaEast" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 2, 30)
+stream = ExtResource("54_wind_trees")
+volume_db = -6.0
+unit_size = 6.0
+max_distance = 32.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindTreesParkingWest" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 2, 62)
+stream = ExtResource("54_wind_trees")
+volume_db = -6.0
+unit_size = 6.0
+max_distance = 32.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindTreesParkingEast" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 2, 65)
+stream = ExtResource("54_wind_trees")
+volume_db = -6.0
+unit_size = 6.0
+max_distance = 32.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindTreesNorthWest" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2, -25)
+stream = ExtResource("54_wind_trees")
+volume_db = -6.0
+unit_size = 6.0
+max_distance = 32.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindTreesNorthEast" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2, -25)
+stream = ExtResource("54_wind_trees")
+volume_db = -6.0
+unit_size = 6.0
+max_distance = 32.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindTreesRoad" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 84)
+stream = ExtResource("54_wind_trees")
+volume_db = -6.0
+unit_size = 6.0
+max_distance = 32.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindTreesFarWest" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -46, 2, 20)
+stream = ExtResource("54_wind_trees")
+volume_db = -6.0
+unit_size = 6.0
+max_distance = 32.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="WindTreesFarEast" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 2, 20)
+stream = ExtResource("54_wind_trees")
+volume_db = -6.0
+unit_size = 6.0
+max_distance = 32.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="DistantCall" type="AudioStreamPlayer3D" parent="Audio/Ambience"]
+stream = ExtResource("51_distant_call")
+unit_size = 15.0
+bus = &"Ambience"
+
+[node name="TensionDrone" type="Node" parent="Audio" node_paths=PackedStringArray("Enemy", "Player", "Drone")]
+script = ExtResource("49_tension_drone")
+Enemy = NodePath("../../Enemy")
+Player = NodePath("../../Player")
+Drone = NodePath("Drone")
+
+[node name="Drone" type="AudioStreamPlayer" parent="Audio/TensionDrone"]
+stream = ExtResource("50_tension")
+volume_db = -16.0
+autoplay = true
 bus = &"Music"
 
 [editable path="Navigation/LampParkingWest"]

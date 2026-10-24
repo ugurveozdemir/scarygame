@@ -10,6 +10,13 @@
 [ext_resource type="PackedScene" path="res://audio/footsteps.tscn" id="8_footsteps"]
 [ext_resource type="AudioStream" path="res://assets/sounds/player/ear_ring.ogg" id="9_ear_ring"]
 [ext_resource type="AudioStream" path="res://assets/sounds/player/death.wav" id="10_death"]
+[ext_resource type="AudioStream" path="res://assets/sounds/player/crouch.wav" id="11_crouch"]
+[ext_resource type="AudioStream" path="res://assets/sounds/player/stand_up.wav" id="12_stand_up"]
+[ext_resource type="Script" path="res://player/Breathing.cs" id="13_breathing"]
+[ext_resource type="AudioStream" path="res://assets/sounds/player/breath.ogg" id="14_breath"]
+[ext_resource type="Script" path="res://player/Dread.cs" id="15_dread"]
+[ext_resource type="AudioStream" path="res://assets/sounds/player/heartbeat.tres" id="16_heartbeat"]
+[ext_resource type="AudioStream" path="res://assets/sounds/player/gasp.wav" id="17_gasp"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_choke"]
 resource_local_to_scene = true
@@ -23,7 +30,7 @@ height = 1.8
 radius = 0.35
 height = 1.0
 
-[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "CameraRig", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "GrabPoints", "LeftShoulder", "RightShoulder", "ThroatLeft", "ThroatRight", "ChokeOverlay", "EarRing", "Hands", "Footsteps")]
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "CameraRig", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "GrabPoints", "LeftShoulder", "RightShoulder", "ThroatLeft", "ThroatRight", "ChokeOverlay", "EarRing", "Hands", "Footsteps", "CrouchSound", "StandUpSound")]
 collision_layer = 2
 script = ExtResource("1_player")
 Head = NodePath("Head")
@@ -42,6 +49,8 @@ ChokeOverlay = NodePath("Hud/ChokeOverlay")
 EarRing = NodePath("EarRing")
 Hands = NodePath("Head/CameraRig/Camera3D/ViewHands")
 Footsteps = NodePath("Footsteps")
+CrouchSound = NodePath("Sounds/Crouch")
+StandUpSound = NodePath("Sounds/StandUp")
 
 [node name="StandingCollision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
@@ -182,3 +191,41 @@ vertical_alignment = 1
 [node name="DeathSound" type="AudioStreamPlayer" parent="Hud/DeathScreen"]
 stream = ExtResource("10_death")
 bus = &"Player"
+
+[node name="Sounds" type="Node" parent="."]
+
+[node name="Crouch" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("11_crouch")
+bus = &"Sfx"
+
+[node name="StandUp" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("12_stand_up")
+bus = &"Sfx"
+
+[node name="Breath" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("14_breath")
+volume_db = -6.0
+autoplay = true
+bus = &"Player"
+
+[node name="Heartbeat" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("16_heartbeat")
+max_polyphony = 2
+bus = &"Player"
+
+[node name="Gasp" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("17_gasp")
+volume_db = -3.0
+bus = &"Player"
+
+[node name="Breathing" type="Node" parent="." node_paths=PackedStringArray("Player", "Breath")]
+script = ExtResource("13_breathing")
+Player = NodePath("..")
+Breath = NodePath("../Sounds/Breath")
+
+[node name="Dread" type="Node" parent="." node_paths=PackedStringArray("Player", "Breathing", "Heartbeat", "Gasp")]
+script = ExtResource("15_dread")
+Player = NodePath("..")
+Breathing = NodePath("../Breathing")
+Heartbeat = NodePath("../Sounds/Heartbeat")
+Gasp = NodePath("../Sounds/Gasp")

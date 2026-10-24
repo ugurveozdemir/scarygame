@@ -46,6 +46,8 @@ public partial class Locker : StaticBody3D, IInteractable
 	[Export] public AudioStreamPlayer3D ShutSound { get; set; }
 	/// <summary>The door torn open and slamming into the locker next to it.</summary>
 	[Export] public AudioStreamPlayer3D TearOpenSound { get; set; }
+	/// <summary>The player's shoulder knocking against the sheet metal while squeezing in.</summary>
+	[Export] public AudioStreamPlayer3D BumpSound { get; set; }
 
 	[ExportGroup("Nodes")]
 	[Export] public Node3D Door { get; set; }
@@ -110,6 +112,7 @@ public partial class Locker : StaticBody3D, IInteractable
 
 		// Step in while the door is still swinging, turning around and reaching back for it.
 		Walk(HidePoint, InsidePitchDegrees, time, StepInSeconds);
+		At(time + StepInSeconds * 0.5f, () => BumpSound.Play());
 		At(time + StepInSeconds * 0.6f, () =>
 		{
 			InsideGrip.Basis = EdgePose;

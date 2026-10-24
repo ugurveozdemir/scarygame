@@ -22,6 +22,8 @@ public partial class Player : CharacterBody3D
 	[Export] public float WalkStepVolumeDb { get; set; } = -6f;
 	[Export] public float SprintStepVolumeDb { get; set; } = 0f;
 	[Export] public float CrouchStepVolumeDb { get; set; } = -15f;
+	[Export] public AudioStreamPlayer CrouchSound { get; set; }
+	[Export] public AudioStreamPlayer StandUpSound { get; set; }
 
 	[ExportGroup("Look")]
 	[Export] public float MouseSensitivity { get; set; } = 0.002f;
@@ -47,6 +49,11 @@ public partial class Player : CharacterBody3D
 	[Export] public AudioStreamPlayer EarRing { get; set; }
 	/// <summary>The low-pass cutoff that muffles the world's sounds just before the player passes out.</summary>
 	[Export] public float PassingOutHearingHz { get; set; } = 400f;
+
+	[ExportGroup("Hiding")]
+	/// <summary>The low-pass cutoff of the world's sounds heard from inside a hiding spot.</summary>
+	[Export] public float HidingHearingHz { get; set; } = 2500f;
+	[Export] public float HidingMuffleSeconds { get; set; } = 0.5f;
 
 	[ExportGroup("Nodes")]
 	[Export] public Node3D Head { get; set; }
@@ -90,10 +97,6 @@ public partial class Player : CharacterBody3D
 		{
 			_chokeAmount = value;
 			_chokeMaterial.SetShaderParameter("amount", value);
-
-			// Hearing fades along with the view: the world's sounds get muffled and the ears start to ring.
-			// The cutoff moves in octaves rather than hertz, so the muffling grows evenly.
-			_worldMuffle.CutoffHz = Mathf.Exp(Mathf.Lerp(Mathf.Log(FullHearingHz), Mathf.Log(PassingOutHearingHz), value));
 			EarRing.VolumeLinear = _earRingVolume * value;
 		}
 	}
@@ -122,6 +125,7 @@ public partial class Player : CharacterBody3D
 	private float _chokeAmount;
 	private ShaderMaterial _chokeMaterial;
 	private AudioEffectLowPassFilter _worldMuffle;
+	private float _hidden;
 	private float _earRingVolume;
 
 	public float HorizontalSpeed => new Vector2(Velocity.X, Velocity.Z).Length();
@@ -164,6 +168,7 @@ public partial class Player : CharacterBody3D
 		if (IsGrabbed)
 			UpdateGrabbedView(dt);
 		CameraRig.UpdateCamera(dt);
+		UpdateHearing(dt);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -315,9 +320,29 @@ public partial class Player : CharacterBody3D
 
 	private void SetCrouching(bool crouching)
 	{
+		if (crouching != IsCrouching)
+			(crouching ? CrouchSound : StandUpSound).Play();
+
 		IsCrouching = crouching;
 		StandingCollision.Disabled = crouching;
 		CrouchingCollision.Disabled = !crouching;
+	}
+
+	/// <summary>
+	/// Muffles the world's sounds while hiding and, much more, as the player passes out, where the ears also ring.
+	/// Cutoffs move in octaves rather than hertz, so the muffling grows evenly.
+	/// </summary>
+	private void UpdateHearing(float delta)
+	{
+		_hidden = Mathf.MoveToward(_hidden, IsHiding ? 1f : 0f, delta / HidingMuffleSeconds);
+		float hiding = Octaves(FullHearingHz, HidingHearingHz, _hidden);
+		float choking = Octaves(FullHearingHz, PassingOutHearingHz, ChokeAmount);
+		_worldMuffle.CutoffHz = Mathf.Min(hiding, choking);
+	}
+
+	private static float Octaves(float fromHz, float toHz, float weight)
+	{
+		return Mathf.Exp(Mathf.Lerp(Mathf.Log(fromHz), Mathf.Log(toHz), weight));
 	}
 
 	private void UpdateHeadPosition(float delta)
