@@ -12,12 +12,15 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/camcorder/reload.wav" id="10_reload"]
 [ext_resource type="AudioStream" path="res://assets/sounds/camcorder/pick_up_battery.wav" id="11_pick_up_battery"]
 [ext_resource type="AudioStream" path="res://assets/sounds/camcorder/night_vision_hum.ogg" id="12_night_vision_hum"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/no_battery.wav" id="13_no_battery"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/tape_motor.ogg" id="14_tape_motor"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/power_on.wav" id="15_power_on"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_screen"]
 resource_local_to_scene = true
 shader = ExtResource("3_shader")
 
-[node name="Camcorder" type="Node3D" node_paths=PackedStringArray("InfraredLight", "AutoGainProbe", "ScreenEffect", "RaiseSound", "LowerSound", "NightVisionOnSound", "NightVisionOffSound", "NightVisionHum", "LowBatterySound", "BatteryDeadSound", "ReloadSound", "PickUpBatterySound")]
+[node name="Camcorder" type="Node3D" node_paths=PackedStringArray("InfraredLight", "AutoGainProbe", "ScreenEffect", "RaiseSound", "LowerSound", "NightVisionOnSound", "NightVisionOffSound", "NightVisionHum", "LowBatterySound", "BatteryDeadSound", "ReloadSound", "PickUpBatterySound", "NoBatterySound", "TapeMotor", "PowerOnSound")]
 script = ExtResource("1_camcorder")
 InfraredLight = NodePath("InfraredLight")
 AutoGainProbe = NodePath("AutoGainProbe")
@@ -31,6 +34,9 @@ LowBatterySound = NodePath("Sounds/LowBatterySound")
 BatteryDeadSound = NodePath("Sounds/BatteryDeadSound")
 ReloadSound = NodePath("Sounds/ReloadSound")
 PickUpBatterySound = NodePath("Sounds/PickUpBatterySound")
+NoBatterySound = NodePath("Sounds/NoBatterySound")
+TapeMotor = NodePath("Sounds/TapeMotor")
+PowerOnSound = NodePath("Sounds/PowerOnSound")
 
 [node name="InfraredLight" type="SpotLight3D" parent="."]
 visible = false
@@ -105,4 +111,16 @@ bus = &"Sfx"
 
 [node name="NightVisionHum" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource("12_night_vision_hum")
+bus = &"Sfx"
+
+[node name="NoBatterySound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("13_no_battery")
+bus = &"Sfx"
+
+[node name="TapeMotor" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("14_tape_motor")
+bus = &"Sfx"
+
+[node name="PowerOnSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("15_power_on")
 bus = &"Sfx"

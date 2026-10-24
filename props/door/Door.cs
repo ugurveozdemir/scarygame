@@ -19,6 +19,8 @@ public partial class Door : AnimatableBody3D, IInteractable
 	[Export] public AudioStreamPlayer3D BurstSound { get; set; }
 	/// <summary>A flat hand thumping against the wood when the door is pushed instead of opened by the handle.</summary>
 	[Export] public AudioStreamPlayer3D PushSound { get; set; }
+	/// <summary>The door knocking against its stop at the end of its swing.</summary>
+	[Export] public AudioStreamPlayer3D StopSound { get; set; }
 	/// <summary>Each door's hinges creak a little higher or lower than the others.</summary>
 	[Export] public float CreakPitchVariation { get; set; } = 0.12f;
 
@@ -87,6 +89,7 @@ public partial class Door : AnimatableBody3D, IInteractable
 			CreakSound.Play();
 		}
 		SwingTo(Mathf.DegToRad(OpenAngleDegrees) * SwingDirectionAwayFrom(opener), burst ? BurstSeconds : SwingSeconds);
+		_swingTween.TweenCallback(Callable.From(() => StopSound.Play()));
 	}
 
 	public void Close()

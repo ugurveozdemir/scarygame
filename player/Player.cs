@@ -22,6 +22,8 @@ public partial class Player : CharacterBody3D
 	[Export] public float WalkStepVolumeDb { get; set; } = -6f;
 	[Export] public float SprintStepVolumeDb { get; set; } = 0f;
 	[Export] public float CrouchStepVolumeDb { get; set; } = -15f;
+	/// <summary>The jacket and the camcorder strap moving with each step.</summary>
+	[Export] public AudioStreamPlayer ClothSound { get; set; }
 	[Export] public AudioStreamPlayer CrouchSound { get; set; }
 	[Export] public AudioStreamPlayer StandUpSound { get; set; }
 
@@ -253,6 +255,8 @@ public partial class Player : CharacterBody3D
 			: IsSprinting ? SprintStepVolumeDb
 			: WalkStepVolumeDb;
 		Footsteps.Step(volumeDb);
+		ClothSound.VolumeDb = volumeDb;
+		ClothSound.Play();
 	}
 
 	private void Stagger(float delta)

@@ -42,6 +42,12 @@ public partial class Camcorder : Node3D
 	[Export] public AudioStreamPlayer BatteryDeadSound { get; set; }
 	[Export] public AudioStreamPlayer ReloadSound { get; set; }
 	[Export] public AudioStreamPlayer PickUpBatterySound { get; set; }
+	/// <summary>R pressed without a spare battery: just the empty click of the latch.</summary>
+	[Export] public AudioStreamPlayer NoBatterySound { get; set; }
+	/// <summary>The barely audible tape motor while recording.</summary>
+	[Export] public AudioStreamPlayer TapeMotor { get; set; }
+	/// <summary>The camcorder powering up when the level starts.</summary>
+	[Export] public AudioStreamPlayer PowerOnSound { get; set; }
 
 	public bool IsRaised { get; private set; }
 	public bool IsNightVisionOn { get; private set; }
@@ -59,6 +65,7 @@ public partial class Camcorder : Node3D
 		_infraredEnergy = InfraredLight.LightEnergy;
 		AutoGainProbe.TargetPosition = Vector3.Forward * AutoGainDistance;
 		UpdateEffects();
+		PowerOnSound.Play();
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -119,8 +126,14 @@ public partial class Camcorder : Node3D
 
 	private void ReloadBattery()
 	{
-		if (SpareBatteries == 0 || Charge == 1f)
+		if (Charge == 1f)
 			return;
+
+		if (SpareBatteries == 0)
+		{
+			NoBatterySound.Play();
+			return;
+		}
 
 		SpareBatteries--;
 		Charge = 1f;
@@ -142,6 +155,14 @@ public partial class Camcorder : Node3D
 		}
 	}
 
+	private static void KeepPlaying(AudioStreamPlayer loop, bool playing)
+	{
+		if (playing && !loop.Playing)
+			loop.Play();
+		else if (!playing)
+			loop.Stop();
+	}
+
 	private void UpdateAutoGain(float delta)
 	{
 		// Like a real camera, turn the infrared light down when something is right in front of the lens.
@@ -156,10 +177,8 @@ public partial class Camcorder : Node3D
 	private void UpdateEffects()
 	{
 		InfraredLight.Visible = IsNightVisionOn;
-		if (IsNightVisionOn && !NightVisionHum.Playing)
-			NightVisionHum.Play();
-		else if (!IsNightVisionOn)
-			NightVisionHum.Stop();
+		KeepPlaying(NightVisionHum, IsNightVisionOn);
+		KeepPlaying(TapeMotor, IsRaised);
 
 		ScreenLook look = IsNightVisionOn ? NightVisionLook
 			: IsRaised ? CamcorderLook

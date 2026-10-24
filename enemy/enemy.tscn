@@ -18,6 +18,7 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/enemy/grunt.tres" id="16_grunt"]
 [ext_resource type="AudioStream" path="res://assets/sounds/enemy/snort.tres" id="17_snort"]
 [ext_resource type="AudioStream" path="res://assets/sounds/enemy/growl.tres" id="18_growl"]
+[ext_resource type="AudioStream" path="res://assets/sounds/enemy/whistle.tres" id="19_whistle"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.38
@@ -115,7 +116,7 @@ Body = NodePath("..")
 Skeleton = NodePath("../Model/GeneralSkeleton")
 Footsteps = NodePath("../Footsteps")
 
-[node name="Voice" type="Node" parent="." node_paths=PackedStringArray("Enemy", "CalmBreath", "HuntingBreath", "SpotRoar", "SuspiciousGrunt", "SearchSnort", "GiveUpGrowl")]
+[node name="Voice" type="Node" parent="." node_paths=PackedStringArray("Enemy", "CalmBreath", "HuntingBreath", "SpotRoar", "SuspiciousGrunt", "SearchSnort", "GiveUpGrowl", "PatrolWhistle")]
 script = ExtResource("8_voice")
 Enemy = NodePath("..")
 CalmBreath = NodePath("../Sounds/CalmBreath")
@@ -124,6 +125,7 @@ SpotRoar = NodePath("../Sounds/SpotRoar")
 SuspiciousGrunt = NodePath("../Sounds/SuspiciousGrunt")
 SearchSnort = NodePath("../Sounds/SearchSnort")
 GiveUpGrowl = NodePath("../Sounds/GiveUpGrowl")
+PatrolWhistle = NodePath("../Sounds/PatrolWhistle")
 
 [node name="Sounds" type="Node3D" parent="."]
 
@@ -202,6 +204,14 @@ stream = ExtResource("18_growl")
 volume_db = -3.0
 unit_size = 4.0
 max_distance = 35.0
+bus = &"Sfx"
+
+[node name="PatrolWhistle" type="AudioStreamPlayer3D" parent="Sounds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, -0.15)
+stream = ExtResource("19_whistle")
+volume_db = -6.0
+unit_size = 5.0
+max_distance = 40.0
 bus = &"Sfx"
 
 [editable path="Model"]

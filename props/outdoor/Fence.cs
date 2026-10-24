@@ -5,6 +5,7 @@ using Godot;
 /// A chain-link fence along a line of corner points: a mesh panel between posts every couple of metres,
 /// drawn with one multimesh for the panels and one for the posts, and a solid wall along each side so nobody
 /// passes through. The panels are stretched slightly so each side ends exactly on its corner.
+/// The wire rattles where someone walks into it.
 /// </summary>
 [Tool]
 public partial class Fence : Node3D
@@ -18,6 +19,11 @@ public partial class Fence : Node3D
 	[Export] public float Height { get; set; } = 2.5f;
 	/// <summary>Corners of the fence in this node's space, on the ground.</summary>
 	[Export] public Vector3[] Corners { get; set; } = System.Array.Empty<Vector3>();
+	[Export] public AudioStream RattleSound { get; set; }
+	/// <summary>How close to the wire someone has to come to set it rattling.</summary>
+	[Export] public float RattleDistance { get; set; } = 0.6f;
+
+	private AudioStreamPlayer3D _rattle;
 
 	public override void _Ready()
 	{
@@ -32,15 +38,30 @@ public partial class Fence : Node3D
 		var panels = new List<Transform3D>();
 		var posts = new List<Transform3D> { new(Basis.Identity, Corners[0]) };
 		var walls = new StaticBody3D { Name = "Walls" };
+		// Walking into the fence means coming this close to a wall, so the area around the walls hears it.
+		var touch = new Area3D { Name = "Touch", CollisionLayer = 0, CollisionMask = 2 };
 		for (int i = 1; i < Corners.Length; i++)
-			AddSide(Corners[i - 1], Corners[i], panels, posts, walls);
+			AddSide(Corners[i - 1], Corners[i], panels, posts, walls, touch);
 
 		AddChild(Instances("Panels", panel, panels));
 		AddChild(Instances("Posts", post, posts));
 		AddChild(walls);
+		AddChild(touch);
+		if (Engine.IsEditorHint() || RattleSound is null)
+			return;
+
+		_rattle = new AudioStreamPlayer3D { Name = "Rattle", Stream = RattleSound, UnitSize = 3f, MaxDistance = 25f, Bus = "Sfx" };
+		AddChild(_rattle);
+		touch.BodyEntered += Rattle;
 	}
 
-	private void AddSide(Vector3 from, Vector3 to, List<Transform3D> panels, List<Transform3D> posts, StaticBody3D walls)
+	private void Rattle(Node3D body)
+	{
+		_rattle.GlobalPosition = body.GlobalPosition + Vector3.Up;
+		_rattle.Play();
+	}
+
+	private void AddSide(Vector3 from, Vector3 to, List<Transform3D> panels, List<Transform3D> posts, StaticBody3D walls, Area3D touch)
 	{
 		Vector3 along = to - from;
 		float length = along.Length();
@@ -56,12 +77,9 @@ public partial class Fence : Node3D
 			posts.Add(new Transform3D(Basis.Identity, position));
 		}
 
-		var wall = new CollisionShape3D
-		{
-			Shape = new BoxShape3D { Size = new Vector3(length, Height, 0.1f) },
-			Transform = new Transform3D(new Basis(Vector3.Up, Mathf.Atan2(-direction.Z, direction.X)), (from + to) / 2f + Vector3.Up * Height / 2f),
-		};
-		walls.AddChild(wall);
+		var placement = new Transform3D(new Basis(Vector3.Up, Mathf.Atan2(-direction.Z, direction.X)), (from + to) / 2f + Vector3.Up * Height / 2f);
+		walls.AddChild(new CollisionShape3D { Shape = new BoxShape3D { Size = new Vector3(length, Height, 0.1f) }, Transform = placement });
+		touch.AddChild(new CollisionShape3D { Shape = new BoxShape3D { Size = new Vector3(length, Height, RattleDistance * 2f) }, Transform = placement });
 	}
 
 	private static MultiMeshInstance3D Instances(string name, Mesh mesh, List<Transform3D> transforms)

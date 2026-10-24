@@ -8,6 +8,8 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/footsteps/grass.tres" id="6_grass"]
 [ext_resource type="AudioStream" path="res://assets/sounds/footsteps/paving.tres" id="7_paving"]
 [ext_resource type="AudioStream" path="res://assets/sounds/footsteps/asphalt.tres" id="8_asphalt"]
+[ext_resource type="AudioStream" path="res://assets/sounds/footsteps/manhole.tres" id="9_manhole"]
+[ext_resource type="AudioStream" path="res://assets/sounds/footsteps/shrub.tres" id="10_shrub"]
 
 [node name="Footsteps" type="AudioStreamPlayer3D"]
 unit_size = 3.0
@@ -20,7 +22,9 @@ Surfaces = Dictionary[StringName, AudioStream]({
 &"concrete": ExtResource("4_concrete"),
 &"duct": ExtResource("3_duct"),
 &"grass": ExtResource("6_grass"),
+&"manhole": ExtResource("9_manhole"),
 &"paving": ExtResource("7_paving"),
+&"shrub": ExtResource("10_shrub"),
 &"stairs": ExtResource("5_stairs"),
 &"tile": ExtResource("2_tile")
 })

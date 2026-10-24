@@ -56,6 +56,16 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/ambience/wind_trees.ogg" id="54_wind_trees"]
 [ext_resource type="AudioStream" path="res://assets/sounds/ambience/wind_window.ogg" id="55_wind_window"]
 [ext_resource type="AudioStream" path="res://assets/sounds/ambience/wind_vent.ogg" id="56_wind_vent"]
+[ext_resource type="Script" path="res://audio/RandomSound.cs" id="57_random_sound"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/chain.tres" id="58_chain"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/pipe_knock.tres" id="59_pipe_knock"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/far_in_the_building.tres" id="60_far"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/bed_creak.tres" id="61_bed_creak"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/chair_scrape.tres" id="62_chair_scrape"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/wheelchair.tres" id="63_wheelchair"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/gate_creak.tres" id="64_gate_creak"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/tarp.ogg" id="65_tarp"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/sewer.ogg" id="66_sewer"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_stair_ramp"]
 size = Vector3(3, 0.2, 5.92)
@@ -121,6 +131,14 @@ size = Vector3(32, 1.2, 16)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_road"]
 size = Vector3(7, 1.2, 34)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_manhole"]
+height = 1.2
+radius = 0.45
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_shrub"]
+height = 1.2
+radius = 0.7
 
 [sub_resource type="BoxMesh" id="BoxMesh_bay_line"]
 material = ExtResource("21_paint")
@@ -1083,6 +1101,7 @@ mesh = SubResource("PlaneMesh_ground")
 script = ExtResource("35_fence")
 Model = ExtResource("36_fence_model")
 Corners = PackedVector3Array(1.5, -3.0, 75, 38, -3.0, 75, 38, -3.0, -38, -38, -3.0, -38, -38, -3.0, 75, -1.5, -3.0, 75)
+RattleSound = ExtResource("58_chain")
 
 [node name="Fountain" parent="Navigation" instance=ExtResource("22_fountain")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.965, 36)
@@ -1806,6 +1825,86 @@ shape = SubResource("BoxShape3D_parking")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.5, 83)
 shape = SubResource("BoxShape3D_road")
 
+[node name="Manhole" type="Area3D" parent="SoundZones"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("43_surface_zone")
+Surface = &"manhole"
+
+[node name="Lid" type="CollisionShape3D" parent="SoundZones/Manhole"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, -2.5, 69)
+shape = SubResource("CylinderShape3D_manhole")
+
+[node name="Shrubs" type="Area3D" parent="SoundZones"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("43_surface_zone")
+Surface = &"shrub"
+
+[node name="Shrub1" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -2.5, 15.6)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub2" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, -2.5, 15.5)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub3" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, -2.5, 15.7)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub4" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -2.5, 15.6)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub5" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, -2.5, 15.4)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub6" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, -2.5, 15.6)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub7" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.7, -2.5, 2)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub8" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.6, -2.5, 9)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub9" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.7, -2.5, -3)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub10" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.6, -2.5, 8)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub11" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.2, -2.5, 29.5)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub12" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, -2.5, 42.3)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub13" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, -2.5, 48)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Shrub14" type="CollisionShape3D" parent="SoundZones/Shrubs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, -2.5, 48.2)
+shape = SubResource("CylinderShape3D_shrub")
+
+[node name="Hum" parent="Navigation/LampParkingWest/Light"]
+autoplay = false
+
+[node name="Hum" parent="Navigation/LampRoad/Light"]
+autoplay = false
+
 [node name="Audio" type="Node" parent="."]
 
 [node name="Ambience" type="Node" parent="Audio" node_paths=PackedStringArray("Indoors", "BuildingTone", "Night", "DistantCall")]
@@ -2137,6 +2236,194 @@ stream = ExtResource("50_tension")
 volume_db = -16.0
 autoplay = true
 bus = &"Music"
+
+[node name="ShowerPipes" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.08, 2.6, -22.4)
+stream = ExtResource("59_pipe_knock")
+volume_db = 0.0
+unit_size = 3.0
+max_distance = 25.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 20.0
+MaxSeconds = 60.0
+
+[node name="FarSoundsNorth" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -14)
+stream = ExtResource("60_far")
+volume_db = 0.0
+unit_size = 4.0
+max_distance = 40.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 40.0
+MaxSeconds = 120.0
+
+[node name="FarSoundsSouth" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 13)
+stream = ExtResource("60_far")
+volume_db = 0.0
+unit_size = 4.0
+max_distance = 40.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 40.0
+MaxSeconds = 120.0
+
+[node name="FarSoundsWard" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.8, 1.5, -21)
+stream = ExtResource("60_far")
+volume_db = 0.0
+unit_size = 4.0
+max_distance = 40.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 50.0
+MaxSeconds = 140.0
+
+[node name="WardBedCreak" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.8, 0.6, -24)
+stream = ExtResource("61_bed_creak")
+volume_db = 0.0
+unit_size = 2.0
+max_distance = 15.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 30.0
+MaxSeconds = 90.0
+
+[node name="DayRoomChairScrape" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.4, -21.4)
+stream = ExtResource("62_chair_scrape")
+volume_db = 0.0
+unit_size = 2.5
+max_distance = 20.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 45.0
+MaxSeconds = 120.0
+
+[node name="WheelchairSqueak" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, -2.5, 31)
+stream = ExtResource("63_wheelchair")
+volume_db = -4.0
+unit_size = 3.0
+max_distance = 25.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 25.0
+MaxSeconds = 70.0
+
+[node name="GateCreak" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 75)
+stream = ExtResource("64_gate_creak")
+volume_db = 0.0
+unit_size = 3.0
+max_distance = 25.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 15.0
+MaxSeconds = 40.0
+
+[node name="GateChain" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -1.8, 75)
+stream = ExtResource("58_chain")
+volume_db = 0.0
+unit_size = 2.5
+max_distance = 20.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 20.0
+MaxSeconds = 50.0
+
+[node name="FenceRattleNorth" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -2, -38)
+stream = ExtResource("58_chain")
+volume_db = -4.0
+unit_size = 2.5
+max_distance = 20.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 30.0
+MaxSeconds = 90.0
+
+[node name="FenceRattleEast" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, -2, 20)
+stream = ExtResource("58_chain")
+volume_db = -4.0
+unit_size = 2.5
+max_distance = 20.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 30.0
+MaxSeconds = 90.0
+
+[node name="FenceRattleWest" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, -2, 20)
+stream = ExtResource("58_chain")
+volume_db = -4.0
+unit_size = 2.5
+max_distance = 20.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 30.0
+MaxSeconds = 90.0
+
+[node name="FenceRattleSouth" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, -2, 75)
+stream = ExtResource("58_chain")
+volume_db = -4.0
+unit_size = 2.5
+max_distance = 20.0
+bus = &"Ambience"
+script = ExtResource("57_random_sound")
+MinSeconds = 30.0
+MaxSeconds = 90.0
+
+[node name="TarpsNorthWest" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, -2.2, 52.7)
+stream = ExtResource("65_tarp")
+volume_db = -10.0
+unit_size = 2.0
+max_distance = 15.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="TarpsNorthEast" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, -2.2, 52.6)
+stream = ExtResource("65_tarp")
+volume_db = -10.0
+unit_size = 2.0
+max_distance = 15.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="TarpsSouthWest" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -2.2, 63.5)
+stream = ExtResource("65_tarp")
+volume_db = -10.0
+unit_size = 2.0
+max_distance = 15.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="TarpsSouthEast" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, -2.2, 63.2)
+stream = ExtResource("65_tarp")
+volume_db = -10.0
+unit_size = 2.0
+max_distance = 15.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="Sewer" type="AudioStreamPlayer3D" parent="SoundEmitters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, -3.3, 69)
+stream = ExtResource("66_sewer")
+volume_db = -6.0
+unit_size = 1.5
+max_distance = 10.0
+autoplay = true
+bus = &"Ambience"
 
 [editable path="Navigation/LampParkingWest"]
 [editable path="Navigation/LampRoad"]

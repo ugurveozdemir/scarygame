@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="PackedScene" path="res://assets/polyhaven/street_lamp_01/street_lamp_01.gltf" id="1_model"]
+[ext_resource type="PackedScene" path="res://lighting/light_hum.tscn" id="2_hum"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
 height = 3.8
@@ -20,3 +21,8 @@ light_color = Color(1, 0.72, 0.42, 1)
 light_energy = 2.0
 omni_range = 13.0
 omni_attenuation = 1.4
+
+[node name="Hum" parent="Light" instance=ExtResource("2_hum")]
+volume_db = -18.0
+pitch_scale = 0.8
+max_distance = 12.0
