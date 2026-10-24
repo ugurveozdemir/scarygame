@@ -1,14 +1,16 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://player/ViewHands.cs" id="1_view_hands"]
 [ext_resource type="PackedScene" path="res://assets/rocketbox/male_adult_12/Male_Adult_12.fbx" id="2_body"]
 [ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual1_standard.glb" id="3_animations"]
 [ext_resource type="Script" path="res://player/HideBonesModifier.cs" id="4_hide_bones"]
 [ext_resource type="Script" path="res://player/GripFingersModifier.cs" id="5_grip_fingers"]
+[ext_resource type="Script" path="res://player/HandAimModifier.cs" id="6_hand_aim"]
 
-[node name="ViewHands" type="Node3D" node_paths=PackedStringArray("AnimationPlayer", "GripFingers", "LeftHandTarget", "RightHandTarget", "LeftRest", "RightRest")]
+[node name="ViewHands" type="Node3D" node_paths=PackedStringArray("AnimationPlayer", "Skeleton", "GripFingers", "LeftHandTarget", "RightHandTarget", "LeftRest", "RightRest")]
 script = ExtResource("1_view_hands")
 AnimationPlayer = NodePath("Body/AnimationPlayer")
+Skeleton = NodePath("Body/GeneralSkeleton")
 ExtraAnimations = ExtResource("3_animations")
 GripFingers = NodePath("Body/GeneralSkeleton/GripFingers")
 LeftHandTarget = NodePath("LeftHandTarget")
@@ -35,6 +37,11 @@ settings/1/root_bone_name = "RightUpperArm"
 settings/1/middle_bone_name = "RightLowerArm"
 settings/1/end_bone_name = "RightHand"
 
+[node name="HandAim" type="SkeletonModifier3D" parent="Body/GeneralSkeleton" node_paths=PackedStringArray("LeftTarget", "RightTarget")]
+script = ExtResource("6_hand_aim")
+LeftTarget = NodePath("../../../LeftHandTarget")
+RightTarget = NodePath("../../../RightHandTarget")
+
 [node name="HideHead" type="SkeletonModifier3D" parent="Body/GeneralSkeleton"]
 script = ExtResource("4_hide_bones")
 BoneNames = PackedStringArray("Head")
@@ -53,9 +60,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, -0.6, -0.05)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, -0.6, -0.05)
 
 [node name="LeftElbowPole" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, -0.5, 0.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, -0.9, 0.1)
 
 [node name="RightElbowPole" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, -0.5, 0.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, -0.9, 0.1)
 
 [editable path="Body"]

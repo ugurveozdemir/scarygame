@@ -13,6 +13,12 @@ public partial class Locker : StaticBody3D, IInteractable
 	private const float InsidePitchDegrees = -20f;
 	private const float ExitPitchDegrees = 0f;
 
+	// The door's front is towards -Z and its hinge towards +X. The player pulls the handle with the fingers
+	// towards the door and the palm facing the hinge, holds the door's edge from inside, and pushes it flat-handed.
+	private static readonly Basis HandlePose = ViewHands.Pose(Vector3.Back, Vector3.Right);
+	private static readonly Basis EdgePose = ViewHands.Pose(Vector3.Forward, Vector3.Left);
+	private static readonly Basis PushPose = ViewHands.Pose(Vector3.Up, Vector3.Forward);
+
 	[ExportGroup("Door")]
 	[Export] public float DoorOpenAngleDegrees { get; set; } = 100f;
 	/// <summary>How far the hand pulls the door before letting it swing the rest of the way.</summary>
@@ -21,6 +27,9 @@ public partial class Locker : StaticBody3D, IInteractable
 	[Export] public float SwingOpenSeconds { get; set; } = 0.5f;
 	[Export] public float CloseSeconds { get; set; } = 0.55f;
 	[Export] public float PushOpenSeconds { get; set; } = 0.5f;
+
+	/// <summary>How tightly the fingers close around the handle and the door's edge, from 0 for an open hand to 1 for a fist.</summary>
+	[Export(PropertyHint.Range, "0,1")] public float HandleCurl { get; set; } = 0.7f;
 
 	[ExportGroup("Walking")]
 	/// <summary>Walking pace used to time the walk up to the locker when the player is standing still.</summary>
@@ -49,6 +58,11 @@ public partial class Locker : StaticBody3D, IInteractable
 
 	public string InteractionPrompt => IsOccupied ? "Leave" : "Hide";
 
+	public override void _Ready()
+	{
+		OutsideHandle.Basis = HandlePose;
+	}
+
 	public void Interact(Player player)
 	{
 		if (IsOccupied)
@@ -68,7 +82,7 @@ public partial class Locker : StaticBody3D, IInteractable
 			float distance = player.GlobalPosition.DistanceTo(ApproachPoint.GlobalPosition);
 			float approach = Mathf.Max(1.5f * distance / Mathf.Max(velocity.Length(), ApproachSpeed), MinApproachSeconds);
 			Walk(ApproachPoint, ApproachPitchDegrees, time, approach, velocity);
-			At(approach * 0.3f, () => player.Hands.Reach(ViewHands.Side.Right, OutsideHandle, approach * 0.7f));
+			At(approach * 0.3f, () => player.Hands.Reach(ViewHands.Side.Right, OutsideHandle, approach * 0.7f, HandleCurl));
 			time += approach;
 
 			// Pull the door while stepping out of its way, then let it swing open by itself.
@@ -81,7 +95,11 @@ public partial class Locker : StaticBody3D, IInteractable
 
 		// Step in while the door is still swinging, turning around and reaching back for it.
 		Walk(HidePoint, InsidePitchDegrees, time, StepInSeconds);
-		At(time + StepInSeconds * 0.6f, () => player.Hands.Reach(ViewHands.Side.Right, InsideGrip, StepInSeconds * 0.4f));
+		At(time + StepInSeconds * 0.6f, () =>
+		{
+			InsideGrip.Basis = EdgePose;
+			player.Hands.Reach(ViewHands.Side.Right, InsideGrip, StepInSeconds * 0.4f, HandleCurl);
+		});
 		time += StepInSeconds;
 		At(time, () =>
 		{
@@ -98,7 +116,11 @@ public partial class Locker : StaticBody3D, IInteractable
 	{
 		BeginSequence(player);
 		float reach = player.Hands.ReachSeconds;
-		At(0f, () => player.Hands.Reach(ViewHands.Side.Right, InsideGrip, reach));
+		At(0f, () =>
+		{
+			InsideGrip.Basis = PushPose;
+			player.Hands.Reach(ViewHands.Side.Right, InsideGrip, reach);
+		});
 
 		// Push the door open and step out right behind it.
 		SwingDoor(1f, reach, PushOpenSeconds);

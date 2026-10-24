@@ -16,7 +16,9 @@ public partial class Door : AnimatableBody3D, IInteractable
 	/// <summary>Handle position in door space; its Z is mirrored to whichever side the player is on.</summary>
 	[Export] public Vector3 HandlePosition { get; set; } = new(0.84f, 1.05f, 0.06f);
 	/// <summary>Further away than this, the hand pushes the door where it is nearest instead of using the handle.</summary>
-	[Export] public float HandleReach { get; set; } = 0.75f;
+	[Export] public float HandleReach { get; set; } = 1.1f;
+	/// <summary>How tightly the fingers close around the handle, from 0 for an open hand to 1 for a fist.</summary>
+	[Export(PropertyHint.Range, "0,1")] public float HandleCurl { get; set; } = 0.7f;
 	[Export] public Node3D GripPoint { get; set; }
 
 	private float _openAngle;
@@ -37,8 +39,8 @@ public partial class Door : AnimatableBody3D, IInteractable
 		if (_handTween is not null && _handTween.IsRunning())
 			return;
 
-		ViewHands.Side side = PlaceGripFor(player);
-		_ = player.Hands.Reach(side, GripPoint, HandReachSeconds);
+		(ViewHands.Side side, float curl) = PlaceGripFor(player);
+		_ = player.Hands.Reach(side, GripPoint, HandReachSeconds, curl);
 
 		// The door starts moving as the hand touches it, and the hand rides along for a moment.
 		_handTween = CreateTween();
@@ -67,19 +69,33 @@ public partial class Door : AnimatableBody3D, IInteractable
 	}
 
 	/// <summary>
-	/// Puts the grip on the handle on the player's side of the door, or on the nearest spot of the door
-	/// if the handle is out of reach. Returns the hand that should do it.
+	/// Puts the grip on the handle on the player's side of the door, or flat on the nearest spot of the door
+	/// if the handle is out of reach. Returns the hand that should do it and how tightly it closes.
 	/// </summary>
-	private ViewHands.Side PlaceGripFor(Player player)
+	private (ViewHands.Side, float) PlaceGripFor(Player player)
 	{
 		Vector3 head = ToLocal(player.Head.GlobalPosition);
 		float playerSide = head.Z >= 0f ? 1f : -1f;
 		Vector3 handle = HandlePosition with { Z = HandlePosition.Z * playerSide };
-		bool canReachHandle = ToGlobal(handle).DistanceTo(player.Head.GlobalPosition) <= HandleReach;
-		GripPoint.Position = canReachHandle
-			? handle
-			: new Vector3(Mathf.Clamp(head.X, 0.2f, 0.9f), Mathf.Clamp(head.Y - 0.5f, 0.9f, 1.4f), handle.Z);
+		Vector3 intoDoor = new(0f, 0f, -playerSide);
 
+		if (ToGlobal(handle).DistanceTo(player.Head.GlobalPosition) <= HandleReach)
+		{
+			// Fingers reach over the handle, palm down.
+			GripPoint.Position = handle;
+			GripPoint.Basis = ViewHands.Pose(intoDoor, Vector3.Down);
+			return (HandSide(player), HandleCurl);
+		}
+
+		// Push the door with a flat hand, fingers up and palm on the door.
+		GripPoint.Position = new Vector3(Mathf.Clamp(head.X, 0.2f, 0.9f), Mathf.Clamp(head.Y - 0.5f, 0.9f, 1.4f), handle.Z);
+		GripPoint.Basis = ViewHands.Pose(Vector3.Up, intoDoor);
+		return (HandSide(player), 0f);
+	}
+
+	/// <summary>The hand on the same side of the player as the grip point.</summary>
+	private ViewHands.Side HandSide(Player player)
+	{
 		bool gripIsOnPlayersLeft = player.ToLocal(GripPoint.GlobalPosition).X < 0f;
 		return gripIsOnPlayersLeft ? ViewHands.Side.Left : ViewHands.Side.Right;
 	}

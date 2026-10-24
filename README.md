@@ -92,7 +92,14 @@ The IK needs its elbow pole markers (`LeftElbowPole`, `RightElbowPole`) to solve
 
 The player's own hands (`player/view_hands.tscn`) only appear while reaching for something: opening
 or closing a door or locker. They belong to a full body placed around the camera, with its head shrunk away by
-`HideBonesModifier`; `GripFingersModifier` curls the fingers into a grip and IK places the hand on a grip point.
+`HideBonesModifier`; IK places the wrist on a grip point, `HandAimModifier` turns the hand to the grip point's
+orientation and `GripFingersModifier` curls the fingers by the amount the interaction asks for.
+
+A grip point says how the hand is held: its -Z axis is where the fingers point and its -Y axis is where the palm
+faces (`ViewHands.Pose`), so a door handle is gripped palm down with curled fingers and a far door is pushed
+with a flat hand. The arms are only a little longer than a real reach, so for a far grip `ViewHands` scales the
+whole view model around the camera until the elbow stays comfortably bent; on screen it looks like a closer
+reach but the hand still touches the grip.
 
 Interactions never stop the player abruptly. Doors don't lock the controls at all: the hand pushes the
 door and the player keeps walking. Getting into a locker is one timeline of overlapping steps
