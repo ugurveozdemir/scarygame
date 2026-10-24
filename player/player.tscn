@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=26 format=3]
 
 [ext_resource type="Script" path="res://player/Player.cs" id="1_player"]
 [ext_resource type="PackedScene" path="res://camcorder/camcorder.tscn" id="2_camcorder"]
@@ -6,7 +6,7 @@
 [ext_resource type="Script" path="res://player/DeathScreen.cs" id="4_death_screen"]
 [ext_resource type="Shader" path="res://player/choke_overlay.gdshader" id="5_choke_shader"]
 [ext_resource type="PackedScene" path="res://player/view_hands.tscn" id="6_view_hands"]
-[ext_resource type="Script" path="res://player/PlayerCamera.cs" id="7_camera"]
+[ext_resource type="Script" path="res://player/FirstPersonCamera.cs" id="7_camera"]
 [ext_resource type="PackedScene" path="res://audio/footsteps.tscn" id="8_footsteps"]
 [ext_resource type="AudioStream" path="res://assets/sounds/player/ear_ring.ogg" id="9_ear_ring"]
 [ext_resource type="AudioStream" path="res://assets/sounds/player/death.wav" id="10_death"]
@@ -19,6 +19,9 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/player/gasp.wav" id="17_gasp"]
 [ext_resource type="AudioStream" path="res://assets/sounds/player/cloth.tres" id="18_cloth"]
 [ext_resource type="AudioStream" path="res://assets/sounds/player/held_breath.ogg" id="19_held_breath"]
+[ext_resource type="Resource" path="res://player/first_person_settings.tres" id="20_settings"]
+[ext_resource type="PackedScene" path="res://player/player_body.tscn" id="21_body"]
+[ext_resource type="Script" path="res://player/TuningPanel.cs" id="22_tuning"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_choke"]
 resource_local_to_scene = true
@@ -32,15 +35,16 @@ height = 1.8
 radius = 0.35
 height = 1.0
 
-[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "CameraRig", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "GrabPoints", "LeftShoulder", "RightShoulder", "ThroatLeft", "ThroatRight", "ChokeOverlay", "EarRing", "Hands", "Footsteps", "CrouchSound", "StandUpSound", "ClothSound")]
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Head", "Camera", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "GrabPoints", "LeftShoulder", "RightShoulder", "ThroatLeft", "ThroatRight", "ChokeOverlay", "EarRing", "Hands", "Footsteps", "CrouchSound", "StandUpSound", "ClothSound")]
 collision_layer = 2
 script = ExtResource("1_player")
+Settings = ExtResource("20_settings")
 Head = NodePath("Head")
-CameraRig = NodePath("Head/CameraRig")
+Camera = NodePath("Camera")
 StandingCollision = NodePath("StandingCollision")
 CrouchingCollision = NodePath("CrouchingCollision")
 CeilingCheck = NodePath("CeilingCheck")
-Camcorder = NodePath("Head/CameraRig/Camera3D/Camcorder")
+Camcorder = NodePath("Camera/Camcorder")
 DeathScreen = NodePath("Hud/DeathScreen")
 GrabPoints = NodePath("GrabPoints")
 LeftShoulder = NodePath("GrabPoints/LeftShoulder")
@@ -49,7 +53,7 @@ ThroatLeft = NodePath("GrabPoints/ThroatLeft")
 ThroatRight = NodePath("GrabPoints/ThroatRight")
 ChokeOverlay = NodePath("Hud/ChokeOverlay")
 EarRing = NodePath("EarRing")
-Hands = NodePath("Head/CameraRig/Camera3D/ViewHands")
+Hands = NodePath("Camera/ViewHands")
 Footsteps = NodePath("Footsteps")
 CrouchSound = NodePath("Sounds/Crouch")
 StandUpSound = NodePath("Sounds/StandUp")
@@ -69,27 +73,26 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 target_position = Vector3(0, 0.9, 0)
 
 [node name="Head" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
 
-[node name="CameraRig" type="Node3D" parent="Head" node_paths=PackedStringArray("Player", "Camera")]
-script = ExtResource("7_camera")
-Player = NodePath("../..")
-Camera = NodePath("Camera3D")
-
-[node name="Camera3D" type="Camera3D" parent="Head/CameraRig"]
+[node name="Camera" type="Camera3D" parent="." node_paths=PackedStringArray("Player")]
 current = true
-fov = 75.0
+script = ExtResource("7_camera")
+Player = NodePath("..")
 
-[node name="Camcorder" parent="Head/CameraRig/Camera3D" instance=ExtResource("2_camcorder")]
+[node name="Camcorder" parent="Camera" instance=ExtResource("2_camcorder")]
 
-[node name="ViewHands" parent="Head/CameraRig/Camera3D" instance=ExtResource("6_view_hands")]
+[node name="ViewHands" parent="Camera" instance=ExtResource("6_view_hands")]
 
-[node name="Interactor" type="RayCast3D" parent="Head/CameraRig/Camera3D" node_paths=PackedStringArray("Player", "PromptLabel")]
+[node name="Interactor" type="RayCast3D" parent="Camera" node_paths=PackedStringArray("Player", "PromptLabel")]
 target_position = Vector3(0, 0, -1.6)
 collision_mask = 9
 script = ExtResource("3_interactor")
-Player = NodePath("../../../..")
-PromptLabel = NodePath("../../../../Hud/PromptLabel")
+Player = NodePath("../..")
+PromptLabel = NodePath("../../Hud/PromptLabel")
+
+[node name="Body" parent="." node_paths=PackedStringArray("Player") instance=ExtResource("21_body")]
+Player = NodePath("..")
 
 [node name="Footsteps" parent="." instance=ExtResource("8_footsteps")]
 
@@ -155,6 +158,12 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="TuningPanel" type="PanelContainer" parent="Hud" ]
+offset_left = 16.0
+offset_top = 16.0
+script = ExtResource("22_tuning")
+Settings = ExtResource("20_settings")
 
 [node name="DeathScreen" type="Control" parent="Hud" node_paths=PackedStringArray("DeathSound")]
 process_mode = 3

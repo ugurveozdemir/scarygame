@@ -1,53 +1,79 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://player/ViewHands.cs" id="1_view_hands"]
-[ext_resource type="PackedScene" path="res://assets/rocketbox/male_adult_12/Male_Adult_12.fbx" id="2_body"]
+[ext_resource type="PackedScene" path="res://assets/mikealger/mike_alger.gltf" id="2_body"]
 [ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual1_standard.glb" id="3_animations"]
-[ext_resource type="Script" path="res://player/HideBonesModifier.cs" id="4_hide_bones"]
+[ext_resource type="Material" path="res://player/first_person_skin.tres" id="4_skin"]
 [ext_resource type="Script" path="res://player/GripFingersModifier.cs" id="5_grip_fingers"]
 [ext_resource type="Script" path="res://player/HandAimModifier.cs" id="6_hand_aim"]
+[ext_resource type="Material" path="res://player/first_person_cloth.tres" id="7_cloth"]
 
 [node name="ViewHands" type="Node3D" node_paths=PackedStringArray("AnimationPlayer", "Skeleton", "GripFingers", "LeftHandTarget", "RightHandTarget", "LeftRest", "RightRest")]
 script = ExtResource("1_view_hands")
 AnimationPlayer = NodePath("Body/AnimationPlayer")
-Skeleton = NodePath("Body/GeneralSkeleton")
+Skeleton = NodePath("Body/MikeAlger/GeneralSkeleton")
 ExtraAnimations = ExtResource("3_animations")
-GripFingers = NodePath("Body/GeneralSkeleton/GripFingers")
+GripFingers = NodePath("Body/MikeAlger/GeneralSkeleton/GripFingers")
 LeftHandTarget = NodePath("LeftHandTarget")
 RightHandTarget = NodePath("RightHandTarget")
 LeftRest = NodePath("LeftRest")
 RightRest = NodePath("RightRest")
 
 [node name="Body" parent="." instance=ExtResource("2_body")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -1.59, -0.1)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -1.6, -0.1)
 
-[node name="m007_hipoly_81_bones" parent="Body/GeneralSkeleton" index="1"]
+[node name="Hands" parent="Body/MikeAlger/GeneralSkeleton" index="2"]
+material_override = ExtResource("4_skin")
 cast_shadow = 0
 
-[node name="ArmsIK" type="TwoBoneIK3D" parent="Body/GeneralSkeleton"]
+[node name="Sleeves" parent="Body/MikeAlger/GeneralSkeleton" index="7"]
+material_override = ExtResource("7_cloth")
+cast_shadow = 0
+
+[node name="Bracelet" parent="Body/MikeAlger/GeneralSkeleton" index="0"]
+material_override = ExtResource("7_cloth")
+cast_shadow = 0
+
+[node name="Face" parent="Body/MikeAlger/GeneralSkeleton" index="3"]
+visible = false
+
+[node name="Hair" parent="Body/MikeAlger/GeneralSkeleton" index="1"]
+visible = false
+
+[node name="Pants" parent="Body/MikeAlger/GeneralSkeleton" index="4"]
+visible = false
+
+[node name="Shirt" parent="Body/MikeAlger/GeneralSkeleton" index="5"]
+visible = false
+
+[node name="Shoes" parent="Body/MikeAlger/GeneralSkeleton" index="6"]
+visible = false
+
+[node name="Sweatshirt" parent="Body/MikeAlger/GeneralSkeleton" index="8"]
+visible = false
+
+[node name="ArmsIK" type="TwoBoneIK3D" parent="Body/MikeAlger/GeneralSkeleton"]
 setting_count = 2
-settings/0/target_node = NodePath("../../../LeftHandTarget")
-settings/0/pole_node = NodePath("../../../LeftElbowPole")
+settings/0/target_node = NodePath("../../../../LeftHandTarget")
+settings/0/pole_node = NodePath("../../../../LeftElbowPole")
 settings/0/root_bone_name = "LeftUpperArm"
 settings/0/middle_bone_name = "LeftLowerArm"
 settings/0/end_bone_name = "LeftHand"
-settings/1/target_node = NodePath("../../../RightHandTarget")
-settings/1/pole_node = NodePath("../../../RightElbowPole")
+settings/1/target_node = NodePath("../../../../RightHandTarget")
+settings/1/pole_node = NodePath("../../../../RightElbowPole")
 settings/1/root_bone_name = "RightUpperArm"
 settings/1/middle_bone_name = "RightLowerArm"
 settings/1/end_bone_name = "RightHand"
 
-[node name="HandAim" type="SkeletonModifier3D" parent="Body/GeneralSkeleton" node_paths=PackedStringArray("LeftTarget", "RightTarget")]
+[node name="HandAim" type="SkeletonModifier3D" parent="Body/MikeAlger/GeneralSkeleton" node_paths=PackedStringArray("LeftTarget", "RightTarget")]
 script = ExtResource("6_hand_aim")
-LeftTarget = NodePath("../../../LeftHandTarget")
-RightTarget = NodePath("../../../RightHandTarget")
+LeftTarget = NodePath("../../../../LeftHandTarget")
+RightTarget = NodePath("../../../../RightHandTarget")
 
-[node name="HideHead" type="SkeletonModifier3D" parent="Body/GeneralSkeleton"]
-script = ExtResource("4_hide_bones")
-BoneNames = PackedStringArray("Head")
-
-[node name="GripFingers" type="SkeletonModifier3D" parent="Body/GeneralSkeleton"]
+[node name="GripFingers" type="SkeletonModifier3D" parent="Body/MikeAlger/GeneralSkeleton"]
 script = ExtResource("5_grip_fingers")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Body"]
 
 [node name="LeftHandTarget" type="Marker3D" parent="."]
 

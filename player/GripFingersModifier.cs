@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Godot;
 
 /// <summary>
-/// Curls the fingers of each hand towards a grip by copying their rotations from the first frame of a gripping
-/// animation, while the rest of the body keeps playing its own animation.
-/// A strength of 0 leaves the animated fingers alone and 1 is the full grip.
+/// Poses the fingers of each hand between an open, flat hand and a grip by copying their rotations from the first
+/// frames of two animations, while the rest of the arm keeps playing its own animation.
+/// A strength of 0 is the open hand and 1 is the full grip.
 /// </summary>
 public partial class GripFingersModifier : SkeletonModifier3D
 {
@@ -17,44 +17,48 @@ public partial class GripFingersModifier : SkeletonModifier3D
 		"LittleProximal", "LittleIntermediate", "LittleDistal",
 	};
 
-	private readonly Dictionary<int, Quaternion> _leftGrip = new();
-	private readonly Dictionary<int, Quaternion> _rightGrip = new();
+	private readonly Dictionary<int, (Quaternion Open, Quaternion Grip)> _leftFingers = new();
+	private readonly Dictionary<int, (Quaternion Open, Quaternion Grip)> _rightFingers = new();
 
 	public float LeftStrength { get; set; }
 	public float RightStrength { get; set; }
 
-	public void UsePose(Animation gripAnimation)
+	public void UsePoses(Animation openAnimation, Animation gripAnimation)
 	{
-		ReadGrip(gripAnimation, "Left", _leftGrip);
-		ReadGrip(gripAnimation, "Right", _rightGrip);
+		ReadPoses(openAnimation, gripAnimation, "Left", _leftFingers);
+		ReadPoses(openAnimation, gripAnimation, "Right", _rightFingers);
 	}
 
 	public override void _ProcessModificationWithDelta(double delta)
 	{
-		Curl(_leftGrip, LeftStrength);
-		Curl(_rightGrip, RightStrength);
+		PoseFingers(_leftFingers, LeftStrength);
+		PoseFingers(_rightFingers, RightStrength);
 	}
 
-	private void ReadGrip(Animation gripAnimation, string side, Dictionary<int, Quaternion> grip)
+	private void ReadPoses(Animation openAnimation, Animation gripAnimation, string side,
+		Dictionary<int, (Quaternion Open, Quaternion Grip)> fingers)
 	{
 		Skeleton3D skeleton = GetSkeleton();
-		grip.Clear();
+		fingers.Clear();
 		foreach (string joint in FingerJoints)
 		{
 			string bone = side + joint;
-			int track = gripAnimation.FindTrack($"%GeneralSkeleton:{bone}", Animation.TrackType.Rotation3D);
-			if (track >= 0)
-				grip[skeleton.FindBone(bone)] = gripAnimation.RotationTrackInterpolate(track, 0.0);
+			string path = $"%GeneralSkeleton:{bone}";
+			int openTrack = openAnimation.FindTrack(path, Animation.TrackType.Rotation3D);
+			int gripTrack = gripAnimation.FindTrack(path, Animation.TrackType.Rotation3D);
+			if (openTrack >= 0 && gripTrack >= 0)
+			{
+				fingers[skeleton.FindBone(bone)] = (
+					openAnimation.RotationTrackInterpolate(openTrack, 0.0),
+					gripAnimation.RotationTrackInterpolate(gripTrack, 0.0));
+			}
 		}
 	}
 
-	private void Curl(Dictionary<int, Quaternion> grip, float strength)
+	private void PoseFingers(Dictionary<int, (Quaternion Open, Quaternion Grip)> fingers, float strength)
 	{
-		if (strength <= 0f)
-			return;
-
 		Skeleton3D skeleton = GetSkeleton();
-		foreach ((int bone, Quaternion rotation) in grip)
-			skeleton.SetBonePoseRotation(bone, skeleton.GetBonePoseRotation(bone).Slerp(rotation, strength));
+		foreach ((int bone, (Quaternion open, Quaternion grip)) in fingers)
+			skeleton.SetBonePoseRotation(bone, open.Slerp(grip, strength));
 	}
 }

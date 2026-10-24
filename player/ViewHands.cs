@@ -2,7 +2,8 @@ using Godot;
 
 /// <summary>
 /// The player's own arms, seen in first person only while a hand reaches for something, like a door.
-/// The arms belong to a headless body around the camera. IK moves a hand from below the view to a grip point
+/// They are the hands and sleeves of the player's body, shown on their own around the camera and drawn in front of
+/// the world, like Unreal Engine's first-person arms. IK moves a hand from below the view to a grip point
 /// and keeps it there, so the hand follows the grip as it moves. A hand always starts from where it is,
 /// so moving between grips never jumps.
 /// A grip point also says how the hand is held: its -Z axis is where the fingers point and its -Y axis is where
@@ -37,6 +38,8 @@ public partial class ViewHands : Node3D
 	[Export] public float ReachSeconds { get; set; } = 0.3f;
 	[Export] public float WithdrawSeconds { get; set; } = 0.3f;
 	[Export] public string BaseAnimation { get; set; } = "ual1/Idle";
+	/// <summary>Animation whose first frame provides the straight fingers of an open, flat hand.</summary>
+	[Export] public string OpenHandAnimation { get; set; } = "ual1/A_TPose";
 	/// <summary>Animation whose first frame provides the curled, gripping finger pose.</summary>
 	[Export] public string GripAnimation { get; set; } = "ual1/Idle_Torch";
 	/// <summary>How much of its length an arm stretches to reach a far grip, the rest stays as a bend in the elbow.</summary>
@@ -79,7 +82,7 @@ public partial class ViewHands : Node3D
 		_reach = ArmLength("Left") * ReachRatio;
 		AnimationPlayer.AddAnimationLibrary("ual1", ExtraAnimations);
 		AnimationPlayer.Play(BaseAnimation);
-		GripFingers.UsePose(AnimationPlayer.GetAnimation(GripAnimation));
+		GripFingers.UsePoses(AnimationPlayer.GetAnimation(OpenHandAnimation), AnimationPlayer.GetAnimation(GripAnimation));
 		Visible = false;
 	}
 
