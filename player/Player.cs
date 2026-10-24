@@ -291,12 +291,10 @@ public partial class Player : CharacterBody3D
 
 	private void UpdateHeadPosition(float delta)
 	{
-		// The head eases between standing and crouching height. An attacker can sway the head and grab points,
-		// and the player leans towards what a hand reaches for.
+		// The head eases between standing and crouching height. An attacker can sway the head and grab points.
 		float targetHeight = IsCrouching ? CrouchingHeadHeight : StandingHeadHeight;
 		_headHeight = Mathf.Lerp(_headHeight, targetHeight, CrouchTransitionSpeed * delta);
-		Vector3 lean = GlobalBasis.Inverse() * Hands.Lean;
-		Head.Position = new Vector3(0f, _headHeight, 0f) + BodySway + lean;
+		Head.Position = new Vector3(0f, _headHeight, 0f) + BodySway;
 		GrabPoints.Position = BodySway;
 	}
 }

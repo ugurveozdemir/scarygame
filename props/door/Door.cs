@@ -2,33 +2,24 @@ using Godot;
 
 /// <summary>
 /// A hinged door that swings open away from whoever opens it. The body's origin is the hinge.
-/// The player opens and closes it by hand without stopping, like in real life: to open it the hand grips the
-/// lever handle, presses it down and pushes; to close it the hand pulls the handle on the near side, or pushes
-/// the door flat-handed when it swings away. The hand rides along until the door moves out of reach.
-/// Only a door within arm's reach can be used.
+/// The player opens and closes it by hand without stopping: the hand pushes or pulls the door
+/// and rides along for a moment while the door starts to move.
 /// </summary>
 public partial class Door : AnimatableBody3D, IInteractable
 {
-	/// <summary>How the player takes hold of the door: the grip point, where it will be, which hand holds it and the lever it is on, if any.</summary>
-	private readonly record struct Grip(Node3D Point, Transform3D Pose, ViewHands.Side Side, Node3D Lever);
-
 	[Export] public float OpenAngleDegrees { get; set; } = 100f;
-	[Export] public float SwingSeconds { get; set; } = 0.9f;
+	[Export] public float SwingSeconds { get; set; } = 0.6f;
 
 	[ExportGroup("Hand")]
-	[Export] public float HandReachSeconds { get; set; } = 0.4f;
-	/// <summary>How tightly the fingers close around the lever, from 0 for an open hand to 1 for a fist.</summary>
-	[Export(PropertyHint.Range, "0,1")] public float HandleCurl { get; set; } = 0.75f;
-	[Export] public float LeverPressDegrees { get; set; } = 35f;
-	[Export] public float LeverPressSeconds { get; set; } = 0.15f;
-	/// <summary>Where a flat hand may push the door, in door space: X along the door and Y up.</summary>
-	[Export] public Rect2 PushArea { get; set; } = new(0.3f, 0.9f, 0.6f, 0.6f);
-
-	[ExportGroup("Nodes")]
-	/// <summary>Grip points on the lever handles; each lever turns about its own Z axis.</summary>
-	[Export] public Node3D FrontGrip { get; set; }
-	[Export] public Node3D BackGrip { get; set; }
-	[Export] public Node3D PushPoint { get; set; }
+	[Export] public float HandReachSeconds { get; set; } = 0.25f;
+	[Export] public float HandHoldSeconds { get; set; } = 0.3f;
+	/// <summary>Handle position in door space; its Z is mirrored to whichever side the player is on.</summary>
+	[Export] public Vector3 HandlePosition { get; set; } = new(0.84f, 1.05f, 0.06f);
+	/// <summary>Further away than this, the hand pushes the door where it is nearest instead of using the handle.</summary>
+	[Export] public float HandleReach { get; set; } = 1.1f;
+	/// <summary>How tightly the fingers close around the handle, from 0 for an open hand to 1 for a fist.</summary>
+	[Export(PropertyHint.Range, "0,1")] public float HandleCurl { get; set; } = 0.7f;
+	[Export] public Node3D GripPoint { get; set; }
 
 	private float _openAngle;
 	private Basis _closedBasis;
@@ -38,50 +29,31 @@ public partial class Door : AnimatableBody3D, IInteractable
 	public bool IsOpen { get; private set; }
 	public string InteractionPrompt => IsOpen ? "Close" : "Open";
 
-	private bool IsBusy => _handTween is not null && _handTween.IsRunning();
-
 	public override void _Ready()
 	{
 		_closedBasis = Basis;
-		// Fingers reach over the lever towards the door and curl under it, palm down.
-		FrontGrip.Basis = ViewHands.Pose(Vector3.Back, Vector3.Down);
-		BackGrip.Basis = ViewHands.Pose(Vector3.Forward, Vector3.Down);
-	}
-
-	public bool CanInteract(Player player)
-	{
-		return !IsBusy && ChooseGrip(player) is not null;
 	}
 
 	public void Interact(Player player)
 	{
-		if (IsBusy || ChooseGrip(player) is not Grip grip)
+		if (_handTween is not null && _handTween.IsRunning())
 			return;
 
-		bool opening = !IsOpen;
-		// Only the push point moves; a handle's grip point is already where its pose says.
-		grip.Point.GlobalTransform = grip.Pose;
-		player.Hands.Reach(grip.Side, grip.Point, HandReachSeconds, grip.Lever is null ? 0f : HandleCurl);
+		(ViewHands.Side side, float curl) = PlaceGripFor(player);
+		_ = player.Hands.Reach(side, GripPoint, HandReachSeconds, curl);
 
-		// One timeline: the hand closes on the handle, presses the lever if the door is latched and swings the door
-		// while still holding on. The lever springs back once the door is unlatched.
-		_handTween = CreateTween().SetParallel();
-		float touch = HandReachSeconds * 0.9f;
-		float swingStart = touch;
-		if (opening && grip.Lever is not null)
-		{
-			TurnLever(grip.Lever, LeverPressDegrees, touch);
-			swingStart += LeverPressSeconds * 0.7f;
-			TurnLever(grip.Lever, 0f, swingStart + LeverPressSeconds);
-		}
+		// The door starts moving as the hand touches it, and the hand rides along for a moment.
+		_handTween = CreateTween();
+		_handTween.TweenInterval(HandReachSeconds * 0.8f);
 		_handTween.TweenCallback(Callable.From(() =>
 		{
-			if (opening)
-				Open(player);
-			else
+			if (IsOpen)
 				Close();
-		})).SetDelay(swingStart);
-		_handTween.TweenCallback(Callable.From(() => player.Hands.Withdraw(grip.Side))).SetDelay(swingStart + SwingSeconds);
+			else
+				Open(player);
+		}));
+		_handTween.TweenInterval(HandHoldSeconds);
+		_handTween.TweenCallback(Callable.From(() => { _ = player.Hands.Withdraw(side); }));
 	}
 
 	public void Open(Node3D opener)
@@ -97,51 +69,35 @@ public partial class Door : AnimatableBody3D, IInteractable
 	}
 
 	/// <summary>
-	/// The handle on the player's side of the door if the hand reaches it, otherwise a flat-handed push on the
-	/// nearest spot of the door if the door is going to swing away from the player. Null when out of reach.
+	/// Puts the grip on the handle on the player's side of the door, or flat on the nearest spot of the door
+	/// if the handle is out of reach. Returns the hand that should do it and how tightly it closes.
 	/// </summary>
-	private Grip? ChooseGrip(Player player)
+	private (ViewHands.Side, float) PlaceGripFor(Player player)
 	{
 		Vector3 head = ToLocal(player.Head.GlobalPosition);
 		float playerSide = head.Z >= 0f ? 1f : -1f;
-		Node3D handle = playerSide > 0f ? BackGrip : FrontGrip;
-		Grip? handleGrip = GripFor(player, handle, handle.GlobalTransform, handle.GetParent<Node3D>());
-		if (handleGrip is not null)
-			return handleGrip;
+		Vector3 handle = HandlePosition with { Z = HandlePosition.Z * playerSide };
+		Vector3 intoDoor = new(0f, 0f, -playerSide);
 
-		// A latched door only opens by its handle, and a flat hand can't pull.
-		if (!IsOpen || ClosesTowards(playerSide))
-			return null;
+		if (ToGlobal(handle).DistanceTo(player.Head.GlobalPosition) <= HandleReach)
+		{
+			// Fingers reach over the handle, palm down.
+			GripPoint.Position = handle;
+			GripPoint.Basis = ViewHands.Pose(intoDoor, Vector3.Down);
+			return (HandSide(player), HandleCurl);
+		}
 
-		// The spot of the door in front of the player's chest.
-		Vector3 nearest = new(
-			Mathf.Clamp(head.X, PushArea.Position.X, PushArea.End.X),
-			Mathf.Clamp(head.Y - 0.4f, PushArea.Position.Y, PushArea.End.Y),
-			playerSide * 0.03f);
-		// Fingers up and palm on the door.
-		Transform3D pushPose = GlobalTransform * new Transform3D(ViewHands.Pose(Vector3.Up, new Vector3(0f, 0f, -playerSide)), nearest);
-		return GripFor(player, PushPoint, pushPose, null);
+		// Push the door with a flat hand, fingers up and palm on the door.
+		GripPoint.Position = new Vector3(Mathf.Clamp(head.X, 0.2f, 0.9f), Mathf.Clamp(head.Y - 0.5f, 0.9f, 1.4f), handle.Z);
+		GripPoint.Basis = ViewHands.Pose(Vector3.Up, intoDoor);
+		return (HandSide(player), 0f);
 	}
 
-	/// <summary>A grip with the hand on the same side of the player as the grip, or null if that hand can't reach it.</summary>
-	private static Grip? GripFor(Player player, Node3D point, Transform3D pose, Node3D lever)
+	/// <summary>The hand on the same side of the player as the grip point.</summary>
+	private ViewHands.Side HandSide(Player player)
 	{
-		bool onPlayersLeft = player.ToLocal(pose.Origin).X < 0f;
-		ViewHands.Side side = onPlayersLeft ? ViewHands.Side.Left : ViewHands.Side.Right;
-		return player.Hands.CanReach(side, pose) ? new Grip(point, pose, side, lever) : null;
-	}
-
-	/// <summary>Whether closing the door moves it towards the given side of it: +1 for its +Z side, -1 for -Z.</summary>
-	private bool ClosesTowards(float side)
-	{
-		// A positive angle swings the door towards its local -Z side, so closing moves it back towards +Z.
-		return Mathf.Sign(_openAngle) == side;
-	}
-
-	private void TurnLever(Node3D lever, float degrees, float delay)
-	{
-		_handTween.TweenProperty(lever, "rotation:z", Mathf.DegToRad(degrees), LeverPressSeconds)
-			.SetDelay(delay).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
+		bool gripIsOnPlayersLeft = player.ToLocal(GripPoint.GlobalPosition).X < 0f;
+		return gripIsOnPlayersLeft ? ViewHands.Side.Left : ViewHands.Side.Right;
 	}
 
 	private void SwingTo(float targetAngle)
@@ -149,8 +105,7 @@ public partial class Door : AnimatableBody3D, IInteractable
 		_swingTween?.Kill();
 		_swingTween = CreateTween()
 			.SetProcessMode(Tween.TweenProcessMode.Physics)
-			.SetTrans(Tween.TransitionType.Sine)
-			.SetEase(Tween.EaseType.InOut);
+			.SetTrans(Tween.TransitionType.Sine);
 		_swingTween.TweenMethod(Callable.From<float>(SetOpenAngle), _openAngle, targetAngle, SwingSeconds);
 	}
 

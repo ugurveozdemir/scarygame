@@ -91,21 +91,15 @@ A `TwoBoneIK3D` modifier moves the hands to grab points on the player (`Player/G
 The IK needs its elbow pole markers (`LeftElbowPole`, `RightElbowPole`) to solve.
 
 The player's own hands (`player/view_hands.tscn`) only appear while reaching for something: opening
-or closing a door or locker. They belong to a life-sized body whose eyes are at the camera, with its head shrunk
-away by `HideBonesModifier`, so the hands are exactly as big and as far away as real hands. The body keeps its
-symmetric rest pose and only turns left and right with the view: looking up or down bends the neck, not the
-shoulders. IK places the wrist on a grip point, `HandAimModifier` turns the hand to the grip point's orientation
-and `GripFingersModifier` curls the fingers by the amount the interaction asks for.
+or closing a door or locker. They belong to a full body placed around the camera, with its head shrunk away by
+`HideBonesModifier`; IK places the wrist on a grip point, `HandAimModifier` turns the hand to the grip point's
+orientation and `GripFingersModifier` curls the fingers by the amount the interaction asks for.
 
 A grip point says how the hand is held: its -Z axis is where the fingers point and its -Y axis is where the palm
-faces (`ViewHands.Pose`), so a lever is gripped palm down with the fingers curled under it and a door is pushed
-with a flat hand. A hand only reaches as far as a real arm does: for a grip a little beyond it the player leans
-in (`ViewHands.Lean` moves the head), and a hand lets go of a grip that moves out of reach, like a door
-swinging away.
-
-Doors have lever handles on both sides. To open one, the hand grips the lever on the player's side, presses it
-down and pushes; to close one, the hand pulls the near handle, or pushes the door when it swings away from the
-player. A door is only usable (and only shows its prompt) when the hand can reach it, so step up to it.
+faces (`ViewHands.Pose`), so a door handle is gripped palm down with curled fingers and a far door is pushed
+with a flat hand. The arms are only a little longer than a real reach, so for a far grip `ViewHands` scales the
+whole view model around the camera until the elbow stays comfortably bent; on screen it looks like a closer
+reach but the hand still touches the grip.
 
 Interactions never stop the player abruptly. Doors don't lock the controls at all: the hand pushes the
 door and the player keeps walking. Getting into a locker is one timeline of overlapping steps
