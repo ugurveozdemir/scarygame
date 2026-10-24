@@ -1822,7 +1822,7 @@ Sting = NodePath("Sting")
 
 [node name="Music" type="AudioStreamPlayer" parent="Audio/ChaseMusic"]
 stream = ExtResource("46_chase")
-volume_db = -14.0
+volume_db = -10.0
 bus = &"Music"
 
 [node name="Sting" type="AudioStreamPlayer" parent="Audio/ChaseMusic"]
