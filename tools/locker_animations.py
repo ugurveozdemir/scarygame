@@ -1,11 +1,13 @@
-"""Makes the first-person animation of hiding in a locker: the right hand pulls the door open by its handle,
-the player steps in turning around, hooks their fingers into a vent slit and pulls the door shut while
-backing in. The arms, the view and the door are animated together, so the hand never slips off the door.
+"""Makes the first-person animations of a locker, posing the arm, the view and the door together frame by frame,
+so the hand never slips off the door:
+  hide: the right hand pulls the door open by its handle, the player steps in turning around, hooks their
+        fingers into a vent slit and pulls the door shut while backing in.
+  exit: the right hand pushes the door open flat-handed and the player steps out after it.
 
 Usage (Blender 5):
-  Blender --background --factory-startup --python tools/locker_hide_animation.py -- export
-      writes props/locker/locker_hide.glb, which the game plays (interaction/PlayerAnimation.cs)
-  Blender --background --factory-startup --python tools/locker_hide_animation.py -- render <dir> <view> <frames>
+  Blender --background --factory-startup --python tools/locker_animations.py -- export <move>
+      writes props/locker/locker_<move>.glb, which the game plays (interaction/PlayerAnimation.cs)
+  Blender --background --factory-startup --python tools/locker_animations.py -- render <move> <dir> <view> <frames>
       renders preview frames; view is fp (first person) or a debug view: tp, close, hand, hand2, top, side,
       inside; frames is a list like 0,19,40 or all
 
@@ -22,10 +24,8 @@ from mathutils import Matrix, Quaternion, Vector
 ROOT = Path(__file__).resolve().parent.parent
 FBX = str(ROOT / "assets/rocketbox/male_adult_12/Male_Adult_12.fbx")
 TEX = str(ROOT / "assets/rocketbox/male_adult_12") + "/"
-GLB = str(ROOT / "props/locker/locker_hide.glb")
 
 FPS = 30
-END = 104
 
 # Player placement. The camera sits at the game's head height (Player.StandingHeadHeight), forward at the face,
 # so the hidden head never shows; the game puts its camera on the exported Eye.
@@ -35,6 +35,9 @@ PULL = Vector((-0.25, 1.0, 0.0))
 MIDWAY = Vector((-0.12, 0.62, 0.0))
 ENTRY = Vector((0.02, 0.24, 0.0))
 HIDE = Vector((0.0, 0.0, 0.03))
+# Stepping out: through the free-edge side of the opening, clear of the door, then to the game's ExitPoint.
+DOORWAY = Vector((-0.08, 0.42, 0.01))
+EXIT = Vector((0.0, 0.8, 0.0))
 CAMERA_OFFSET = Vector((0.0, -0.08, 1.6))
 PITCH_DEG = -15.0
 
@@ -47,9 +50,10 @@ OPEN_DEG = -80.0
 
 args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 MODE = args[0] if args else "export"
-OUT = args[1] if len(args) > 1 else ""
-CAM = args[2] if len(args) > 2 else "fp"
-FRAMES = args[3] if len(args) > 3 else "0"
+MOVE = args[1] if len(args) > 1 else "hide"
+OUT = args[2] if len(args) > 2 else ""
+CAM = args[3] if len(args) > 3 else "fp"
+FRAMES = args[4] if len(args) > 4 else "0"
 
 
 def smooth(a, b, t):
@@ -312,10 +316,14 @@ BAR = Grip(BAR_CENTER + Vector((-0.012, 0.004, 0)), (0, -1, 0), (1, 0, 0), (-0.0
 # Inside: fingers through the lowest vent slit, palm down, hooked over its edge.
 SLIT = Grip((-0.22, -0.0175, 1.393), (0, 1, 0), (0, 0, -1), (0.0, -0.07, -0.03),
             ((10, 10, 10), (15, 65, 50), (15, 70, 50), (15, 70, 50), (15, 65, 45)))
+# Inside: a flat hand on the door near its free edge, fingers up over the slits, thumb clear of the door,
+# pushing it open. The palm's heel is thicker than the knuckles, so the grip point stays off the door.
+PUSH = Grip((-0.42, -0.03, 1.50), (0, 0, 1), (0, 1, 0), (0.0, -0.08, -0.04),
+            ((-25, -10, 0), (-8, -4, 0), (-8, -4, 0), (-8, -4, 0), (-8, -4, 0)))
 
-# Frames of the move.
-RELEASE_BAR = 33
-RELEASE_SLIT = 84
+# Hanging at the side, in the player's space (facing -Y before turning).
+REST = Vector((-0.24, 0.02, 0.90))
+LEFT_REST = Vector((0.24, 0.02, 0.90))
 
 
 def lerp(a, b, t):
@@ -339,109 +347,178 @@ def catmull(points, t):
                   + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u)
 
 
-def door_angle(f):
-    pull = smooth(19, 31, f) * PULL_DEG
-    swing = ease_out(31, 48, f) * (OPEN_DEG - PULL_DEG)
-    close = smooth(60, 76, f) * -OPEN_DEG
-    return pull + swing + close
-
-
 def door_matrix(angle):
     return Matrix.Translation(HINGE) @ Matrix.Rotation(math.radians(angle), 4, "Z")
 
 
-def camera_pitch(f):
-    """Looks at whatever the hand is reaching for, and out through the slits once the door is shut."""
-    pitch = lerp(PITCH_DEG, -40.0, smooth(2, 15, f))
-    pitch = lerp(pitch, -26.0, smooth(21, 33, f))
-    pitch = lerp(pitch, -12.0, smooth(31, 46, f))
-    pitch = lerp(pitch, -30.0, smooth(48, 57, f))
-    return lerp(pitch, -8.0, smooth(72, 90, f))
+class Frame:
+    """The scene posed for one frame: helpers to place the hand relative to the player and the door."""
+
+    def __init__(self, move, arm_obj, right, root, f):
+        self.move = move
+        self.right = right
+        self.f = f
+        self.to_arm = arm_obj.matrix_world.inverted()
+        self.rot_to_arm = self.to_arm.to_3x3().normalized()
+        self.root = root.matrix_world.copy()
+        self.rest = self.body(*REST)
+        self.rest_rot = right.hand_rotation(self.heading(0, 0, -1), self.heading(1, 0, 0))
+
+    def body(self, x, y, z):
+        """A point in the player's space, in armature space."""
+        return self.to_arm @ (self.root @ Vector((x, y, z)))
+
+    def heading(self, x, y, z):
+        """A direction in the player's space, in armature space."""
+        return self.rot_to_arm @ (self.root.to_3x3().normalized() @ Vector((x, y, z)))
+
+    def hold(self, grip, frame=None, approach=0.0):
+        """Wrist and hand rotation holding `grip` with the door as it is at `frame` (this one by default)."""
+        m = door_matrix(self.move.door_angle(self.f if frame is None else frame))
+        to_arm = self.rot_to_arm @ m.to_3x3()
+        rot = self.right.hand_rotation(to_arm @ grip.fingers, to_arm @ grip.palm)
+        at = self.to_arm @ (m @ (grip.point + grip.approach * approach))
+        return self.right.wrist_for_grip(rot, at), rot
+
+    @staticmethod
+    def turn(r0, r1, t):
+        return r0.to_quaternion().slerp(r1.to_quaternion(), t).to_matrix()
+
+    def reach(self, grip, start, arrive, via):
+        """Brings the hand from the side up to `grip` between frames `start` and `arrive`, opening then closing it."""
+        f = self.f
+        at, rot = self.hold(grip)
+        pre, _ = self.hold(grip, approach=1.0)
+        span = arrive - start
+        wrist = catmull([(start, self.rest), (start + span * 0.45, self.body(*via)), (arrive - span * 0.25, pre),
+                         (arrive, at)], f)
+        rot = self.turn(self.rest_rot, rot, smooth(start, arrive - span * 0.25, f))
+        curl = lerp(0.05, -0.15, smooth(start, start + span * 0.6, f)) + 1.15 * smooth(arrive - 3, arrive + 2, f)
+        return wrist, rot, curl
+
+    def release(self, grip, frame, back, done):
+        """Lets go of `grip` at `frame` and drops the hand out of view by `done`, first moving it by `back`."""
+        f = self.f
+        at, rot = self.hold(grip, frame)
+        away = at + self.heading(*back) * 100
+        wrist = catmull([(frame, at), (frame + (done - frame) * 0.35, away), (done, self.rest)], f)
+        rot = self.turn(rot, self.rest_rot, smooth(frame + 2, done, f))
+        curl = lerp(1.0, -0.1, smooth(frame, frame + 4, f)) + 0.15 * smooth(frame + 6, done + 1, f)
+        return wrist, rot, curl
 
 
-def root_position(f):
-    if f < 33:
-        return APPROACH.lerp(PULL, smooth(19, 33, f))
-    if f < 58:
-        return catmull([(33, PULL), (45, MIDWAY), (58, ENTRY)], f)
-    return ENTRY.lerp(HIDE, smooth(58, 74, f))
+class Hide:
+    name = "LockerHide"
+    end = 104
+    release_bar = 33
+    release_slit = 84
+
+    @staticmethod
+    def door_angle(f):
+        pull = smooth(19, 31, f) * PULL_DEG
+        swing = ease_out(31, 48, f) * (OPEN_DEG - PULL_DEG)
+        close = smooth(60, 76, f) * -OPEN_DEG
+        return pull + swing + close
+
+    @staticmethod
+    def pitch(f):
+        """Looks at whatever the hand is reaching for, and out through the slits once the door is shut."""
+        pitch = lerp(PITCH_DEG, -40.0, smooth(2, 15, f))
+        pitch = lerp(pitch, -26.0, smooth(21, 33, f))
+        pitch = lerp(pitch, -12.0, smooth(31, 46, f))
+        pitch = lerp(pitch, -30.0, smooth(48, 57, f))
+        return lerp(pitch, -8.0, smooth(72, 90, f))
+
+    @staticmethod
+    def position(f):
+        if f < 33:
+            return APPROACH.lerp(PULL, smooth(19, 33, f))
+        if f < 58:
+            return catmull([(33, PULL), (45, MIDWAY), (58, ENTRY)], f)
+        return ENTRY.lerp(HIDE, smooth(58, 74, f))
+
+    @staticmethod
+    def yaw(f):
+        """Turns around towards the hinge side while stepping in, to face out of the locker."""
+        return 180.0 * smooth(36, 56, f)
+
+    @staticmethod
+    def elbow(fr):
+        """Outside the elbow swings out; inside the locker it stays down, clear of the door."""
+        return fr.body(-0.6, 0.15, 0.6).lerp(fr.body(-0.25, 0.05, 0.4), smooth(40, 50, fr.f))
+
+    @classmethod
+    def hand(cls, fr):
+        f = fr.f
+        if f < cls.release_bar:
+            if f < 21:
+                return BAR, *fr.reach(BAR, 4, 19, (-0.30, -0.25, 1.05))
+            return BAR, *fr.hold(BAR), 1.0
+        if f < 47:
+            return BAR, *fr.release(BAR, cls.release_bar, (-0.02, 0.06, -0.12), 47)
+        if f < cls.release_slit:
+            # Reach out for the open door's vent and pull it shut while backing in.
+            if f < 60:
+                return SLIT, *fr.reach(SLIT, 47, 58, (-0.28, -0.15, 1.0))
+            return SLIT, *fr.hold(SLIT), 1.0
+        return SLIT, *fr.release(SLIT, cls.release_slit, (0.0, 0.08, -0.08), 96)
 
 
-def root_yaw(f):
-    """Turns around towards the hinge side while stepping in, to face out of the locker."""
-    return 180.0 * smooth(36, 56, f)
+class Exit:
+    name = "LockerExit"
+    end = 44
+    release_push = 20
+
+    @staticmethod
+    def door_angle(f):
+        push = smooth(9, 20, f) * -45.0
+        swing = ease_out(20, 30, f) * (OPEN_DEG + 45.0)
+        return push + swing
+
+    @staticmethod
+    def pitch(f):
+        """Glances down at the hand on the door, then looks ahead while stepping out."""
+        pitch = lerp(-8.0, -14.0, smooth(1, 9, f))
+        return lerp(pitch, 0.0, smooth(14, 32, f))
+
+    @staticmethod
+    def position(f):
+        return catmull([(11, HIDE), (26, DOORWAY), (36, EXIT)], f)
+
+    @staticmethod
+    def yaw(f):
+        return 180.0
+
+    @staticmethod
+    def elbow(fr):
+        return fr.body(-0.25, 0.05, 0.4)
+
+    @classmethod
+    def hand(cls, fr):
+        f = fr.f
+        if f < 11:
+            return PUSH, *fr.reach(PUSH, 0, 9, (-0.25, -0.12, 1.05))
+        if f < cls.release_push:
+            return PUSH, *fr.hold(PUSH), 1.0
+        return PUSH, *fr.release(PUSH, cls.release_push, (0.0, 0.06, -0.10), 30)
 
 
-def animate(arm_obj, right, left, door, root, f):
+MOVES = {"hide": Hide, "exit": Exit}
+
+
+def animate(move, arm_obj, right, left, door, root, f):
     bpy.context.scene.frame_set(f)
-    door.rotation_euler.z = math.radians(door_angle(f))
-    root.location = root_position(f)
-    root.rotation_euler.z = math.radians(root_yaw(f))
-    bpy.data.objects["Eye"].rotation_euler.x = math.radians(90 + camera_pitch(f))
+    door.rotation_euler.z = math.radians(move.door_angle(f))
+    root.location = move.position(f)
+    root.rotation_euler.z = math.radians(move.yaw(f))
+    bpy.data.objects["Eye"].rotation_euler.x = math.radians(90 + move.pitch(f))
     bpy.context.view_layer.update()
 
-    to_arm = arm_obj.matrix_world.inverted()
-    rot_to_arm = to_arm.to_3x3().normalized()
-    body_rot = root.matrix_world.to_3x3().normalized()
-
-    def body(x, y, z):
-        """A point relative to the player's feet (facing -Y before turning), in armature space."""
-        return to_arm @ (root.matrix_world @ Vector((x, y, z)))
-
-    def heading(x, y, z):
-        return rot_to_arm @ (body_rot @ Vector((x, y, z)))
-
-    def hold(grip, frame, approach=0.0):
-        """Wrist and hand rotation holding `grip` with the door as it is at `frame`."""
-        m = door_matrix(door_angle(frame))
-        rot = right.hand_rotation(rot_to_arm @ (m.to_3x3() @ grip.fingers), rot_to_arm @ (m.to_3x3() @ grip.palm))
-        at = to_arm @ (m @ (grip.point + grip.approach * approach))
-        return right.wrist_for_grip(rot, at), rot
-
-    def turn(q0, q1, t):
-        return q0.to_quaternion().slerp(q1.to_quaternion(), t).to_matrix()
-
-    rest_rot = right.hand_rotation(heading(0, 0, -1), heading(1, 0, 0))
-    rest = body(-0.24, 0.02, 0.90)
-
-    if f < RELEASE_BAR:
-        grip, (at, rot) = BAR, hold(BAR, f)
-        if f < 21:
-            pre, _ = hold(BAR, f, approach=1.0)
-            wrist = catmull([(0, rest), (4, rest), (11, body(-0.30, -0.25, 1.05)), (15, pre), (19, at)], f)
-            rot = turn(rest_rot, rot, smooth(5, 15, f))
-            curl = lerp(0.05, -0.15, smooth(4, 13, f)) + 1.15 * smooth(16, 21, f)
-        else:
-            wrist, curl = at, 1.0
-    elif f < 47:
-        # Let go of the bar and drop the hand back out of view.
-        grip, (at, rot) = BAR, hold(BAR, RELEASE_BAR)
-        away = at + heading(-0.02, 0.06, -0.12) * 100
-        wrist = catmull([(RELEASE_BAR, at), (38, away), (47, rest)], f)
-        rot = turn(rot, rest_rot, smooth(35, 47, f))
-        curl = lerp(1.0, -0.1, smooth(33, 37, f)) + 0.15 * smooth(40, 48, f)
-    elif f < RELEASE_SLIT:
-        # Reach out for the open door's vent and pull it shut while backing in.
-        grip, (at, rot) = SLIT, hold(SLIT, f)
-        if f < 60:
-            pre, _ = hold(SLIT, f, approach=1.0)
-            wrist = catmull([(47, rest), (51, body(-0.28, -0.15, 1.0)), (55, pre), (58, at)], f)
-            rot = turn(rest_rot, rot, smooth(47, 55, f))
-            curl = lerp(0.1, -0.15, smooth(48, 53, f)) + 1.15 * smooth(56, 60, f)
-        else:
-            wrist, curl = at, 1.0
-    else:
-        grip, (at, rot) = SLIT, hold(SLIT, RELEASE_SLIT)
-        away = at + heading(0.0, 0.08, -0.08) * 100
-        wrist = catmull([(RELEASE_SLIT, at), (88, away), (96, rest)], f)
-        rot = turn(rot, rest_rot, smooth(86, 96, f))
-        curl = lerp(1.0, -0.1, smooth(84, 88, f)) + 0.15 * smooth(90, 96, f)
-
-    # Outside the elbow swings out; inside the locker it stays down, clear of the door.
-    pole = body(-0.6, 0.15, 0.6).lerp(body(-0.25, 0.05, 0.4), smooth(40, 50, f))
-    right.pose(wrist, rot, pole, curl, max(curl, 0) * 0.9, grip.curl)
-    left.pose(body(0.24, 0.02, 0.90), left.hand_rotation(heading(0, 0, -1), heading(-1, 0, 0)),
-              body(0.3, 0.6, 1.0), 0.25, 0.2, BAR.curl)
+    fr = Frame(move, arm_obj, right, root, f)
+    grip, wrist, rot, curl = move.hand(fr)
+    right.pose(wrist, rot, move.elbow(fr), curl, max(curl, 0) * 0.9, grip.curl)
+    left.pose(fr.body(*LEFT_REST), left.hand_rotation(fr.heading(0, 0, -1), fr.heading(-1, 0, 0)),
+              fr.body(0.3, 0.6, 1.0), 0.25, 0.2, BAR.curl)
 
 
 def key_pose(arm_obj, door, root, f):
@@ -466,14 +543,14 @@ def setup_render(cam):
     sc.view_settings.view_transform = "AgX"
 
 
-def export(arm_obj, root, door):
+def export(move, arm_obj, root, door):
     """Writes the player's body, eye and the door with their animation to the game's glb."""
-    bpy.context.scene.name = "LockerHide"
+    bpy.context.scene.name = move.name
     bpy.ops.object.select_all(action="DESELECT")
     for o in (root, arm_obj, bpy.data.objects["Eye"], door, *arm_obj.children):
         o.select_set(True)
     bpy.ops.export_scene.gltf(
-        filepath=GLB,
+        filepath=str(ROOT / f"props/locker/locker_{MOVE}.glb"),
         use_selection=True,
         export_animation_mode="SCENE",
         export_anim_scene_split_object=False,
@@ -515,19 +592,20 @@ def main():
         bpy.ops.object.light_add(type="SUN", rotation=(0.6, 0.0, -2.2))
         bpy.context.object.data.energy = 3
 
+    move = MOVES[MOVE]
     bpy.context.scene.frame_start = 0
-    bpy.context.scene.frame_end = END
+    bpy.context.scene.frame_end = move.end
     right, left = Arm(arm_obj, "R"), Arm(arm_obj, "L")
-    for f in range(0, END + 1):
-        animate(arm_obj, right, left, door, root, f)
+    for f in range(0, move.end + 1):
+        animate(move, arm_obj, right, left, door, root, f)
         key_pose(arm_obj, door, root, f)
 
     if MODE == "export":
-        export(arm_obj, root, door)
+        export(move, arm_obj, root, door)
         return
 
     setup_render(cam)
-    frames = range(0, END + 1) if FRAMES == "all" else [int(x) for x in FRAMES.split(",")]
+    frames = range(0, move.end + 1) if FRAMES == "all" else [int(x) for x in FRAMES.split(",")]
     for f in frames:
         bpy.context.scene.frame_set(f)
         bpy.context.scene.render.filepath = f"{OUT}/{CAM}_{f:03d}.png"

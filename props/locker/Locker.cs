@@ -2,7 +2,7 @@ using Godot;
 
 /// <summary>
 /// A locker the player can hide in, looking out through the slits in its door.
-/// Getting in is an animation made in Blender (tools/locker_hide_animation.py): the player pulls the door open
+/// Getting in is an animation made in Blender (tools/locker_animations.py): the player pulls the door open
 /// by its handle, steps in turning around, hooks their fingers into a vent slit and pulls the door shut while
 /// backing in. The player first walks up to where the animation starts, from wherever they are.
 /// Getting out pushes the door open with the hand. An enemy checking the locker tears the door open.
