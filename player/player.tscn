@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://player/Player.cs" id="1_player"]
 [ext_resource type="PackedScene" path="res://camcorder/camcorder.tscn" id="2_camcorder"]
@@ -23,6 +23,14 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_choke"]
 resource_local_to_scene = true
 shader = ExtResource("5_choke_shader")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_crosshair"]
+bg_color = Color(1, 1, 1, 0.5)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 16
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_standing"]
 radius = 0.35
@@ -115,20 +123,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 1.43, -0.07)
 [node name="Hud" type="CanvasLayer" parent="."]
 layer = 3
 
-[node name="Crosshair" type="ColorRect" parent="Hud"]
+[node name="Crosshair" type="Panel" parent="Hud"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -2.0
-offset_top = -2.0
-offset_right = 2.0
-offset_bottom = 2.0
+offset_left = -3.0
+offset_top = -3.0
+offset_right = 3.0
+offset_bottom = 3.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(1, 1, 1, 0.5)
+theme_override_styles/panel = SubResource("StyleBoxFlat_crosshair")
 
 [node name="PromptLabel" type="Label" parent="Hud"]
 anchors_preset = 8
