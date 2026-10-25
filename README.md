@@ -28,26 +28,14 @@ godot --path .
 | Night vision | F (camcorder raised) |
 | Replace battery | R |
 | Release mouse | Esc |
-| Tuning panel (field of view, sensitivity, speeds, head bob) | F1 |
 
-## Camera and movement
+## Camera
 
-The first-person setup follows Unreal Engine's first-person template. The camera (`player/FirstPersonCamera.cs`)
-sits at eye height and turns exactly with the mouse, so the crosshair always covers what the player aims at. Its
-field of view is measured horizontally (90°), as Unreal measures it. The body only moves in physics steps, 60 times a
-second, so the camera blends its position between the last two steps and stays smooth on screens that refresh
-faster. The only effects on top are a small head bob that dips the eyes as each foot lands, without ever turning
-them, and shakes when the player is grabbed and strangled. The first-person arms, the camcorder and the interaction
-ray are children of the camera.
-
-Movement (`player/Player.cs`) speeds up and brakes at a fixed rate, like Unreal's character movement, so starting
-and stopping feel direct. Everything that shapes the feel lives in one resource, `player/first_person_settings.tres`:
-field of view, mouse sensitivity, eye height, speeds, acceleration, braking, air control, stride length, head bob and
-an optional sprint field of view boost. Press F1 in the game to tune them with sliders; "Save as defaults" writes
-them back into the resource.
-
-The player's body (`player/player_body.tscn`) is a photo-scanned man in a hoodie. As in Unreal's template, the player
-never sees it themselves: it only casts their shadow, and it stands, walks, sprints and crouches along with them.
+The first-person view sits on a small camera rig (`player/PlayerCamera.cs`) between the head and the camera.
+It adds the procedural movement that makes the view feel handheld: a step bob that scales with speed, a lean
+when strafing, a slightly wider field of view while sprinting, and a small roll and yaw lag when turning the
+view. Getting grabbed adds a shake impulse and the strangle adds a continuous shake. The view hands, the
+camcorder and the interaction ray are children of the camera, so they all move with these effects.
 
 ## Rendering
 
@@ -62,7 +50,7 @@ Scenes and their scripts live together, grouped by feature.
 
 | Folder | Contents |
 |---|---|
-| `player/` | First-person controller (movement, crouch, hiding, being grabbed), the camera and its tunable settings, the player's body and first-person arms |
+| `player/` | First-person controller (movement, crouch, hiding, being grabbed), procedural camera effects and first-person hands |
 | `camcorder/` | Camcorder logic, recording HUD and the screen-effect shader |
 | `interaction/` | `IInteractable` interface and the look-at interactor |
 | `enemy/` | Stalker AI (patrol, hearing, sight, chase, search), its voice and its strangle attack |
@@ -116,8 +104,8 @@ Buses (`default_bus_layout.tres`):
 Footsteps (`audio/Footsteps.cs`, `audio/footsteps.tscn`) play the sound of the ground under the feet. A floor body
 says what it is made of with a `surface` metadata entry (the building is `tile`, the stairs `stairs`, the lawn
 `grass`), and a `SurfaceZone` area on the "zones" physics layer overrides it where one body has several surfaces:
-the vents, the balcony, the paths, the parking lot, the road, the manhole cover and the shrubs. The player takes a step every stride length, and the head bob
-dips with each one, so the steps match the camera. The enemy steps whenever one of its animated feet lands (`audio/SkeletonFootsteps.cs`),
+the vents, the balcony, the paths, the parking lot, the road, the manhole cover and the shrubs. The player steps at the bottom of each head bob, so
+the steps match the camera. The enemy steps whenever one of its animated feet lands (`audio/SkeletonFootsteps.cs`),
 which keeps the steps in time with every animation and blend.
 
 The `Indoors` area covers the building: it sends the sounds made inside it to the reverb bus, and `audio/Ambience.cs`
@@ -135,8 +123,8 @@ choking uses, and the player holds their breath, so only shaky breaths through t
 
 ## Animation
 
-The enemy is a masked surgeon from the Microsoft Rocketbox library and the player is Mike Alger's photo scan of
-himself in a hoodie. The Quaternius animation libraries and both models are imported with a
+The enemy is a masked surgeon and the player's arms belong to a man in a denim jacket, both from the
+Microsoft Rocketbox library. The Quaternius animation libraries and the Rocketbox models are all imported with a
 `SkeletonProfileHumanoid` bone map (`assets/*/*bone_map.tres`), so every animation targets the standard humanoid
 skeleton and plays on every character. Rocketbox characters also need:
 
@@ -147,11 +135,6 @@ Godot does not notice edits to a bone map, so after changing one, delete the mod
 to reimport it. Importing a Rocketbox FBX logs errors about missing `.tga` files: the FBX still points at the
 author's original textures, which our own materials (`assets/rocketbox/*/*.tres`) replace.
 
-The scan was cleaned up in Blender before import: its helper bones were merged into their parents, its bones got
-plain Mixamo names, and its hands and sleeves were split into their own meshes (`Hands`, `Sleeves` and `Bracelet`)
-for the first-person arms. Its face mesh is called `Face` because glTF node names must be unique, and a mesh named
-`Head` would rename the `Head` bone.
-
 The enemy model is scaled up to about 2.15 m. Its movement speeds are scaled with it so the feet don't slide.
 
 The strangle attack (`enemy/StrangleAttack.cs`) is not a canned animation. The enemy lunges in mid-sprint,
@@ -161,11 +144,9 @@ A `TwoBoneIK3D` modifier moves the hands to grab points on the player (`Player/G
 The IK needs its elbow pole markers (`LeftElbowPole`, `RightElbowPole`) to solve.
 
 The player's own hands (`player/view_hands.tscn`) only appear while reaching for something: opening
-or closing a door or locker. They are the scan's hands and sleeves, shown on their own around the camera. Like
-Unreal's first-person primitives they are drawn with their own shader (`player/first_person_arms.gdshader`), which
-squeezes their depth into the sliver in front of the camera, so walls and doors never cut through them. IK places
-the wrist on a grip point, `HandAimModifier` turns the hand to the grip point's orientation and
-`GripFingersModifier` poses the fingers between an open, flat hand and a grip, as tightly as the interaction asks.
+or closing a door or locker. They belong to a full body placed around the camera, with its head shrunk away by
+`HideBonesModifier`; IK places the wrist on a grip point, `HandAimModifier` turns the hand to the grip point's
+orientation and `GripFingersModifier` curls the fingers by the amount the interaction asks for.
 
 A grip point says how the hand is held: its -Z axis is where the fingers point and its -Y axis is where the palm
 faces (`ViewHands.Pose`), so a door handle is gripped palm down with curled fingers and a far door is pushed

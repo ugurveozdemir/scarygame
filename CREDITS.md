@@ -7,7 +7,7 @@ Third-party assets used in this project.
 | [Universal Animation Library (Standard)](https://quaternius.com/packs/universalanimationlibrary.html) | [Quaternius](https://quaternius.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Jog, sprint, idle and first-person arm poses (`assets/quaternius/ual1_standard.glb`) |
 | [Universal Animation Library 2 (Standard)](https://quaternius.itch.io/universal-animation-library-2) | [Quaternius](https://quaternius.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Zombie walk and idle animations (`assets/quaternius/ual2_standard.glb`) |
 | [Microsoft Rocketbox Avatar Library](https://github.com/microsoft/Microsoft-Rocketbox): Medical_Male_04 | Microsoft | [MIT](assets/rocketbox/LICENSE.md) | The surgeon enemy (`assets/rocketbox/medical_male_04`) |
-| [Rigged T-Pose Human Male w 50 Face Blendshapes](https://sketchfab.com/3d-models/rigged-t-pose-human-male-w-50-face-blendshapes-cc7e4596bcd145208a6992c757854c07) | [Mike Alger](https://sketchfab.com/mikealger) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | The player's body and first-person arms (`assets/mikealger`) |
+| [Microsoft Rocketbox Avatar Library](https://github.com/microsoft/Microsoft-Rocketbox): Male_Adult_12 | Microsoft | [MIT](assets/rocketbox/LICENSE.md) | The player's first-person arms (`assets/rocketbox/male_adult_12`) |
 | [Tiles140](https://ambientcg.com/view?id=Tiles140) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Floor tiles (`assets/ambientcg/Tiles140`) |
 | [OfficeCeiling006](https://ambientcg.com/view?id=OfficeCeiling006) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Suspended ceiling (`assets/ambientcg/OfficeCeiling006`) |
 | [Tiles133D](https://ambientcg.com/view?id=Tiles133D) | [ambientCG](https://ambientcg.com) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Glazed wall tiles (`assets/ambientcg/Tiles133D`) |
@@ -40,8 +40,6 @@ Third-party assets used in this project.
 The Quaternius packs were downloaded from OpenGameArt, the ambientCG textures at 1K resolution and the Poly Haven
 models as 1K glTF. The two trees were reduced in Blender, and the fence's wire texture got its alpha map baked in.
 The Rocketbox textures were scaled down to 1K, and their specular maps inverted into roughness maps.
-The Mike Alger scan was cleaned up in Blender: its helper bones were merged into their parents, its bones got
-plain Mixamo names and its hands and sleeves were split off for the first-person arms.
 Colours and tints are applied in materials (`materials/`, `enemy/enemy.tscn`).
 
 ## Sounds

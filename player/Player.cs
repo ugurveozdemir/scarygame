@@ -3,15 +3,16 @@ using Godot;
 
 /// <summary>
 /// First-person controller: mouse look, walking, sprinting, crouching, hiding and being grabbed.
-/// The body turns left and right and the head looks up and down. Like Unreal Engine's character movement, the
-/// player speeds up and brakes at a steady rate, so starting, stopping and turning feel direct.
-/// How all of it feels is set in <see cref="Settings"/>.
 /// </summary>
 public partial class Player : CharacterBody3D
 {
 	private const float FullHearingHz = 20000f;
 
-	[Export] public FirstPersonSettings Settings { get; set; }
+	[ExportGroup("Movement")]
+	[Export] public float WalkSpeed { get; set; } = 2.5f;
+	[Export] public float SprintSpeed { get; set; } = 5f;
+	[Export] public float CrouchSpeed { get; set; } = 1.3f;
+	[Export] public float Acceleration { get; set; } = 10f;
 
 	[ExportGroup("Noise")]
 	[Export] public float WalkNoiseRadius { get; set; } = 3f;
@@ -25,6 +26,15 @@ public partial class Player : CharacterBody3D
 	[Export] public AudioStreamPlayer ClothSound { get; set; }
 	[Export] public AudioStreamPlayer CrouchSound { get; set; }
 	[Export] public AudioStreamPlayer StandUpSound { get; set; }
+
+	[ExportGroup("Look")]
+	[Export] public float MouseSensitivity { get; set; } = 0.002f;
+	[Export] public float MaxPitchDegrees { get; set; } = 85f;
+
+	[ExportGroup("Crouch")]
+	[Export] public float StandingHeadHeight { get; set; } = 1.6f;
+	[Export] public float CrouchingHeadHeight { get; set; } = 0.9f;
+	[Export] public float CrouchTransitionSpeed { get; set; } = 8f;
 
 	[ExportGroup("Being Grabbed")]
 	[Export] public float GrabbedTurnSpeed { get; set; } = 8f;
@@ -48,9 +58,8 @@ public partial class Player : CharacterBody3D
 	[Export] public float HidingMuffleSeconds { get; set; } = 0.5f;
 
 	[ExportGroup("Nodes")]
-	/// <summary>Sits at eye height and holds the up and down look; the camera follows it.</summary>
 	[Export] public Node3D Head { get; set; }
-	[Export] public FirstPersonCamera Camera { get; set; }
+	[Export] public PlayerCamera CameraRig { get; set; }
 	[Export] public CollisionShape3D StandingCollision { get; set; }
 	[Export] public CollisionShape3D CrouchingCollision { get; set; }
 	[Export] public RayCast3D CeilingCheck { get; set; }
@@ -60,8 +69,7 @@ public partial class Player : CharacterBody3D
 	[Export] public Footsteps Footsteps { get; set; }
 
 	public bool IsCrouching { get; private set; }
-	public bool IsSprinting => !IsCrouching && HorizontalSpeed > Settings.WalkSpeed + 0.5f;
-	public bool IsWalking => !IsGrabbed && IsOnFloor() && HorizontalSpeed > 0.1f;
+	public bool IsSprinting => !IsCrouching && HorizontalSpeed > WalkSpeed + 0.5f;
 	public IInteractable HidingSpot { get; private set; }
 	public bool IsHiding => HidingSpot is not null;
 	public bool IsGrabbed => _grabLookTarget is not null;
@@ -80,11 +88,6 @@ public partial class Player : CharacterBody3D
 	/// How far an attacker has pushed or pulled the player's upper body, in the player's own space.
 	/// </summary>
 	public Vector3 BodySway { get; set; }
-
-	/// <summary>
-	/// How far into the current step the player is, from 0 as a foot lands to 1 as the next one does.
-	/// </summary>
-	public float StepProgress => _strideDistance / Settings.StrideLength;
 
 	/// <summary>
 	/// How close to passing out the player is, from 0 to 1. Darkens the view and shakes it harder.
@@ -114,19 +117,11 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	public float HorizontalSpeed => new Vector2(Velocity.X, Velocity.Z).Length();
-
-	private float CurrentSpeed => IsCrouching ? Settings.CrouchSpeed
-		: Input.IsActionPressed("sprint") ? Settings.SprintSpeed
-		: Settings.WalkSpeed;
-
 	private uint _collisionLayer;
 	private uint _collisionMask;
-	private Transform3D _previousTransform;
-	private float _previousPitch;
+	private Vector3 _previousPosition;
 	private Transform3D _hidingExitPoint;
-	private float _eyeHeight;
-	private float _strideDistance;
+	private float _headHeight;
 	private Node3D _grabLookTarget;
 	private Vector3 _staggerVelocity;
 	private float _chokeAmount;
@@ -135,17 +130,23 @@ public partial class Player : CharacterBody3D
 	private float _hidden;
 	private float _earRingVolume;
 
+	public float HorizontalSpeed => new Vector2(Velocity.X, Velocity.Z).Length();
+
+	private float CurrentSpeed => IsCrouching ? CrouchSpeed
+		: Input.IsActionPressed("sprint") ? SprintSpeed
+		: WalkSpeed;
+
 	public override void _Ready()
 	{
 		_collisionLayer = CollisionLayer;
 		_collisionMask = CollisionMask;
-		_eyeHeight = Settings.EyeHeight;
-		_strideDistance = Settings.StrideLength * 0.5f;
-		_previousTransform = GlobalTransform;
+		_headHeight = StandingHeadHeight;
+		_previousPosition = GlobalPosition;
 		_chokeMaterial = (ShaderMaterial)ChokeOverlay.Material;
 		_worldMuffle = (AudioEffectLowPassFilter)AudioServer.GetBusEffect(AudioServer.GetBusIndex("World"), 0);
 		_earRingVolume = EarRing.VolumeLinear;
 		ChokeAmount = 0f;
+		CameraRig.Stepped += OnStepped;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 	}
 
@@ -155,7 +156,7 @@ public partial class Player : CharacterBody3D
 			return;
 
 		if (@event is InputEventMouseMotion motion && Input.MouseMode == Input.MouseModeEnum.Captured)
-			Look(motion.ScreenRelative);
+			Look(motion.Relative);
 		else if (@event.IsActionPressed("ui_cancel"))
 			Input.MouseMode = Input.MouseModeEnum.Visible;
 		else if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
@@ -168,52 +169,30 @@ public partial class Player : CharacterBody3D
 		UpdateHeadPosition(dt);
 		if (IsGrabbed)
 			UpdateGrabbedView(dt);
-		Camera.UpdateView(dt);
+		CameraRig.UpdateCamera(dt);
 		UpdateHearing(dt);
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
 		float dt = (float)delta;
-		// Scripted moves like a locker's run after this, so the last step's movement is measured here.
-		Vector3 moved = GlobalPosition - _previousTransform.Origin;
-		_previousTransform = GlobalTransform;
-		_previousPitch = Head.Rotation.X;
-
 		if (IsGrabbed)
-			Stagger(dt);
-		else if (IsHiding || AreControlsLocked)
-			// Something else moves the player now; the velocity still drives the footsteps and the head bob.
-			Velocity = moved / dt;
-		else
 		{
-			UpdateCrouch();
-			Move(dt);
+			Stagger(dt);
+			return;
 		}
 
-		UpdateStride(moved);
-	}
+		if (IsHiding || AreControlsLocked)
+		{
+			// Something else moves the player now; the camera still follows the scripted move.
+			Velocity = (GlobalPosition - _previousPosition) / dt;
+			_previousPosition = GlobalPosition;
+			return;
+		}
 
-	/// <summary>
-	/// Where the body is this frame. It only moves in physics steps, so between two steps its position is blended
-	/// from where it was after the previous one; that keeps the camera smooth at any frame rate. The mouse turns the
-	/// body every frame, so the turn is only blended while a scripted move like a locker's is turning it.
-	/// </summary>
-	public Transform3D GetInterpolatedTransform()
-	{
-		float weight = (float)Engine.GetPhysicsInterpolationFraction();
-		Vector3 position = _previousTransform.Origin.Lerp(GlobalPosition, weight);
-		float yaw = AreControlsLocked
-			? Mathf.LerpAngle(_previousTransform.Basis.GetEuler().Y, Rotation.Y, weight)
-			: Rotation.Y;
-		return new Transform3D(new Basis(Vector3.Up, yaw), position);
-	}
-
-	/// <summary>The head's up and down look this frame, blended like <see cref="GetInterpolatedTransform"/>.</summary>
-	public float GetInterpolatedPitch()
-	{
-		float weight = (float)Engine.GetPhysicsInterpolationFraction();
-		return AreControlsLocked ? Mathf.Lerp(_previousPitch, Head.Rotation.X, weight) : Head.Rotation.X;
+		UpdateCrouch();
+		Move(dt);
+		_previousPosition = GlobalPosition;
 	}
 
 	public void LockControls()
@@ -257,13 +236,12 @@ public partial class Player : CharacterBody3D
 		{
 			// Dragged out of the hiding spot.
 			GlobalTransform = _hidingExitPoint;
-			_previousTransform = GlobalTransform;
 			StopHiding();
 		}
 
 		_grabLookTarget = lookTarget;
 		_staggerVelocity = shove;
-		Camera.AddShake(1f);
+		CameraRig.AddShake(1f);
 	}
 
 	public void Die()
@@ -271,20 +249,8 @@ public partial class Player : CharacterBody3D
 		DeathScreen.Play();
 	}
 
-	private void UpdateStride(Vector3 moved)
+	private void OnStepped()
 	{
-		if (!IsWalking)
-		{
-			// Standing still is halfway through a step, so the first footstep comes half a stride in.
-			_strideDistance = Settings.StrideLength * 0.5f;
-			return;
-		}
-
-		_strideDistance += new Vector2(moved.X, moved.Z).Length();
-		if (_strideDistance < Settings.StrideLength)
-			return;
-
-		_strideDistance %= Settings.StrideLength;
 		float volumeDb = IsCrouching ? CrouchStepVolumeDb
 			: IsSprinting ? SprintStepVolumeDb
 			: WalkStepVolumeDb;
@@ -318,15 +284,14 @@ public partial class Player : CharacterBody3D
 		CollisionMask = enabled ? _collisionMask : 0;
 	}
 
-	private void Look(Vector2 mouseMotion)
+	private void Look(Vector2 mouseDelta)
 	{
 		// Setting the angle instead of calling RotateY keeps rounding errors from building up in the basis.
-		float turn = Mathf.DegToRad(Settings.MouseSensitivity);
-		Rotation = new Vector3(0f, Rotation.Y - mouseMotion.X * turn, 0f);
+		Rotation = new Vector3(0f, Rotation.Y - mouseDelta.X * MouseSensitivity, 0f);
 
-		float maxPitch = Mathf.DegToRad(Settings.MaxPitchDegrees);
+		float maxPitch = Mathf.DegToRad(MaxPitchDegrees);
 		Vector3 headRotation = Head.Rotation;
-		headRotation.X = Mathf.Clamp(headRotation.X - mouseMotion.Y * turn, -maxPitch, maxPitch);
+		headRotation.X = Mathf.Clamp(headRotation.X - mouseDelta.Y * MouseSensitivity, -maxPitch, maxPitch);
 		Head.Rotation = headRotation;
 	}
 
@@ -336,17 +301,13 @@ public partial class Player : CharacterBody3D
 		if (!IsOnFloor())
 			velocity += GetGravity() * delta;
 
-		// The input vector is already at most 1 long, so diagonals are no faster.
 		Vector2 input = Input.GetVector("move_left", "move_right", "move_forward", "move_back");
-		Vector3 targetVelocity = Transform.Basis * new Vector3(input.X, 0f, input.Y) * CurrentSpeed;
+		Vector3 direction = (Transform.Basis * new Vector3(input.X, 0f, input.Y)).Normalized();
+		Vector3 targetVelocity = direction * CurrentSpeed;
+		velocity.X = Mathf.Lerp(velocity.X, targetVelocity.X, Acceleration * delta);
+		velocity.Z = Mathf.Lerp(velocity.Z, targetVelocity.Z, Acceleration * delta);
 
-		// Speed changes at a fixed rate instead of easing in, so the player starts and stops crisply.
-		float rate = input == Vector2.Zero ? Settings.BrakingDeceleration : Settings.Acceleration;
-		if (!IsOnFloor())
-			rate *= Settings.AirControl;
-		Vector3 horizontal = new Vector3(velocity.X, 0f, velocity.Z).MoveToward(targetVelocity, rate * delta);
-
-		Velocity = new Vector3(horizontal.X, velocity.Y, horizontal.Z);
+		Velocity = velocity;
 		MoveAndSlide();
 	}
 
@@ -390,10 +351,10 @@ public partial class Player : CharacterBody3D
 
 	private void UpdateHeadPosition(float delta)
 	{
-		// The eyes ease between standing and crouching height. An attacker can sway the head and grab points.
-		float targetHeight = IsCrouching ? Settings.CrouchEyeHeight : Settings.EyeHeight;
-		_eyeHeight = Mathf.Lerp(_eyeHeight, targetHeight, Settings.CrouchTransitionSpeed * delta);
-		Head.Position = new Vector3(0f, _eyeHeight, 0f) + BodySway;
+		// The head eases between standing and crouching height. An attacker can sway the head and grab points.
+		float targetHeight = IsCrouching ? CrouchingHeadHeight : StandingHeadHeight;
+		_headHeight = Mathf.Lerp(_headHeight, targetHeight, CrouchTransitionSpeed * delta);
+		Head.Position = new Vector3(0f, _headHeight, 0f) + BodySway;
 		GrabPoints.Position = BodySway;
 	}
 }
