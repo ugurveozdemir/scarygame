@@ -4,8 +4,8 @@ together frame by frame, so a hand never slips off what it holds:
                   hooks their fingers into a vent slit and pulls the door shut while backing in.
   locker_exit:    the right hand pushes the locker door open flat-handed and the player steps out after it.
   battery_pickup: the player squats, picks a battery up off the floor, glances at it and pockets it.
-  bed_hide:       the player kneels beside a bed, lies down on the floor along it, shuffles sideways under it
-                  and turns their head to watch the room.
+  bed_hide:       the player drops flat in front of a bed, crawls in head first pulling with the right hand (the
+                  left one holds the camera) and turns around under it to watch the room.
 
 Usage (Blender 5):
   Blender --background --factory-startup --python tools/player_animations.py -- export <move>
@@ -201,7 +201,7 @@ def build_bed():
     box("FarWall", (-2.6, 0, 1.5), (0.1, 6, 3), material("wall", (0.32, 0.33, 0.30), roughness=0.9))
 
 
-def build_player():
+def build_player(hidden_bones):
     root = empty("PlayerRoot", (0, 0, 0))
 
     bpy.ops.import_scene.fbx(filepath=FBX)
@@ -210,8 +210,8 @@ def build_player():
         if o.type == "MESH":
             skin_material(o)
     arm.parent = root
-    # The view model hides the head, as HideBonesModifier does in the game, and the legs, which the game never shows.
-    for name in ("Bip01 Head", "Bip01 L Thigh", "Bip01 R Thigh"):
+    # Shrunk as HideBonesModifier does in the game.
+    for name in hidden_bones:
         arm.pose.bones[name].scale = (0.001, 0.001, 0.001)
 
     # The eye carries the view; the game reads it from the exported animation.
@@ -302,11 +302,13 @@ class Arm:
         self.grip_point = knuckles + normal * 0.012 * 100
         self.rest_hand = bones[self.names["hand"]].matrix_local.copy()
         self.curl_axis = {}
+        self.spread_axis = {}
         for i, chain in enumerate(self.fingers):
             for n in chain:
                 local = bones[n].matrix_local.to_3x3().inverted()
                 axis = across if i else fingers  # the thumb swings across the palm instead
                 self.curl_axis[n] = (local @ axis).normalized()
+                self.spread_axis[n] = (local @ normal).normalized()
 
     @property
     def shoulder(self):
@@ -371,14 +373,16 @@ class Arm:
         self.arm.pose.bones[name].matrix = Matrix.Translation(head) @ (rot @ bone.matrix_local.to_3x3()).to_4x4()
 
     def _curl(self, curl, thumb, grip):
-        """`grip` holds the degrees per joint (knuckle, middle, tip) of each finger, thumb first, when closed."""
+        """Bends the fingers `curl` (the thumb `thumb`) of the way into `grip`'s pose and spreads them as it says."""
         sign = 1 if self.side == "R" else -1
         for i, chain in enumerate(self.fingers):
             amount = thumb if i == 0 else curl
-            for n, deg in zip(chain, grip[i]):
+            for j, (n, deg) in enumerate(zip(chain, grip.curl[i])):
                 pb = self.arm.pose.bones[n]
                 pb.rotation_mode = "QUATERNION"
-                pb.rotation_quaternion = Quaternion(self.curl_axis[n], sign * math.radians(deg) * amount)
+                bend = Quaternion(self.curl_axis[n], sign * math.radians(deg) * amount)
+                spread = Quaternion(self.spread_axis[n], sign * math.radians(grip.spread[i]) if j == 0 else 0.0)
+                pb.rotation_quaternion = spread @ bend
 
 
 # ---------------------------------------------------------------- grips and hand motion
@@ -386,12 +390,15 @@ class Arm:
 class Grip:
     """Where and how a hand holds something, in that thing's space."""
 
-    def __init__(self, point, fingers, palm, approach, curl):
+    def __init__(self, point, fingers, palm, approach, curl, spread=(0, 0, 0, 0, 0)):
         self.point = Vector(point)
         self.fingers = Vector(fingers)
         self.palm = Vector(palm)
         self.approach = Vector(approach)  # offset of the open hand just before it closes
+        # Degrees per joint (knuckle, middle, tip) of each finger, thumb first, when closed.
         self.curl = curl
+        # Degrees each finger turns sideways at the knuckle, thumb first.
+        self.spread = spread
 
 
 # Locker, outside: fingers into the gap behind the bar, palm facing the hinge.
@@ -410,7 +417,8 @@ CLAW = Grip((0.0, 0.0, BATTERY_HEIGHT / 2 + 0.012), (0, -1, -0.35), (0, 0, -1), 
 
 # A hand flat on the floor; only its finger pose is used.
 FLAT = Grip((0, 0, 0), (0, -1, 0), (0, 0, -1), (0, 0, 0),
-            ((10, 0, 0), (5, 10, 5), (5, 10, 5), (5, 10, 5), (5, 10, 5)))
+            ((10, 0, 0), (5, 10, 5), (5, 10, 5), (5, 10, 5), (5, 10, 5)),
+            (-25, -12, -2, 8, 18))
 
 # How a hand hangs at the side, relative to its shoulder, in the player's space.
 HANG = Vector((-0.03, 0.0, -0.52))
@@ -493,8 +501,12 @@ class Move:
     """A move's timeline. Positions and yaw are the player's root in the prop's space; the player faces -Y at yaw 0."""
     end = 0
     walls = False
-    # Preview lights: location, energy, colour.
+    # Bones shrunk away: the game hides the head and never shows the legs.
+    hidden_bones = ("Bip01 Head", "Bip01 L Thigh", "Bip01 R Thigh")
+    # Preview lights: location, energy, colour; and whether a light on the camera stands in for the camcorder's
+    # night vision in the dark.
     lights = (((-0.6, 1.6, 2.6), 120, WARM), ((0.8, 1.2, 1.4), 25, COOL))
+    camera_light = False
     debug_views = {}
 
     @staticmethod
@@ -734,23 +746,30 @@ class BatteryPickup(Move):
 
 class BedHide(Move):
     """
-    Kneels beside the bed, lies down face down along it, shuffles sideways under it and turns the head to
-    watch the room from the floor. The bed's open side is -X and its head end +Y.
+    Drops flat on the floor in front of the bed, crawls in head first pulling with the right hand and turns
+    around under it to watch the room. The left hand holds the camera, so it is never seen. The bed's open side
+    is -X.
     """
     name = "BedHide"
     prop = "furniture"
-    end = 52
+    end = 58
+    hidden_bones = Move.hidden_bones + ("Bip01 L UpperArm",)
     lights = (((-1.4, -0.6, 2.4), 150, WARM), ((-0.6, 1.4, 0.6), 30, COOL))
+    camera_light = True
     debug_views = {
-        "side": ((-2.4, -0.2, 1.1), (-0.4, -0.1, 0.35), 28, ()),
-        "top": ((-0.5, -0.2, 3.2), (-0.45, -0.2, 0.2), 22, ("Mattress", "Base", "Pillow")),
-        "front": ((-0.55, 1.9, 0.6), (-0.4, -0.2, 0.2), 28, ()),
+        "side": ((-1.2, -2.4, 1.1), (-0.5, 0.0, 0.3), 28, ()),
+        "top": ((-0.5, 0.0, 3.2), (-0.5, 0.0, 0.2), 22, ("Mattress", "Base", "Pillow")),
+        "hand": ((-0.25, -0.75, 0.3), (-0.17, -0.12, 0.03), 40, ("Mattress", "Base", "Pillow")),
     }
+    # Hips of the player lying face down; the eye is this far ahead of them.
+    reach = 0.8
     start = Vector((-0.9, 0.0, 0.0))
-    # Lying beside the bed, then under it; the head ends near the middle of the bed's open side.
-    down = Vector((-0.75, -0.45, 0.0))
-    under = Vector((-0.05, -0.45, 0.0))
-    shuffle = (24, 40)
+    lying = Vector((-1.25, 0.0, 0.0))
+    # Each pull: the hand is planted at the first frame and the body slides up to it until the second.
+    pulls = ((16, 25), (29, 38))
+    pull_length = 0.2
+    turn = (40, 52)
+    plant = 54
 
     def __init__(self):
         build_bed()
@@ -758,60 +777,81 @@ class BedHide(Move):
 
     @staticmethod
     def posture(f):
-        """Kneels, puts the hands down, then lies flat."""
-        keys = [(0, Vector((0, 0, 0, 0))), (4, Vector((0, 0, 0, 0))), (10, Vector((0.45, 0.05, 25, 10))),
-                (15, Vector((0.6, 0.0, 15, 50))), (22, Vector((0.78, 0.0, 0, 90)))]
+        """Drops to the knees and straight down onto the belly."""
+        keys = [(0, Vector((0, 0, 0, 0))), (2, Vector((0, 0, 0, 0))), (7, Vector((0.4, 0.0, 20, 15))),
+                (14, Vector((0.78, 0.0, 0, 90)))]
         return tuple(catmull(keys, f))
 
     @staticmethod
     def head_up(f):
-        return smooth(12, 22, f)
-
-    @staticmethod
-    def head_yaw(f):
-        return 90.0 * smooth(36, 48, f)
+        return smooth(7, 14, f)
 
     @staticmethod
     def pitch(f):
-        pitch = lerp(-25.0, -45.0, smooth(2, 12, f))
-        pitch = lerp(pitch, -14.0, smooth(14, 24, f))
-        return lerp(pitch, -2.0, smooth(38, 48, f))
+        pitch = lerp(-25.0, -40.0, smooth(1, 8, f))
+        pitch = lerp(pitch, -42.0, smooth(10, 16, f))
+        return lerp(pitch, -20.0, smooth(50, 56, f))
+
+    @classmethod
+    def yaw(cls, f):
+        """Faces the bed while crawling in, then turns around to face out."""
+        return 90.0 + 180.0 * smooth(*cls.turn, f)
+
+    @classmethod
+    def forward(cls, f):
+        yaw = math.radians(cls.yaw(f))
+        return Vector((math.sin(yaw), -math.cos(yaw), 0.0))
+
+    @classmethod
+    def eye_xy(cls, f):
+        """Where the head is over the floor: it moves only while getting down and with each pull."""
+        crawl = sum(smooth(a, b, f) for a, b in cls.pulls) * cls.pull_length
+        down = cls.start.lerp(cls.lying, smooth(2, 14, f)) + Vector((cls.reach, 0, 0)) * smooth(6, 14, f)
+        return down + Vector((crawl, 0, 0))
 
     def position(self, f):
-        if f < self.shuffle[0]:
-            return catmull([(4, self.start), (22, self.down)], f)
-        return self.down.lerp(self.under, smooth(*self.shuffle, f))
+        # Turning around under the bed pivots on the head, so the view stays put.
+        return self.eye_xy(f) - self.forward(f) * self.reach * smooth(6, 14, f)
 
-    @staticmethod
-    def yaw(f):
-        """Turns left from facing the bed to lying along it, head towards its head end."""
-        return 90.0 + 90.0 * smooth(4, 20, f)
-
-    def floor_hand(self, fr, arm, x):
-        """A hand going down from the side to the floor, then forward as the body lies down; it lifts while shuffling."""
-        f = fr.f
-        side = 1 if arm is fr.right else -1
-        lift = 0.04 * math.sin(math.pi * smooth(self.shuffle[0] + 2, sum(self.shuffle) / 2, f))
-        down_at, rot = fr.on_floor(arm, x, -0.5)
-        lying_at, _ = fr.on_floor(arm, x * 0.9, -1.08, lift)
-        rest = fr.rest if side == 1 else fr.left_rest
-        rest_rot = fr.rest_rot if side == 1 else fr.left_rest_rot
-        wrist = catmull([(4, rest), (10, fr.body(x, -0.35, 0.45)), (14, down_at), (22, lying_at)], f)
-        return wrist, fr.turn(rest_rot, rot, smooth(5, 13, f))
+    def planted(self, fr, f, offset=(0.1, 0.2)):
+        """The hand flat on the floor ahead of the face and to the right, where it lands at frame `f`."""
+        forward = self.forward(f)
+        right = Vector((forward.y, -forward.x, 0.0))
+        point = self.eye_xy(f) + forward * offset[1] + right * offset[0]
+        point.z = 0.004
+        heading = fr.rot_to_arm @ (forward + right * 0.35).normalized()
+        rot = fr.right.hand_rotation(heading, fr.rot_to_arm @ Vector((0, 0, -1)))
+        return fr.right.wrist_for_grip(rot, fr.to_arm @ point), rot
 
     def hand(self, fr):
-        wrist, rot = self.floor_hand(fr, fr.right, -0.2)
-        return FLAT, wrist, rot, smooth(8, 14, fr.f)
-
-    def left_hand(self, fr, left):
-        wrist, rot = self.floor_hand(fr, left, 0.22)
-        pole = fr.body(0.3, 0.6, 1.0).lerp(fr.body(0.45, -0.4, -0.4), smooth(6, 14, fr.f))
-        return wrist, rot, pole, smooth(8, 14, fr.f), FLAT
+        f = fr.f
+        (first, _), (second, _) = self.pulls
+        hold1, rot1 = self.planted(fr, first)
+        hold2, rot2 = self.planted(fr, second)
+        last, rot3 = self.planted(fr, self.plant, (0.14, 0.24))
+        lifted = lambda w: w + fr.rot_to_arm @ Vector((0, 0, 0.06)) * 100
+        if f < first:
+            wrist = catmull([(2, fr.rest), (9, fr.body(-0.25, -0.55, 0.45)), (first - 3, lifted(hold1)),
+                             (first, hold1)], f)
+            rot = fr.turn(fr.rest_rot, rot1, smooth(4, first - 3, f))
+        elif f < self.pulls[0][1] + 1:
+            wrist, rot = hold1, rot1
+        elif f < second:
+            # Lift the hand and put it down further ahead.
+            wrist = catmull([(self.pulls[0][1] + 1, hold1), (second - 2, lifted(hold2)), (second, hold2)], f)
+            rot = rot1
+        elif f < self.turn[0]:
+            wrist, rot = hold2, rot2
+        else:
+            wrist = catmull([(self.turn[0], hold2), (self.turn[0] + 3, lifted(hold2)),
+                             (self.plant - 3, lifted(last)), (self.plant, last)], f)
+            rot = fr.turn(rot2, rot3, smooth(self.turn[0], self.plant - 2, f))
+        return FLAT, wrist, rot, smooth(8, first, f) * 0.6
 
     @staticmethod
     def elbow(fr):
-        """Elbows out and down on the floor once lying."""
-        return fr.body(-0.6, 0.15, 0.6).lerp(fr.body(-0.45, -0.4, -0.4), smooth(6, 14, fr.f))
+        """The elbow out to the side and down, as when pulling along the floor."""
+        return fr.body(-0.6, 0.15, 0.6).lerp(fr.body(-0.6, -0.5, -0.3), smooth(6, 14, fr.f))
 
     def key_prop(self, f):
         pass
@@ -837,16 +877,16 @@ def animate(move, arm_obj, right, left, root, eye, eye_on_neck, f):
     # The eye rides on the neck; lying face down, the head is raised to look ahead.
     neck = arm_obj.matrix_world @ arm_obj.pose.bones["Bip01 Neck"].matrix
     on_neck = root.matrix_world.inverted() @ (neck @ eye_on_neck)
-    raised = root.matrix_world.inverted() @ neck.translation + Vector((0, -0.12, 0.1))
+    raised = root.matrix_world.inverted() @ neck.translation + Vector((0, -0.1, 0.15))
     eye.location = on_neck.lerp(raised, move.head_up(f))
     eye.rotation_euler = (math.radians(90 + move.pitch(f)), 0, math.pi + math.radians(move.head_yaw(f)))
     bpy.context.view_layer.update()
 
     fr = Frame(move, arm_obj, right, left, root, f)
     grip, wrist, rot, curl = move.hand(fr)
-    right.pose(wrist, rot, move.elbow(fr), curl, max(curl, 0) * 0.9, grip.curl)
+    right.pose(wrist, rot, move.elbow(fr), curl, max(curl, 0) * 0.9, grip)
     wrist, rot, pole, curl, grip = move.left_hand(fr, left)
-    left.pose(wrist, rot, pole, curl, 0.2, grip.curl)
+    left.pose(wrist, rot, pole, curl, 0.2, grip)
     move.pose_prop(f, fr)
 
 
@@ -897,7 +937,7 @@ def main():
     move_type = MOVES[MOVE]
     build_room(move_type.walls, move_type.lights)
     move = move_type()
-    root, arm_obj, eye, cam = build_player()
+    root, arm_obj, eye, cam = build_player(move_type.hidden_bones)
     bpy.context.view_layer.update()
     # The eye rides on the neck, so it follows the body when it bends.
     neck = arm_obj.matrix_world @ arm_obj.pose.bones["Bip01 Neck"].matrix
@@ -925,6 +965,13 @@ def main():
         export(move, arm_obj, root, eye)
         return
 
+    if move.camera_light:
+        bpy.ops.object.light_add(type="SPOT")
+        light = bpy.context.object
+        light.parent = cam
+        light.data.energy = 8
+        light.data.spot_size = math.radians(100)
+        light.data.color = (0.8, 1.0, 0.85)
     setup_render(cam)
     frames = range(0, move.end + 1) if FRAMES == "all" else [int(x) for x in FRAMES.split(",")]
     for f in frames:
