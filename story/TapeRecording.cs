@@ -62,6 +62,8 @@ public partial class TapeRecording : Node3D
 		_defaultFov = Camera.Fov;
 		SurgeonAnimations.AddAnimationLibrary("ual1", Ual1Animations);
 		VisualLayers.Assign(Surgeon, VisualLayers.Past);
+		foreach (Node node in Surgeon.FindChildren("*", nameof(MeshInstance3D), owned: false))
+			((MeshInstance3D)node).CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
 		Surgeon.Visible = false;
 		Picture.RenderTargetUpdateMode = SubViewport.UpdateMode.Disabled;
 		Overlay.Visible = false;

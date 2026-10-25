@@ -26,6 +26,8 @@ public partial class Sleepwalker : CharacterBody3D
 	[Export] public float TouchDistance { get; set; } = 0.75f;
 	/// <summary>After a lunge it stands still for a moment before it listens again.</summary>
 	[Export] public float CalmSeconds { get; set; } = 1.5f;
+	/// <summary>Further from the player than this it stops swaying, which nobody could see anyway.</summary>
+	[Export] public float AnimatedDistance { get; set; } = 25f;
 
 	[ExportGroup("Nodes")]
 	[Export] public Player Player { get; set; }
@@ -45,11 +47,15 @@ public partial class Sleepwalker : CharacterBody3D
 	{
 		AnimationPlayer.AddAnimationLibrary("ual1", Ual1Animations);
 		AnimationPlayer.AddAnimationLibrary("ual2", Ual2Animations);
-		// Only the skinned body; the blindfold keeps its own colour.
+		// Only the skinned body; the blindfold keeps its own colour. A swaying body that casts shadows would make
+		// every shadowed light around it redraw its shadows each frame, so it casts none.
 		foreach (Node node in FindChildren("*", nameof(MeshInstance3D), owned: false))
 		{
-			if (node.GetParent() is Skeleton3D)
-				((MeshInstance3D)node).MaterialOverlay = PaleOverlay;
+			var mesh = (MeshInstance3D)node;
+			mesh.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
+			mesh.VisibilityRangeEnd = AnimatedDistance;
+			if (mesh.GetParent() is Skeleton3D)
+				mesh.MaterialOverlay = PaleOverlay;
 		}
 		VisualLayers.Assign(this, VisualLayers.Enemies);
 
@@ -68,6 +74,7 @@ public partial class Sleepwalker : CharacterBody3D
 	{
 		float dt = (float)delta;
 		_calmLeft -= dt;
+		AnimationPlayer.Active = GlobalPosition.DistanceTo(Player.GlobalPosition) <= AnimatedDistance;
 
 		if (_mood == Mood.Still && _calmLeft <= 0f && IsTouchingPlayer())
 			Lunge(Player.GlobalPosition);

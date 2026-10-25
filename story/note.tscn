@@ -20,6 +20,7 @@ script = ExtResource("1_note")
 
 [node name="Paper" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0)
+visibility_range_end = 25.0
 mesh = SubResource("BoxMesh_paper")
 
 [node name="Collision" type="CollisionShape3D" parent="."]

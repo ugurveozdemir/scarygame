@@ -417,9 +417,6 @@ size = Vector3(23.2, 3.4, 28.6)
 [sub_resource type="BoxShape3D" id="BoxShape3D_observation_room"]
 size = Vector3(8.8, 2.8, 3.6)
 
-[sub_resource type="BoxMesh" id="BoxMesh_tread"]
-material = ExtResource("15_duct")
-size = Vector3(1.2, 0.04, 0.3)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_fire_escape_ramp"]
 size = Vector3(1.2, 0.1, 6.19)
@@ -2241,6 +2238,10 @@ mesh = SubResource("BoxMesh_bay_line")
 
 [node name="CorridorLightNear" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 9)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.85, 0.92, 1, 1)
 light_energy = 0.78
 shadow_enabled = true
@@ -2248,6 +2249,10 @@ omni_range = 10.0
 
 [node name="CorridorLightMiddle" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.85, 0.92, 1, 1)
 light_energy = 0.78
 shadow_enabled = true
@@ -2260,6 +2265,10 @@ Crackle = NodePath("FlickerSound/Crackle")
 [node name="FlickerSound" parent="CorridorLightMiddle" instance=ExtResource("40_flicker_sound")]
 [node name="RoomRight3Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 2.7, 9.3)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.8, 0.6, 1)
 light_energy = 0.65
 shadow_enabled = true
@@ -2267,6 +2276,10 @@ omni_range = 9.0
 
 [node name="RoomLeft1Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 2.7, -9.3)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.86, 0.72, 1)
 light_energy = 0.39
 shadow_enabled = true
@@ -2274,6 +2287,10 @@ omni_range = 8.0
 
 [node name="RoomLeft2Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 2.7, 0)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.86, 0.72, 1)
 light_energy = 0.36
 shadow_enabled = true
@@ -2281,6 +2298,10 @@ omni_range = 8.0
 
 [node name="RoomLeft3Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 2.7, 9.3)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.86, 0.72, 1)
 light_energy = 0.39
 shadow_enabled = true
@@ -2288,6 +2309,10 @@ omni_range = 8.0
 
 [node name="RoomRight1Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 2.7, -9.3)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.8, 0.9, 1, 1)
 light_energy = 0.39
 shadow_enabled = true
@@ -2295,6 +2320,10 @@ omni_range = 8.0
 
 [node name="RoomRight2Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 2.7, 0)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.8, 0.9, 1, 1)
 light_energy = 0.36
 shadow_enabled = true
@@ -2302,6 +2331,10 @@ omni_range = 8.0
 
 [node name="DayRoomLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, -21)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.85, 0.92, 1, 1)
 light_energy = 0.65
 shadow_enabled = true
@@ -2314,6 +2347,10 @@ Crackle = NodePath("FlickerSound/Crackle")
 [node name="FlickerSound" parent="DayRoomLight" instance=ExtResource("40_flicker_sound")]
 [node name="WardLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.8, 2.7, -21)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.86, 0.72, 1)
 light_energy = 0.33
 shadow_enabled = true
@@ -2321,6 +2358,10 @@ omni_range = 8.0
 
 [node name="ShowersLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8, 2.7, -21)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.8, 0.95, 0.85, 1)
 light_energy = 0.39
 shadow_enabled = true
@@ -2333,6 +2374,10 @@ Crackle = NodePath("FlickerSound/Crackle")
 [node name="FlickerSound" parent="ShowersLight" instance=ExtResource("40_flicker_sound")]
 [node name="StairwellLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.3, 2.75, -5.5)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.8, 0.55, 1)
 light_energy = 0.25
 shadow_enabled = true
@@ -2340,6 +2385,10 @@ omni_range = 4
 
 [node name="BasementStairFootLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.55, -5.5)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.8, 0.55, 1)
 light_energy = 0.5
 shadow_enabled = true
@@ -2352,6 +2401,10 @@ Crackle = NodePath("FlickerSound/Crackle")
 
 [node name="BoilerGlow" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3, -4.9, -20)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.45, 0.15, 1)
 light_energy = 2.0
 shadow_enabled = true
@@ -2359,6 +2412,10 @@ omni_range = 8
 
 [node name="BoilerRoomLamp" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, -3.6, -22.8)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.8, 0.55, 1)
 light_energy = 0.35
 shadow_enabled = true
@@ -2366,6 +2423,10 @@ omni_range = 6.0
 
 [node name="MorgueLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.6, -3.55, 3)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.8, 0.9, 1, 1)
 light_energy = 0.7
 shadow_enabled = true
@@ -3440,19 +3501,23 @@ transform = Transform3D(0.9903, -8.522e-18, -0.1392, 0.1392, 6.064e-17, 0.9903, 
 
 [node name="HideoutBracketNorth" type="MeshInstance3D" parent="Act1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.035, 1.02, -10.15)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_bracket")
 
 [node name="HideoutBracketSouth" type="MeshInstance3D" parent="Act1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.035, 1.02, -8.45)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_bracket")
 
-[node name="HideoutTallyMarks" type="Node3D" parent="Act1"]
+[node name="HideoutTallyMarks" type="MultiMeshInstance3D" parent="Act1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.0, 1.75, -13.79)
+visibility_range_end = 30.0
 script = ExtResource("75_tally")
 Material = SubResource("StandardMaterial3D_scratch")
 
 [node name="HideoutScrawl" type="Label3D" parent="Act1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.6, 1.75, -13.79)
+visibility_range_end = 30.0
 script = ExtResource("76_after_loop")
 pixel_size = 0.004
 modulate = Color(0.08, 0.07, 0.06, 1)
@@ -3712,6 +3777,10 @@ transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, -1.05, -6, -
 
 [node name="ArchiveLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.0, -3.6, -10.3)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.8, 0.9, 1, 1)
 light_energy = 0.45
 shadow_enabled = true
@@ -3722,6 +3791,10 @@ pitch_scale = 1.06
 
 [node name="ElectricalLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, -3.6, -6.0)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.85, 0.6, 1)
 light_energy = 0.4
 shadow_enabled = true
@@ -3730,98 +3803,114 @@ omni_range = 7.0
 [node name="Hum" parent="ElectricalLight" instance=ExtResource("48_light_hum")]
 pitch_scale = 0.9
 
-[node name="TapesEast12" type="Node3D" parent="Act2"]
+[node name="TapesEast12" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -5.28, -11.38)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 31
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesEast13" type="Node3D" parent="Act2"]
+[node name="TapesEast13" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.68, -11.38)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesEast14" type="Node3D" parent="Act2"]
+[node name="TapesEast14" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.08, -11.38)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesEast22" type="Node3D" parent="Act2"]
+[node name="TapesEast22" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -5.28, -9.48)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesEast23" type="Node3D" parent="Act2"]
+[node name="TapesEast23" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.68, -9.48)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesEast24" type="Node3D" parent="Act2"]
+[node name="TapesEast24" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.08, -9.48)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 31
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesEast32" type="Node3D" parent="Act2"]
+[node name="TapesEast32" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -5.28, -7.58)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesEast33" type="Node3D" parent="Act2"]
+[node name="TapesEast33" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.68, -7.58)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 31
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesEast34" type="Node3D" parent="Act2"]
+[node name="TapesEast34" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.08, -7.58)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesNorth12" type="Node3D" parent="Act2"]
+[node name="TapesNorth12" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.78, -5.28, -12.95)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 37
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesNorth13" type="Node3D" parent="Act2"]
+[node name="TapesNorth13" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.78, -4.68, -12.95)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 44
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesNorth14" type="Node3D" parent="Act2"]
+[node name="TapesNorth14" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.78, -4.08, -12.95)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 37
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesNorth22" type="Node3D" parent="Act2"]
+[node name="TapesNorth22" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78, -5.28, -12.95)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 37
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesNorth23" type="Node3D" parent="Act2"]
+[node name="TapesNorth23" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78, -4.68, -12.95)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 37
 Material = SubResource("StandardMaterial3D_tape_case")
 
-[node name="TapesNorth24" type="Node3D" parent="Act2"]
+[node name="TapesNorth24" type="MultiMeshInstance3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78, -4.08, -12.95)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 37
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="ShelfLabel1" type="Label3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 8.2, -3.88, -12.2)
+visibility_range_end = 30.0
 pixel_size = 0.0012
 modulate = Color(0.85, 0.83, 0.75, 1)
 text = "SUBJECT 14 · TRIALS 01–05"
@@ -3830,6 +3919,7 @@ outline_size = 0
 
 [node name="ShelfLabel2" type="Label3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 8.2, -3.88, -10.3)
+visibility_range_end = 30.0
 pixel_size = 0.0012
 modulate = Color(0.85, 0.83, 0.75, 1)
 text = "SUBJECT 14 · TRIALS 06–10"
@@ -3838,6 +3928,7 @@ outline_size = 0
 
 [node name="ShelfLabel3" type="Label3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 8.2, -3.88, -8.4)
+visibility_range_end = 30.0
 pixel_size = 0.0012
 modulate = Color(0.85, 0.83, 0.75, 1)
 text = "SUBJECT 14 · TRIALS 11–13"
@@ -3846,6 +3937,7 @@ outline_size = 0
 
 [node name="ShelfLabel4" type="Label3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, -3.88, -12.72)
+visibility_range_end = 30.0
 pixel_size = 0.0012
 modulate = Color(0.85, 0.83, 0.75, 1)
 text = "SUBJECT 09"
@@ -3854,6 +3946,7 @@ outline_size = 0
 
 [node name="ShelfLabel5" type="Label3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, -3.88, -12.72)
+visibility_range_end = 30.0
 pixel_size = 0.0012
 modulate = Color(0.85, 0.83, 0.75, 1)
 text = "SUBJECT 11"
@@ -3862,10 +3955,12 @@ outline_size = 0
 
 [node name="ArchiveMonitor" type="MeshInstance3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0, -5.04, -7.68)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_monitor")
 
 [node name="ArchiveMonitorScreen" type="MeshInstance3D" parent="Act2"]
 transform = Transform3D(-1, 0, 1.225e-16, 0, 1, 0, -1.225e-16, 0, -1, 3, -5.03, -7.905)
+visibility_range_end = 30.0
 material_override = SubResource("ShaderMaterial_tape_screen")
 mesh = SubResource("QuadMesh_monitor_screen")
 
@@ -4045,6 +4140,7 @@ bus = &"Sfx"
 
 [node name="BreakerSign" type="Label3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -7.69, -4.32, -7.2)
+visibility_range_end = 30.0
 pixel_size = 0.0012
 modulate = Color(0.9, 0.9, 0.85, 1)
 text = "MAIN FEED · SERVICE LIFT"
@@ -4053,6 +4149,7 @@ outline_size = 0
 
 [node name="DangerSign" type="Label3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -7.69, -4.12, -7.2)
+visibility_range_end = 30.0
 pixel_size = 0.0012
 modulate = Color(0.95, 0.75, 0.1, 1)
 text = "DANGER · HIGH VOLTAGE"
@@ -4159,11 +4256,13 @@ bus = &"Sfx"
 
 [node name="PastStickyNote" type="MeshInstance3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -8.684, 1.12, 1.35)
+visibility_range_end = 30.0
 layers = 1024
 mesh = SubResource("QuadMesh_sticky_note")
 
 [node name="PastStickyNoteCode" type="Label3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -8.682, 1.12, 1.35)
+visibility_range_end = 30.0
 layers = 1024
 pixel_size = 0.0008
 modulate = Color(0.1, 0.15, 0.45, 1)
@@ -4174,6 +4273,7 @@ outline_size = 0
 
 [node name="LiftSign" type="Label3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -8.684, 2.45, 0)
+visibility_range_end = 30.0
 pixel_size = 0.0015
 modulate = Color(0.85, 0.85, 0.8, 1)
 text = "SERVICE LIFT · STAFF ONLY"
@@ -4513,79 +4613,97 @@ shape = SubResource("BoxShape3D_fire_escape_ramp")
 
 [node name="Act3" type="Node3D" parent="."]
 
-[node name="FireEscapeSteps" type="Node3D" parent="Act3"]
+[node name="FireEscapeSteps" type="CSGCombiner3D" parent="Act3"]
 
-[node name="Flight1Step1" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step1" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 3.202, 10.15)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step2" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step2" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 3.024, 9.858)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step3" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step3" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.847, 9.564)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step4" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step4" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.669, 9.269)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step5" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step5" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.491, 8.975)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step6" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step6" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.313, 8.681)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step7" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step7" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.136, 8.386)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step8" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step8" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.958, 8.092)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step9" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step9" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.78, 7.797)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step10" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step10" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.602, 7.503)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step11" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step11" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.424, 7.208)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step12" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step12" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.247, 6.914)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step13" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step13" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.069, 6.619)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step14" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step14" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.8911, 6.325)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step15" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step15" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.7133, 6.031)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step16" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step16" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.5356, 5.736)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step17" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step17" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.3578, 5.442)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight1Step18" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight1Step18" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.18, 5.147)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
 [node name="Flight1Rail" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 0.8561, 0.5169, 0, -0.5169, 0.8561, 12.97, 2.7, 7.65)
@@ -4597,77 +4715,95 @@ transform = Transform3D(1, 0, 0, 0, 0.8561, 0.5169, 0, -0.5169, 0.8561, 12.95, 1
 size = Vector3(0.04, 0.25, 6.191)
 material = ExtResource("15_duct")
 
-[node name="Flight2Step1" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step1" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.002222, 3.653)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step2" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step2" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -0.1756, 3.358)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step3" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step3" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -0.3533, 3.064)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step4" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step4" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -0.5311, 2.769)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step5" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step5" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -0.7089, 2.475)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step6" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step6" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -0.8867, 2.181)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step7" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step7" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.064, 1.886)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step8" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step8" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.242, 1.592)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step9" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step9" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.42, 1.297)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step10" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step10" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.598, 1.003)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step11" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step11" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.776, 0.7083)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step12" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step12" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.953, 0.4139)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step13" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step13" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -2.131, 0.1194)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step14" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step14" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -2.309, -0.175)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step15" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step15" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -2.487, -0.4694)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step16" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step16" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -2.664, -0.7639)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step17" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step17" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -2.842, -1.058)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
-[node name="Flight2Step18" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+[node name="Flight2Step18" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -3.02, -1.353)
-mesh = SubResource("BoxMesh_tread")
+size = Vector3(1.2, 0.04, 0.3)
+material = ExtResource("15_duct")
 
 [node name="Flight2Rail" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
 transform = Transform3D(1, 0, 0, 0, 0.8561, 0.5169, 0, -0.5169, 0.8561, 12.97, -0.5, 1.15)
@@ -4727,15 +4863,17 @@ Surface = &"manhole"
 [node name="Shape" type="CollisionShape3D" parent="SoundZones/FireEscape"]
 shape = SubResource("BoxShape3D_fire_escape_steps")
 
-[node name="GlassCorridorShards" type="Node3D" parent="Act3"]
+[node name="GlassCorridorShards" type="MultiMeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 3.4, -6.0)
+visibility_range_end = 30.0
 script = ExtResource("110_glass_shards")
 Count = 90
 AreaSize = Vector2(1.6, 2.9)
 Material = SubResource("StandardMaterial3D_glass_shard")
 
-[node name="GlassPharmacyShards" type="Node3D" parent="Act3"]
+[node name="GlassPharmacyShards" type="MultiMeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 3.4, 9.4)
+visibility_range_end = 30.0
 script = ExtResource("110_glass_shards")
 Count = 220
 AreaSize = Vector2(6.4, 3.0)
@@ -4743,6 +4881,10 @@ Material = SubResource("StandardMaterial3D_glass_shard")
 
 [node name="UpperCorridorNorthLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.1, -7)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.85, 0.92, 1, 1)
 light_energy = 0.3
 shadow_enabled = true
@@ -4753,6 +4895,10 @@ pitch_scale = 0.96
 
 [node name="UpperCorridorSouthLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.1, 6.5)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.85, 0.92, 1, 1)
 light_energy = 0.35
 shadow_enabled = true
@@ -4765,20 +4911,30 @@ Crackle = NodePath("FlickerSound/Crackle")
 
 [node name="DormWest1Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 6.1, -9.3)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.55, 0.65, 1, 1)
 light_energy = 0.18
-shadow_enabled = true
 omni_range = 7.0
 
 [node name="DormWest3Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 6.1, 9.3)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.55, 0.65, 1, 1)
 light_energy = 0.18
-shadow_enabled = true
 omni_range = 7.0
 
 [node name="UpperLiftLobbyLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 6.1, 0)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.86, 0.72, 1)
 light_energy = 0.3
 shadow_enabled = true
@@ -4789,20 +4945,30 @@ pitch_scale = 0.96
 
 [node name="ChiefOfficeLamp" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.3, 4.6, -10.3)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.8, 0.55, 1)
 light_energy = 0.45
-shadow_enabled = true
 omni_range = 5.0
 
 [node name="ObservationGlow" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.6, -6.2)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.6, 0.75, 1, 1)
 light_energy = 0.25
-shadow_enabled = true
 omni_range = 4.0
 
 [node name="SleepLabLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 6, 1.5)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.45, 0.6, 1, 1)
 light_energy = 0.45
 shadow_enabled = true
@@ -4813,6 +4979,10 @@ pitch_scale = 0.96
 
 [node name="PharmacyLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 6.1, 10.2)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.8, 0.95, 0.85, 1)
 light_energy = 0.35
 shadow_enabled = true
@@ -4852,19 +5022,23 @@ transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 10, 3.4, -1.
 
 [node name="SleepLabSleeper1" type="CSGBox3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.85, 4.12, -1.6)
+visibility_range_end = 30.0
 size = Vector3(1.6, 0.24, 0.5)
 material = ExtResource("68_fabric")
 
 [node name="SleepLabHead1" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.65, 4.18, -1.6)
+visibility_range_end = 30.0
 mesh = SubResource("SphereMesh_head")
 
 [node name="SleepLabCap1" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(0.342, 0.9397, 0, -0.9397, 0.342, 0, 0, 0, 1, 10.66, 4.2, -1.6)
+visibility_range_end = 30.0
 mesh = SubResource("SphereMesh_electrode_cap")
 
 [node name="SleepLabCable1" type="CSGCylinder3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 0.6428, -0.766, 0, 0.766, 0.6428, 10.78, 4.65, -1.2)
+visibility_range_end = 30.0
 radius = 0.012
 height = 1.0
 sides = 6
@@ -4872,6 +5046,7 @@ material = SubResource("StandardMaterial3D_black_plastic")
 
 [node name="SleepLabMachineLed1" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.54, 4.75, -0.8)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_led")
 
 [node name="SleepLabBed2" parent="Navigation" instance=ExtResource("11_bed")]
@@ -4879,19 +5054,23 @@ transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 10, 3.4, 0.6
 
 [node name="SleepLabSleeper2" type="CSGBox3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.85, 4.12, 0.6)
+visibility_range_end = 30.0
 size = Vector3(1.6, 0.24, 0.5)
 material = ExtResource("68_fabric")
 
 [node name="SleepLabHead2" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.65, 4.18, 0.6)
+visibility_range_end = 30.0
 mesh = SubResource("SphereMesh_head")
 
 [node name="SleepLabCap2" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(0.342, 0.9397, 0, -0.9397, 0.342, 0, 0, 0, 1, 10.66, 4.2, 0.6)
+visibility_range_end = 30.0
 mesh = SubResource("SphereMesh_electrode_cap")
 
 [node name="SleepLabCable2" type="CSGCylinder3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 0.6428, -0.766, 0, 0.766, 0.6428, 10.78, 4.65, 1)
+visibility_range_end = 30.0
 radius = 0.012
 height = 1.0
 sides = 6
@@ -4899,6 +5078,7 @@ material = SubResource("StandardMaterial3D_black_plastic")
 
 [node name="SleepLabMachineLed2" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.54, 4.75, 1.4)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_led")
 
 [node name="SleepLabBed3" parent="Navigation" instance=ExtResource("11_bed")]
@@ -4906,19 +5086,23 @@ transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 10, 3.4, 2.8
 
 [node name="SleepLabSleeper3" type="CSGBox3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.85, 4.12, 2.8)
+visibility_range_end = 30.0
 size = Vector3(1.6, 0.24, 0.5)
 material = ExtResource("68_fabric")
 
 [node name="SleepLabHead3" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.65, 4.18, 2.8)
+visibility_range_end = 30.0
 mesh = SubResource("SphereMesh_head")
 
 [node name="SleepLabCap3" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(0.342, 0.9397, 0, -0.9397, 0.342, 0, 0, 0, 1, 10.66, 4.2, 2.8)
+visibility_range_end = 30.0
 mesh = SubResource("SphereMesh_electrode_cap")
 
 [node name="SleepLabCable3" type="CSGCylinder3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 0.6428, -0.766, 0, 0.766, 0.6428, 10.78, 4.65, 3.2)
+visibility_range_end = 30.0
 radius = 0.012
 height = 1.0
 sides = 6
@@ -4926,6 +5110,7 @@ material = SubResource("StandardMaterial3D_black_plastic")
 
 [node name="SleepLabMachineLed3" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.54, 4.75, 3.5999999999999996)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_led")
 
 [node name="SleepLabBed4" parent="Navigation" instance=ExtResource("11_bed")]
@@ -4933,19 +5118,23 @@ transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 10, 3.4, 5)
 
 [node name="SleepLabSleeper4" type="CSGBox3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.85, 4.12, 5.0)
+visibility_range_end = 30.0
 size = Vector3(1.6, 0.24, 0.5)
 material = ExtResource("68_fabric")
 
 [node name="SleepLabHead4" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.65, 4.18, 5.0)
+visibility_range_end = 30.0
 mesh = SubResource("SphereMesh_head")
 
 [node name="SleepLabCap4" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(0.342, 0.9397, 0, -0.9397, 0.342, 0, 0, 0, 1, 10.66, 4.2, 5)
+visibility_range_end = 30.0
 mesh = SubResource("SphereMesh_electrode_cap")
 
 [node name="SleepLabCable4" type="CSGCylinder3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 0.6428, -0.766, 0, 0.766, 0.6428, 10.78, 4.65, 5.4)
+visibility_range_end = 30.0
 radius = 0.012
 height = 1.0
 sides = 6
@@ -4953,6 +5142,7 @@ material = SubResource("StandardMaterial3D_black_plastic")
 
 [node name="SleepLabMachineLed4" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.54, 4.75, 5.8)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_led")
 
 [node name="SleepwalkerCorridorNorth" parent="Act3" node_paths=PackedStringArray("Player") instance=ExtResource("109_sleepwalker")]
@@ -4981,10 +5171,12 @@ Player = NodePath("../../Player")
 
 [node name="OneWayMirror" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(-1, 0, 1.225e-16, 0, 1, 0, -1.225e-16, 0, -1, 6.5, 4.9, -3.3)
+visibility_range_end = 30.0
 mesh = SubResource("QuadMesh_mirror")
 
 [node name="RouteSign" type="Label3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 5.25, -7.17)
+visibility_range_end = 30.0
 pixel_size = 0.0015
 modulate = Color(0.85, 0.85, 0.8, 1)
 text = "SUBJECT 14 · TRIAL 14 · ROUTE"
@@ -5018,10 +5210,12 @@ shape = SubResource("BoxShape3D_observation_room")
 
 [node name="SecurityMonitor1" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.35, 4.36, -6.9)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_monitor")
 
 [node name="SecurityScreen1" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.35, 4.37, -6.675)
+visibility_range_end = 30.0
 material_override = SubResource("ShaderMaterial_security_screen")
 mesh = SubResource("QuadMesh_monitor_screen")
 
@@ -5056,10 +5250,12 @@ theme_override_font_sizes/font_size = 12
 
 [node name="SecurityMonitor2" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 4.36, -6.9)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_monitor")
 
 [node name="SecurityScreen2" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 4.37, -6.675)
+visibility_range_end = 30.0
 material_override = SubResource("ShaderMaterial_security_screen")
 mesh = SubResource("QuadMesh_monitor_screen")
 
@@ -5094,10 +5290,12 @@ theme_override_font_sizes/font_size = 12
 
 [node name="SecurityMonitor3" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.25, 4.36, -6.9)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_monitor")
 
 [node name="SecurityScreen3" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.25, 4.37, -6.675)
+visibility_range_end = 30.0
 material_override = SubResource("ShaderMaterial_security_screen")
 mesh = SubResource("QuadMesh_monitor_screen")
 
@@ -5132,10 +5330,12 @@ theme_override_font_sizes/font_size = 12
 
 [node name="SecurityMonitor4" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.7, 4.36, -6.9)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_monitor")
 
 [node name="SecurityScreen4" type="MeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.7, 4.37, -6.675)
+visibility_range_end = 30.0
 material_override = SubResource("ShaderMaterial_security_screen")
 mesh = SubResource("QuadMesh_monitor_screen")
 
@@ -5256,48 +5456,54 @@ bus = &"Sfx"
 [node name="BatteryPharmacy" parent="." instance=ExtResource("8_battery")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 4.3, 8.4)
 
-[node name="MedicineBoxesNorth1" type="Node3D" parent="Act3"]
+[node name="MedicineBoxesNorth1" type="MultiMeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 3.815, 6.85)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 75
 ItemSize = Vector3(0.06, 0.09, 0.05)
 Gap = 0.01
 Material = SubResource("StandardMaterial3D_medicine")
 
-[node name="MedicineBoxesNorth2" type="Node3D" parent="Act3"]
+[node name="MedicineBoxesNorth2" type="MultiMeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.315, 6.85)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 68
 ItemSize = Vector3(0.06, 0.09, 0.05)
 Gap = 0.01
 Material = SubResource("StandardMaterial3D_medicine")
 
-[node name="MedicineBoxesNorth3" type="Node3D" parent="Act3"]
+[node name="MedicineBoxesNorth3" type="MultiMeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.815, 6.85)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 61
 ItemSize = Vector3(0.06, 0.09, 0.05)
 Gap = 0.01
 Material = SubResource("StandardMaterial3D_medicine")
 
-[node name="MedicineBoxesSouth1" type="Node3D" parent="Act3"]
+[node name="MedicineBoxesSouth1" type="MultiMeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 3.815, 13.55)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 61
 ItemSize = Vector3(0.06, 0.09, 0.05)
 Gap = 0.01
 Material = SubResource("StandardMaterial3D_medicine")
 
-[node name="MedicineBoxesSouth2" type="Node3D" parent="Act3"]
+[node name="MedicineBoxesSouth2" type="MultiMeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.315, 13.55)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 54
 ItemSize = Vector3(0.06, 0.09, 0.05)
 Gap = 0.01
 Material = SubResource("StandardMaterial3D_medicine")
 
-[node name="MedicineBoxesSouth3" type="Node3D" parent="Act3"]
+[node name="MedicineBoxesSouth3" type="MultiMeshInstance3D" parent="Act3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.815, 13.55)
+visibility_range_end = 30.0
 script = ExtResource("85_item_row")
 Count = 47
 ItemSize = Vector3(0.06, 0.09, 0.05)
@@ -5346,6 +5552,7 @@ bus = &"Sfx"
 
 [node name="UpperLiftSign" type="Label3D" parent="Act3"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -8.684, 5.85, 0)
+visibility_range_end = 30.0
 pixel_size = 0.0015
 modulate = Color(0.85, 0.85, 0.8, 1)
 text = "SLEEP WARD · LEVEL 2"
@@ -5653,102 +5860,130 @@ material = ExtResource("15_duct")
 
 [node name="Coil1" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, -5.6, 34.6)
+visibility_range_end = 30.0
 mesh = SubResource("TorusMesh_coil")
 
 [node name="Coil2" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, -5.2, 34.6)
+visibility_range_end = 30.0
 mesh = SubResource("TorusMesh_coil")
 
 [node name="Coil3" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, -4.8, 34.6)
+visibility_range_end = 30.0
 mesh = SubResource("TorusMesh_coil")
 
 [node name="TransmitterLed00" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.2, 31.6)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed01" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.2, 31.72)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed02" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.2, 31.84)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed03" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.2, 31.96)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed04" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.2, 32.08)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed10" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.32, 31.6)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed11" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.32, 31.72)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed12" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.32, 31.84)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed13" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.32, 31.96)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed14" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.32, 32.08)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed20" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.44, 31.6)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed21" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.44, 31.72)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed22" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.44, 31.84)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed23" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.44, 31.96)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed24" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.44, 32.08)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed30" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.56, 31.6)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed31" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.56, 31.72)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed32" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.56, 31.84)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed33" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.56, 31.96)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="TransmitterLed34" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.56, 32.08)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_transmitter_led")
 
 [node name="DrainWater" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.0, -6.985, 32)
+visibility_range_end = 30.0
 mesh = SubResource("PlaneMesh_drain_water")
 
 [node name="TransmitterGlow" type="OmniLight3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, -5.4, 32)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.4, 0.55, 1, 1)
 light_energy = 0.5
 shadow_enabled = true
@@ -5756,18 +5991,30 @@ omni_range = 6.0
 
 [node name="PilotLamp" type="OmniLight3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, -4.7, 34.5)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.2, 0.1, 1)
 light_energy = 0.25
 omni_range = 5.0
 
 [node name="Sparks" type="OmniLight3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9, -5.6, 32)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(1, 0.8, 0.5, 1)
 light_energy = 0.0
 omni_range = 7.0
 
 [node name="Moonlight" type="OmniLight3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.0, -4.8, 32)
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_shadow = 24.0
+distance_fade_length = 6.0
 light_color = Color(0.6, 0.7, 0.95, 1)
 light_energy = 0.6
 omni_range = 6.0
@@ -5833,6 +6080,7 @@ bus = &"Sfx"
 
 [node name="HatchFrame" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, -2.955, 31.5)
+visibility_range_end = 30.0
 mesh = SubResource("BoxMesh_hatch_frame")
 
 [node name="HatchLid" type="Node3D" parent="SignalLost"]
@@ -5911,64 +6159,80 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, -6.98, 29.6)
 
 [node name="HatchRung1" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -6.75, 31.5)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="HatchRung2" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -6.45, 31.5)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="HatchRung3" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -6.15, 31.5)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="HatchRung4" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -5.85, 31.5)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="HatchRung5" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -5.55, 31.5)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="HatchRung6" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -5.25, 31.5)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="HatchRung7" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -4.95, 31.5)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="HatchRung8" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -4.65, 31.5)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="ExitRung1" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -6.75, 32)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="ExitRung2" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -6.45, 32)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="ExitRung3" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -6.15, 32)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="ExitRung4" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -5.85, 32)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="ExitRung5" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -5.55, 32)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="ExitRung6" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -5.25, 32)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="ExitRung7" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -4.95, 32)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
 
 [node name="ExitRung8" type="MeshInstance3D" parent="SignalLost"]
 transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -4.65, 32)
+visibility_range_end = 30.0
 mesh = SubResource("CylinderMesh_rung")
