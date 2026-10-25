@@ -70,6 +70,11 @@ Prototype: a dark, textured asylum to explore with the camcorder. A 28 m corrido
 north into a second wing: a day room with tables, a TV and a nurse station, a ward with four beds, a shower room
 and a balcony outside the day room's barred windows. Two crawl-only ventilation ducts link the first side rooms
 to the ward and the showers; crouch to get through them, the enemy can't follow.
+In the last room on the right a door opens onto a long concrete stairwell, 32 steps down to a basement under the
+building, below the grounds: a service corridor with pipes along the ceiling, a boiler room lit only by the
+boiler's fire and a work lamp, a tiled morgue with a wall of cold chambers and covered bodies, and a pitch-dark
+storage room. It is darker than the floor above, so the camcorder's night vision does most of the seeing there.
+The ground ends at the building's concrete base, so the stairwell and the basement can pass below it.
 The player starts at the locked iron gate of the asylum grounds at night, under a flickering road lamp, and walks up
 to the building. Behind the corridor's south end a door opens onto stairs down to the grounds: a lawn with trees, a fountain
 on a paved plaza, benches and street lamps, a parking lot of cars under tarps, and a road out to a locked iron
@@ -181,7 +186,7 @@ shadows, which keeps the grounds above 30 FPS.
 
 ## Level editing
 
-The enemy walks on the level's navigation mesh. After changing walls or lockers, select the
+The enemy walks on the level's navigation mesh. Its patrol takes it down the stairwell to the boiler room too. After changing walls or lockers, select the
 `Navigation` node in the level and press **Bake NavigationMesh** in the editor toolbar.
 Doors are deliberately kept outside the `Navigation` node so the enemy can path through them.
 Furniture, lockers, trees and the grounds' props go inside it, so the enemy walks around them, and the bake
