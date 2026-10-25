@@ -71,12 +71,33 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_stair_ramp"]
 size = Vector3(3, 0.2, 5.92)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
-size = Vector3(140, 1, 170)
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground_south"]
+size = Vector3(140, 1, 85.7)
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground_south"]
 material = ExtResource("20_lawn")
-size = Vector2(140, 170)
+size = Vector2(140, 85.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground_north"]
+size = Vector3(140, 1, 43.6)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground_north"]
+material = ExtResource("20_lawn")
+size = Vector2(140, 43.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground_west"]
+size = Vector3(58.4, 1, 40.7)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground_west"]
+material = ExtResource("20_lawn")
+size = Vector2(58.4, 40.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground_east"]
+size = Vector3(58.4, 1, 40.7)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground_east"]
+material = ExtResource("20_lawn")
+size = Vector2(58.4, 40.7)
 
 [sub_resource type="BoxMesh" id="BoxMesh_path_stairs"]
 material = ExtResource("19_paving")
@@ -147,6 +168,15 @@ size = Vector3(0.1, 0.01, 4.6)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_objective_start"]
 size = Vector3(8, 3, 6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_basement_ramp"]
+size = Vector3(10.7834, 0.2, 1.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_indoors_basement"]
+size = Vector3(23.2, 6.1, 40.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_objective_basement"]
+size = Vector3(1.8, 2.7, 2.4)
 
 [node name="TestLevel" type="Node3D"]
 
@@ -846,6 +876,29 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.06, 1.7, 14.05)
 size = Vector3(0.03, 1.2, 0.03)
 material = ExtResource("3_prop")
 
+[node name="StairwellWallNorth" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.485, 1.5, -6.3)
+size = Vector3(5.03, 3, 0.2)
+material = ExtResource("2_wall")
+
+[node name="StairwellWallWest" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.07, 1.5, -5.6)
+size = Vector3(0.2, 3, 1.6)
+material = ExtResource("2_wall")
+
+[node name="DoorwayStairwell" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.25, 1.225, -6.3)
+operation = 2
+size = Vector3(1.1, 2.45, 0.6)
+material = ExtResource("2_wall")
+
+[node name="BasementStairs" type="CSGPolygon3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.8)
+operation = 2
+polygon = PackedVector2Array(9.6, 0.05, 6.1653, 0.05, 1.2373, -3.3, 0.5, -3.3, 0.5, -6, 0.92, -6, 0.92, -5.8125, 1.2, -5.8125, 1.2, -5.625, 1.48, -5.625, 1.48, -5.4375, 1.76, -5.4375, 1.76, -5.25, 2.04, -5.25, 2.04, -5.0625, 2.32, -5.0625, 2.32, -4.875, 2.6, -4.875, 2.6, -4.6875, 2.88, -4.6875, 2.88, -4.5, 3.16, -4.5, 3.16, -4.3125, 3.44, -4.3125, 3.44, -4.125, 3.72, -4.125, 3.72, -3.9375, 4, -3.9375, 4, -3.75, 4.28, -3.75, 4.28, -3.5625, 4.56, -3.5625, 4.56, -3.375, 4.84, -3.375, 4.84, -3.1875, 5.12, -3.1875, 5.12, -3, 5.4, -3, 5.4, -2.8125, 5.68, -2.8125, 5.68, -2.625, 5.96, -2.625, 5.96, -2.4375, 6.24, -2.4375, 6.24, -2.25, 6.52, -2.25, 6.52, -2.0625, 6.8, -2.0625, 6.8, -1.875, 7.08, -1.875, 7.08, -1.6875, 7.36, -1.6875, 7.36, -1.5, 7.64, -1.5, 7.64, -1.3125, 7.92, -1.3125, 7.92, -1.125, 8.2, -1.125, 8.2, -0.9375, 8.48, -0.9375, 8.48, -0.75, 8.76, -0.75, 8.76, -0.5625, 9.04, -0.5625, 9.04, -0.375, 9.32, -0.375, 9.32, -0.1875, 9.6, -0.1875)
+depth = 1.4
+material = ExtResource("17_concrete")
+
 [node name="BedLeft1" parent="Navigation" instance=ExtResource("11_bed")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -10.1)
 
@@ -1083,6 +1136,72 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, -2.374, 20.6)
 size = Vector3(0.05, 0.9, 0.05)
 material = ExtResource("3_prop")
 
+[node name="BasementStairs" type="CSGPolygon3D" parent="Navigation/Exterior"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.8)
+operation = 2
+polygon = PackedVector2Array(9.6, 0.05, 6.1653, 0.05, 1.2373, -3.3, 0.5, -3.3, 0.5, -6, 0.92, -6, 0.92, -5.8125, 1.2, -5.8125, 1.2, -5.625, 1.48, -5.625, 1.48, -5.4375, 1.76, -5.4375, 1.76, -5.25, 2.04, -5.25, 2.04, -5.0625, 2.32, -5.0625, 2.32, -4.875, 2.6, -4.875, 2.6, -4.6875, 2.88, -4.6875, 2.88, -4.5, 3.16, -4.5, 3.16, -4.3125, 3.44, -4.3125, 3.44, -4.125, 3.72, -4.125, 3.72, -3.9375, 4, -3.9375, 4, -3.75, 4.28, -3.75, 4.28, -3.5625, 4.56, -3.5625, 4.56, -3.375, 4.84, -3.375, 4.84, -3.1875, 5.12, -3.1875, 5.12, -3, 5.4, -3, 5.4, -2.8125, 5.68, -2.8125, 5.68, -2.625, 5.96, -2.625, 5.96, -2.4375, 6.24, -2.4375, 6.24, -2.25, 6.52, -2.25, 6.52, -2.0625, 6.8, -2.0625, 6.8, -1.875, 7.08, -1.875, 7.08, -1.6875, 7.36, -1.6875, 7.36, -1.5, 7.64, -1.5, 7.64, -1.3125, 7.92, -1.3125, 7.92, -1.125, 8.2, -1.125, 8.2, -0.9375, 8.48, -0.9375, 8.48, -0.75, 8.76, -0.75, 8.76, -0.5625, 9.04, -0.5625, 9.04, -0.375, 9.32, -0.375, 9.32, -0.1875, 9.6, -0.1875)
+depth = 1.4
+material = ExtResource("17_concrete")
+
+[node name="Basement" type="CSGCombiner3D" parent="Navigation"]
+use_collision = true
+metadata/surface = &"concrete"
+
+[node name="Shell" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.7, -6.05)
+size = Vector3(23.2, 3.2, 40.7)
+material = ExtResource("17_concrete")
+
+[node name="Corridor" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.65, -3)
+operation = 2
+size = Vector3(1.8, 2.7, 22)
+material = ExtResource("17_concrete")
+
+[node name="BoilerRoom" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.65, -19)
+operation = 2
+size = Vector3(14, 2.7, 10)
+material = ExtResource("17_concrete")
+
+[node name="Morgue" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.6, -4.65, 3)
+operation = 2
+size = Vector3(8.8, 2.7, 10)
+material = ExtResource("17_concrete")
+
+[node name="Storage" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, -4.65, 4.5)
+operation = 2
+size = Vector3(6.8, 2.7, 7)
+material = ExtResource("17_concrete")
+
+[node name="DoorwayMorgue" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, -4.775, 3)
+operation = 2
+size = Vector3(0.4, 2.45, 1.1)
+material = ExtResource("17_concrete")
+
+[node name="DoorwayStorage" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, -4.775, 4)
+operation = 2
+size = Vector3(0.4, 2.45, 1.1)
+material = ExtResource("17_concrete")
+
+[node name="Stairs" type="CSGPolygon3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.8)
+operation = 2
+polygon = PackedVector2Array(9.6, 0.05, 6.1653, 0.05, 1.2373, -3.3, 0.5, -3.3, 0.5, -6, 0.92, -6, 0.92, -5.8125, 1.2, -5.8125, 1.2, -5.625, 1.48, -5.625, 1.48, -5.4375, 1.76, -5.4375, 1.76, -5.25, 2.04, -5.25, 2.04, -5.0625, 2.32, -5.0625, 2.32, -4.875, 2.6, -4.875, 2.6, -4.6875, 2.88, -4.6875, 2.88, -4.5, 3.16, -4.5, 3.16, -4.3125, 3.44, -4.3125, 3.44, -4.125, 3.72, -4.125, 3.72, -3.9375, 4, -3.9375, 4, -3.75, 4.28, -3.75, 4.28, -3.5625, 4.56, -3.5625, 4.56, -3.375, 4.84, -3.375, 4.84, -3.1875, 5.12, -3.1875, 5.12, -3, 5.4, -3, 5.4, -2.8125, 5.68, -2.8125, 5.68, -2.625, 5.96, -2.625, 5.96, -2.4375, 6.24, -2.4375, 6.24, -2.25, 6.52, -2.25, 6.52, -2.0625, 6.8, -2.0625, 6.8, -1.875, 7.08, -1.875, 7.08, -1.6875, 7.36, -1.6875, 7.36, -1.5, 7.64, -1.5, 7.64, -1.3125, 7.92, -1.3125, 7.92, -1.125, 8.2, -1.125, 8.2, -0.9375, 8.48, -0.9375, 8.48, -0.75, 8.76, -0.75, 8.76, -0.5625, 9.04, -0.5625, 9.04, -0.375, 9.32, -0.375, 9.32, -0.1875, 9.6, -0.1875)
+depth = 1.4
+material = ExtResource("17_concrete")
+
+[node name="BasementStairRamp" type="StaticBody3D" parent="Navigation"]
+transform = Transform3D(0.8309, -0.5564, 0, 0.5564, 0.8309, 0, 0, 0, 1, 5.1756, -3.0831, -5.5)
+metadata/surface = &"stairs"
+
+[node name="Collision" type="CollisionShape3D" parent="Navigation/BasementStairRamp"]
+shape = SubResource("BoxShape3D_basement_ramp")
+
 [node name="StairRamp" type="StaticBody3D" parent="Navigation"]
 transform = Transform3D(1, 0, 0, 0, 0.862, -0.507, 0, 0.507, 0.862, 0, -1.586, 18.299)
 metadata/surface = &"stairs"
@@ -1091,15 +1210,40 @@ metadata/surface = &"stairs"
 shape = SubResource("BoxShape3D_stair_ramp")
 
 [node name="Ground" type="StaticBody3D" parent="Navigation"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.0, 15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.0, 0)
 metadata/surface = &"grass"
 
-[node name="Collision" type="CollisionShape3D" parent="Navigation/Ground"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-shape = SubResource("BoxShape3D_ground")
+[node name="CollisionSouth" type="CollisionShape3D" parent="Navigation/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 57.15)
+shape = SubResource("BoxShape3D_ground_south")
 
-[node name="Lawn" type="MeshInstance3D" parent="Navigation/Ground"]
-mesh = SubResource("PlaneMesh_ground")
+[node name="LawnSouth" type="MeshInstance3D" parent="Navigation/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 57.15)
+mesh = SubResource("PlaneMesh_ground_south")
+
+[node name="CollisionNorth" type="CollisionShape3D" parent="Navigation/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -48.2)
+shape = SubResource("BoxShape3D_ground_north")
+
+[node name="LawnNorth" type="MeshInstance3D" parent="Navigation/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -48.2)
+mesh = SubResource("PlaneMesh_ground_north")
+
+[node name="CollisionWest" type="CollisionShape3D" parent="Navigation/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.8, -0.5, -6.05)
+shape = SubResource("BoxShape3D_ground_west")
+
+[node name="LawnWest" type="MeshInstance3D" parent="Navigation/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.8, 0, -6.05)
+mesh = SubResource("PlaneMesh_ground_west")
+
+[node name="CollisionEast" type="CollisionShape3D" parent="Navigation/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.8, -0.5, -6.05)
+shape = SubResource("BoxShape3D_ground_east")
+
+[node name="LawnEast" type="MeshInstance3D" parent="Navigation/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.8, 0, -6.05)
+mesh = SubResource("PlaneMesh_ground_east")
 
 [node name="Fence" type="Node3D" parent="Navigation"]
 script = ExtResource("35_fence")
@@ -1667,6 +1811,12 @@ transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 6.2, 0, -21.5)
 [node name="DoorSouth" parent="." instance=ExtResource("6_door")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 14.15)
 
+[node name="DoorStairwell" parent="." instance=ExtResource("6_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.75, 0, -6.3)
+
+[node name="DoorMorgue" parent="." instance=ExtResource("6_door")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -1.05, -6, 2.5)
+
 [node name="LockerLeft3" parent="Navigation" instance=ExtResource("7_locker")]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -10.68, 0, 11.1)
 
@@ -1748,6 +1898,17 @@ Objective = "Get down to the basement. The stairs are in the last room on the ri
 [node name="Shape" type="CollisionShape3D" parent="Objectives/ReachTheBasement"]
 shape = SubResource("BoxShape3D_objective_start")
 
+[node name="SearchTheBasement" type="Area3D" parent="Objectives"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.65, -5.5)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("67_objective_trigger")
+Objective = "Search the basement."
+
+[node name="Shape" type="CollisionShape3D" parent="Objectives/SearchTheBasement"]
+shape = SubResource("BoxShape3D_objective_basement")
+
 [node name="SoundZones" type="Node3D" parent="."]
 
 [node name="Indoors" type="Area3D" parent="SoundZones"]
@@ -1762,6 +1923,10 @@ reverb_bus_uniformity = 0.5
 [node name="Shape" type="CollisionShape3D" parent="SoundZones/Indoors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -6.05)
 shape = SubResource("BoxShape3D_indoors")
+
+[node name="Basement" type="CollisionShape3D" parent="SoundZones/Indoors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.25, -6.05)
+shape = SubResource("BoxShape3D_indoors_basement")
 
 [node name="VentWest" type="Area3D" parent="SoundZones"]
 collision_layer = 16
