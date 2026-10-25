@@ -98,13 +98,22 @@ public partial class PlayerAnimation : Node3D
 	/// <summary>Samples the eye's global transform from the animation's tracks without playing it.</summary>
 	private Transform3D EyeAt(float seconds)
 	{
-		Transform3D root = new(
-			new Basis(_animation.RotationTrackInterpolate(Track(AnimatedRoot, Animation.TrackType.Rotation3D), seconds)),
-			_animation.PositionTrackInterpolate(Track(AnimatedRoot, Animation.TrackType.Position3D), seconds));
-		Transform3D eye = new(
-			new Basis(_animation.RotationTrackInterpolate(Track(Eye, Animation.TrackType.Rotation3D), seconds)),
-			Eye.Position);
+		Transform3D root = new(new Basis(RotationAt(AnimatedRoot, seconds)), PositionAt(AnimatedRoot, seconds));
+		Transform3D eye = new(new Basis(RotationAt(Eye, seconds)), PositionAt(Eye, seconds));
 		return AnimatedScene.GlobalTransform * root * eye;
+	}
+
+	// A node that never moves in the animation has no track for it, so it keeps its own value.
+	private Vector3 PositionAt(Node3D node, float seconds)
+	{
+		int track = Track(node, Animation.TrackType.Position3D);
+		return track < 0 ? node.Position : _animation.PositionTrackInterpolate(track, seconds);
+	}
+
+	private Quaternion RotationAt(Node3D node, float seconds)
+	{
+		int track = Track(node, Animation.TrackType.Rotation3D);
+		return track < 0 ? node.Quaternion : _animation.RotationTrackInterpolate(track, seconds);
 	}
 
 	private int Track(Node3D node, Animation.TrackType type)

@@ -208,7 +208,7 @@ open with the `Interact` animation and kneels beside beds with `Fixing_Kneeling`
 its head towards the player's face while it punches and into the hiding spot while it checks one.
 
 The player's own hands (`player/view_hands.tscn`) only appear while reaching for something: opening
-or closing a door, or pushing a locker open from inside. They belong to a full body placed around the camera, with its head shrunk away by
+or closing a door. They belong to a full body placed around the camera, with its head shrunk away by
 `HideBonesModifier`; IK places the wrist on a grip point, `HandAimModifier` turns the hand to the grip point's
 orientation and `GripFingersModifier` curls the fingers by the amount the interaction asks for.
 
@@ -224,22 +224,26 @@ door and the player keeps walking. Getting into a locker or under a bed is one t
 it blends in from however the player was moving. Under a bed the player gets down on the floor and crawls in
 sideways, turning to face out, and watches the room from floor level.
 
-Getting into a locker is a hand-made animation instead of IK, because a hand that has to hold a handle, follow
-a swinging door and change grips looks wrong when it is worked out on the fly. `tools/locker_animations.py`
-builds the locker in Blender at the game's measurements, poses the arm, the view and the door together frame by
-frame and exports them as `props/locker/locker_hide.glb`: the right hand takes the door's pull bar from the
-side and pulls the door open, the player steps in turning around, hooks their fingers into the lowest vent slit
-and pulls the door shut while backing in. Run it with Blender after changing the locker, the move or the arms:
+Getting into and out of a locker are hand-made animations instead of IK, because a hand that has to hold a
+handle, follow a swinging door and change grips looks wrong when it is worked out on the fly.
+`tools/locker_animations.py` builds the locker in Blender at the game's measurements, poses the arm, the view
+and the door together frame by frame and exports each move as `props/locker/locker_<move>.glb`. Getting in
+(`hide`), the right hand takes the door's pull bar from the side and pulls the door open, the player steps in
+turning around, hooks their fingers into the lowest vent slit and pulls the door shut while backing in. Getting
+out (`exit`), the hand pushes the door open flat-handed and the player steps out after it. Both play one and a
+half times as fast as authored, since hiding is usually done on the run. Run the script with Blender after
+changing the locker, a move or the arms:
 
 ```bash
 /Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/locker_animations.py -- export hide
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/locker_animations.py -- export exit
 ```
 
 `interaction/PlayerAnimation.cs` plays such an animation in the prop's space: the player's camera sits on the
 animated eye, the prop's parts copy their animated twins and the animated body stands in for the player's arms.
 Since the animation always starts from the same spot, the player first walks there from wherever they pressed
 the key, so the hand lands on the handle from any angle. A locker whose door is already open skips to stepping
-in.
+in, and a player who looked around while hiding turns back to the door before pushing it.
 
 Lockers and beds are hiding spots (`IHidingSpot`): each has a search point where the enemy stands to check it,
 a point it looks at, and a way to drag out whoever hides there. A bed's open side is its local -X, so beds whose

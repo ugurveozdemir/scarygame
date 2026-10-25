@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://props/locker/Locker.cs" id="1_locker"]
 [ext_resource type="Material" path="res://materials/locker_metal.tres" id="2_prop"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://interaction/PlayerAnimation.cs" id="8_animation"]
 [ext_resource type="PackedScene" path="res://props/locker/locker_hide.glb" id="9_hide"]
 [ext_resource type="Script" path="res://player/HideBonesModifier.cs" id="10_hide_bones"]
+[ext_resource type="PackedScene" path="res://props/locker/locker_exit.glb" id="11_exit"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_locker"]
 size = Vector3(0.7, 2.1, 0.6)
@@ -31,7 +32,7 @@ rings = 1
 material = SubResource("StandardMaterial3D_handle")
 size = Vector3(0.016, 0.016, 0.05)
 
-[node name="Locker" type="StaticBody3D" node_paths=PackedStringArray("LatchSound", "CreakSound", "ShutSound", "TearOpenSound", "BumpSound", "Door", "HideAnimation", "InsideGrip", "ExitPoint", "SearchPoint", "LookPoint")]
+[node name="Locker" type="StaticBody3D" node_paths=PackedStringArray("LatchSound", "CreakSound", "ShutSound", "TearOpenSound", "BumpSound", "Door", "HideAnimation", "ExitAnimation", "ExitPoint", "SearchPoint", "LookPoint")]
 collision_layer = 9
 script = ExtResource("1_locker")
 LatchSound = NodePath("Sounds/LatchSound")
@@ -41,7 +42,7 @@ TearOpenSound = NodePath("Sounds/TearOpenSound")
 BumpSound = NodePath("Sounds/BumpSound")
 Door = NodePath("Door")
 HideAnimation = NodePath("HideAnimation")
-InsideGrip = NodePath("Door/InsideGrip")
+ExitAnimation = NodePath("ExitAnimation")
 ExitPoint = NodePath("ExitPoint")
 SearchPoint = NodePath("SearchPoint")
 LookPoint = NodePath("LookPoint")
@@ -115,9 +116,6 @@ mesh = SubResource("BoxMesh_standoff")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.075, 0.025)
 mesh = SubResource("BoxMesh_standoff")
 
-[node name="InsideGrip" type="Marker3D" parent="Door"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 1.3, 0.05)
-
 [node name="ExitPoint" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.8)
 
@@ -144,6 +142,26 @@ Speed = 1.5
 cast_shadow = 0
 
 [node name="HideHead" type="SkeletonModifier3D" parent="HideAnimation/LockerHide/PlayerRoot/Bip01/Skeleton3D" index="1"]
+script = ExtResource("10_hide_bones")
+BoneNames = PackedStringArray("Bip01 Head")
+
+[node name="ExitAnimation" type="Node3D" parent="." node_paths=PackedStringArray("AnimationPlayer", "AnimatedScene", "AnimatedRoot", "Eye", "Parts", "AnimatedParts")]
+script = ExtResource("8_animation")
+AnimationPlayer = NodePath("LockerExit/AnimationPlayer")
+AnimationName = &"LockerExit"
+AnimatedScene = NodePath("LockerExit")
+AnimatedRoot = NodePath("LockerExit/PlayerRoot")
+Eye = NodePath("LockerExit/PlayerRoot/Eye")
+Parts = [NodePath("../Door")]
+AnimatedParts = [NodePath("LockerExit/Door")]
+Speed = 1.5
+
+[node name="LockerExit" parent="ExitAnimation" instance=ExtResource("11_exit")]
+
+[node name="m007_hipoly_81_bones" parent="ExitAnimation/LockerExit/PlayerRoot/Bip01/Skeleton3D" index="0"]
+cast_shadow = 0
+
+[node name="HideHead" type="SkeletonModifier3D" parent="ExitAnimation/LockerExit/PlayerRoot/Bip01/Skeleton3D" index="1"]
 script = ExtResource("10_hide_bones")
 BoneNames = PackedStringArray("Bip01 Head")
 
@@ -185,3 +203,4 @@ max_distance = 25.0
 bus = &"Sfx"
 
 [editable path="HideAnimation/LockerHide"]
+[editable path="ExitAnimation/LockerExit"]
