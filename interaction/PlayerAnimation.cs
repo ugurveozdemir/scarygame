@@ -1,11 +1,12 @@
 using Godot;
 
 /// <summary>
-/// A first-person move authored in Blender, like getting into a locker. The animated scene holds the player's
-/// body, an eye for the view and twins of the prop's moving parts, all animated together, so a hand never
-/// slips off a handle. While it plays, the player's camera sits on the eye, the prop's parts copy their twins
-/// and the animated body stands in for the player's own arms.
-/// The animated scene is posed in the prop's space, so it sits at the prop's origin.
+/// A first-person move authored in Blender (tools/player_animations.py), like getting into a locker. The
+/// animated scene holds the player's body, an eye for the view and twins of the prop's moving parts, all animated
+/// together, so a hand never slips off a handle. While it plays, the player's camera sits on the eye, the prop's
+/// parts copy their twins and the animated body stands in for the player's own arms.
+/// The animated scene is posed in the prop's space, so it sits at the prop's origin; a prop that looks the same
+/// from every side, like a battery, may turn it towards the player.
 /// </summary>
 public partial class PlayerAnimation : Node3D
 {
@@ -25,6 +26,11 @@ public partial class PlayerAnimation : Node3D
 	/// own seconds; <see cref="RealSeconds"/> turns them into seconds of play.
 	/// </summary>
 	[Export] public float Speed { get; set; } = 1f;
+	/// <summary>
+	/// Whether the body stays in its last pose after the animation, until <see cref="Stop"/>, like a hand on the
+	/// floor while lying under a bed. The player is free again either way.
+	/// </summary>
+	[Export] public bool HoldsLastPose { get; set; }
 
 	private Player _player;
 	private Animation _animation;
@@ -43,10 +49,10 @@ public partial class PlayerAnimation : Node3D
 		_animation = AnimationPlayer.GetAnimation(AnimationName);
 		// Advanced by hand, so the view is placed after the body has moved in the same frame.
 		AnimationPlayer.CallbackModeProcess = AnimationMixer.AnimationCallbackModeProcess.Manual;
-		AnimatedScene.Visible = false;
+		SetShown(false);
 	}
 
-	/// <summary>Where <paramref name="player"/> stands, facing the view, <paramref name="seconds"/> into the animation.</summary>
+	/// <summary>Where <paramref name="player"/> stands upright, facing the view, <paramref name="seconds"/> into the animation.</summary>
 	public Transform3D PlayerTransformAt(Player player, float seconds)
 	{
 		return PlayerTransform(EyeAt(seconds), player.StandingHeadHeight);
@@ -61,7 +67,7 @@ public partial class PlayerAnimation : Node3D
 	public void Play(Player player, float fromSeconds = 0f)
 	{
 		_player = player;
-		AnimatedScene.Visible = true;
+		SetShown(true);
 		AnimationPlayer.Play(AnimationName);
 		AnimationPlayer.Seek(fromSeconds, true);
 		Apply();
@@ -71,8 +77,15 @@ public partial class PlayerAnimation : Node3D
 	public void Stop()
 	{
 		AnimationPlayer.Stop();
-		AnimatedScene.Visible = false;
+		SetShown(false);
 		_player = null;
+	}
+
+	/// <summary>The animated body only exists while it plays; hidden, it costs nothing to process.</summary>
+	private void SetShown(bool shown)
+	{
+		AnimatedScene.Visible = shown;
+		AnimatedScene.ProcessMode = shown ? ProcessModeEnum.Inherit : ProcessModeEnum.Disabled;
 	}
 
 	public override void _Process(double delta)
@@ -82,17 +95,23 @@ public partial class PlayerAnimation : Node3D
 
 		AnimationPlayer.Advance(delta * Speed);
 		Apply();
-		if (!AnimationPlayer.IsPlaying())
+		if (AnimationPlayer.IsPlaying())
+			return;
+
+		if (HoldsLastPose)
+			_player = null;
+		else
 			Stop();
 	}
 
 	private void Apply()
 	{
+		// The player's head stays at its height, standing or lying, and the body moves to put it on the eye.
 		Transform3D eye = Eye.GlobalTransform;
-		_player.GlobalTransform = PlayerTransform(eye, _player.StandingHeadHeight);
+		_player.GlobalTransform = PlayerTransform(eye, _player.Head.Position.Y);
 		_player.Head.Rotation = new Vector3(Pitch(eye), 0f, 0f);
 		for (int i = 0; i < Parts.Length; i++)
-			Parts[i].Transform = AnimatedParts[i].Transform;
+			Parts[i].GlobalTransform = AnimatedParts[i].GlobalTransform;
 	}
 
 	/// <summary>Samples the eye's global transform from the animation's tracks without playing it.</summary>

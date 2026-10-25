@@ -107,9 +107,11 @@ public partial class Camcorder : Node3D
 		UpdateAutoGain((float)delta);
 	}
 
+	public bool CanAddSpareBattery => SpareBatteries < MaxSpareBatteries;
+
 	public bool TryAddSpareBattery()
 	{
-		if (SpareBatteries >= MaxSpareBatteries)
+		if (!CanAddSpareBattery)
 			return false;
 
 		SpareBatteries++;

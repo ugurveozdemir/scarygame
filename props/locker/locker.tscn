@@ -9,7 +9,6 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/locker/bump.wav" id="7_bump"]
 [ext_resource type="Script" path="res://interaction/PlayerAnimation.cs" id="8_animation"]
 [ext_resource type="PackedScene" path="res://props/locker/locker_hide.glb" id="9_hide"]
-[ext_resource type="Script" path="res://player/HideBonesModifier.cs" id="10_hide_bones"]
 [ext_resource type="PackedScene" path="res://props/locker/locker_exit.glb" id="11_exit"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_locker"]
@@ -141,10 +140,6 @@ Speed = 1.5
 [node name="m007_hipoly_81_bones" parent="HideAnimation/LockerHide/PlayerRoot/Bip01/Skeleton3D" index="0"]
 cast_shadow = 0
 
-[node name="HideHead" type="SkeletonModifier3D" parent="HideAnimation/LockerHide/PlayerRoot/Bip01/Skeleton3D" index="1"]
-script = ExtResource("10_hide_bones")
-BoneNames = PackedStringArray("Bip01 Head")
-
 [node name="ExitAnimation" type="Node3D" parent="." node_paths=PackedStringArray("AnimationPlayer", "AnimatedScene", "AnimatedRoot", "Eye", "Parts", "AnimatedParts")]
 script = ExtResource("8_animation")
 AnimationPlayer = NodePath("LockerExit/AnimationPlayer")
@@ -160,10 +155,6 @@ Speed = 1.5
 
 [node name="m007_hipoly_81_bones" parent="ExitAnimation/LockerExit/PlayerRoot/Bip01/Skeleton3D" index="0"]
 cast_shadow = 0
-
-[node name="HideHead" type="SkeletonModifier3D" parent="ExitAnimation/LockerExit/PlayerRoot/Bip01/Skeleton3D" index="1"]
-script = ExtResource("10_hide_bones")
-BoneNames = PackedStringArray("Bip01 Head")
 
 [node name="Sounds" type="Node3D" parent="."]
 

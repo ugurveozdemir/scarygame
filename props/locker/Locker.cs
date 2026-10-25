@@ -99,17 +99,11 @@ public partial class Locker : StaticBody3D, IHidingSpot
 		BeginMove(player);
 		player.Hit += OnHit;
 
-		// Walk up to where the animation starts, carrying on from however the player was moving.
+		// Walk up to where the animation starts, from wherever the player is; an open door skips opening it.
 		float from = _doorOpenness == 0f ? 0f : StepInSeconds;
-		Transform3D start = HideAnimation.PlayerTransformAt(player, from);
-		Vector3 velocity = new(player.Velocity.X, 0f, player.Velocity.Z);
-		float distance = player.GlobalPosition.DistanceTo(start.Origin);
-		float approach = Mathf.Max(1.5f * distance / Mathf.Max(velocity.Length(), ApproachSpeed), MinApproachSeconds);
-		_move.Walk(start, HideAnimation.PitchDegreesAt(from), 0f, approach, velocity);
-		_move.At(approach, () => HideAnimation.Play(player, from));
+		float zero = _move.PlayAfterWalking(HideAnimation, from, ApproachSpeed, MinApproachSeconds);
 
-		// The rest follows the animation, timed from its start.
-		float zero = approach - HideAnimation.RealSeconds(from);
+		// The rest follows the animation.
 		if (from < LatchSeconds)
 		{
 			_move.At(zero + HideAnimation.RealSeconds(LatchSeconds), () =>

@@ -39,6 +39,28 @@ public class ScriptedMove
 	}
 
 	/// <summary>
+	/// Walks the player to where <paramref name="animation"/> stands them at <paramref name="fromSeconds"/>,
+	/// carrying on from however they were moving, at least at <paramref name="pace"/> metres per second, then
+	/// plays it from there; <paramref name="onStart"/> runs just before. Returns the time on this timeline at which
+	/// the animation's own second zero falls, to time steps by the animation.
+	/// </summary>
+	public float PlayAfterWalking(PlayerAnimation animation, float fromSeconds, float pace, float minSeconds,
+		Action onStart = null)
+	{
+		Transform3D start = animation.PlayerTransformAt(_player, fromSeconds);
+		Vector3 velocity = new(_player.Velocity.X, 0f, _player.Velocity.Z);
+		float distance = _player.GlobalPosition.DistanceTo(start.Origin);
+		float seconds = Mathf.Max(1.5f * distance / Mathf.Max(velocity.Length(), pace), minSeconds);
+		Walk(start, animation.PitchDegreesAt(fromSeconds), 0f, seconds, velocity);
+		At(seconds, () =>
+		{
+			onStart?.Invoke();
+			animation.Play(_player, fromSeconds);
+		});
+		return seconds - animation.RealSeconds(fromSeconds);
+	}
+
+	/// <summary>
 	/// Walks the player to <paramref name="point"/>, starting at <paramref name="startVelocity"/> and ending at rest.
 	/// The path is a cubic Hermite curve, so a player who was already walking curves smoothly into it.
 	/// </summary>

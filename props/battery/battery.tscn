@@ -1,6 +1,8 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://props/battery/BatteryPickup.cs" id="1_battery"]
+[ext_resource type="Script" path="res://interaction/PlayerAnimation.cs" id="2_animation"]
+[ext_resource type="PackedScene" path="res://props/battery/battery_pickup.glb" id="3_pickup"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_battery"]
 albedo_color = Color(0.8, 0.6, 0.1, 1)
@@ -16,10 +18,12 @@ height = 0.1
 [sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
 radius = 0.15
 
-[node name="Battery" type="StaticBody3D"]
+[node name="Battery" type="StaticBody3D" node_paths=PackedStringArray("PickupAnimation", "Mesh")]
 collision_layer = 8
 collision_mask = 0
 script = ExtResource("1_battery")
+PickupAnimation = NodePath("PickupAnimation")
+Mesh = NodePath("Mesh")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
@@ -28,3 +32,21 @@ mesh = SubResource("CylinderMesh_battery")
 [node name="Collision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 shape = SubResource("SphereShape3D_pickup")
+
+[node name="PickupAnimation" type="Node3D" parent="." node_paths=PackedStringArray("AnimationPlayer", "AnimatedScene", "AnimatedRoot", "Eye", "Parts", "AnimatedParts")]
+script = ExtResource("2_animation")
+AnimationPlayer = NodePath("BatteryPickup/AnimationPlayer")
+AnimationName = &"BatteryPickup"
+AnimatedScene = NodePath("BatteryPickup")
+AnimatedRoot = NodePath("BatteryPickup/PlayerRoot")
+Eye = NodePath("BatteryPickup/PlayerRoot/Eye")
+Parts = [NodePath("../Mesh")]
+AnimatedParts = [NodePath("BatteryPickup/Battery")]
+Speed = 1.2
+
+[node name="BatteryPickup" parent="PickupAnimation" instance=ExtResource("3_pickup")]
+
+[node name="m007_hipoly_81_bones" parent="PickupAnimation/BatteryPickup/PlayerRoot/Bip01/Skeleton3D" index="0"]
+cast_shadow = 0
+
+[editable path="PickupAnimation/BatteryPickup"]

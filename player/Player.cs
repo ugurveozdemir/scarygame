@@ -225,10 +225,18 @@ public partial class Player : CharacterBody3D
 		AreControlsLocked = false;
 	}
 
-	/// <summary>Brings the head down to the floor, like when crawling under a bed.</summary>
-	public void LieDown()
+	/// <summary>
+	/// Brings the head down to the floor, like when crawling under a bed. <paramref name="instantly"/> puts it
+	/// there at once instead of easing it down, for an animation that moves the view itself.
+	/// </summary>
+	public void LieDown(bool instantly = false)
 	{
 		IsLyingDown = true;
+		if (instantly)
+		{
+			_headHeight = TargetHeadHeight;
+			Head.Position = new Vector3(0f, _headHeight, 0f);
+		}
 	}
 
 	public void GetUp()
@@ -421,14 +429,15 @@ public partial class Player : CharacterBody3D
 		return Mathf.Exp(Mathf.Lerp(Mathf.Log(fromHz), Mathf.Log(toHz), weight));
 	}
 
+	// The head eases between standing, crouching and lying height, and drops to the floor when the player dies.
+	private float TargetHeadHeight => IsDead ? FallenHeadHeight
+		: IsLyingDown ? LyingHeadHeight
+		: IsCrouching ? CrouchingHeadHeight
+		: StandingHeadHeight;
+
 	private void UpdateHeadPosition(float delta)
 	{
-		// The head eases between standing, crouching and lying height, and drops to the floor when the player dies.
-		float targetHeight = IsDead ? FallenHeadHeight
-			: IsLyingDown ? LyingHeadHeight
-			: IsCrouching ? CrouchingHeadHeight
-			: StandingHeadHeight;
-		_headHeight = Mathf.Lerp(_headHeight, targetHeight, CrouchTransitionSpeed * delta);
+		_headHeight = Mathf.Lerp(_headHeight, TargetHeadHeight, CrouchTransitionSpeed * delta);
 		Head.Position = new Vector3(0f, _headHeight, 0f);
 	}
 }

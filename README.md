@@ -97,7 +97,7 @@ Scenes and their scripts live together, grouped by feature.
 | `audio/` | Footsteps and the surfaces they sound on, the ambience and the chase music |
 | `materials/` | PBR materials, the asylum interior shader and the exterior materials (brick, concrete, asphalt, paving, lawn, fountain water) |
 | `assets/` | Third-party models, animations, textures and sounds, see [CREDITS.md](CREDITS.md) |
-| `tools/` | `synthesize_sounds.py`, which makes the story's machine sounds in `assets/sounds/story`, and `player_animations.py`, the Blender script that makes the player's hand-made first-person animations |
+| `tools/` | `synthesize_sounds.py`, which makes the story's machine sounds in `assets/sounds/story`, and `player_animations.py`, the Blender script that makes the player's hand-made first-person animations (lockers, beds, batteries) |
 
 ## Status
 
@@ -221,29 +221,36 @@ reach but the hand still touches the grip.
 Interactions never stop the player abruptly. Doors don't lock the controls at all: the hand pushes the
 door and the player keeps walking. Getting into a locker or under a bed is one timeline of overlapping steps
 (`interaction/ScriptedMove.cs`); the walk up to it starts from the player's current velocity along a curve, so
-it blends in from however the player was moving. Under a bed the player gets down on the floor and crawls in
-sideways, turning to face out, and watches the room from floor level.
+it blends in from however the player was moving.
 
-Getting into and out of a locker are hand-made animations instead of IK, because a hand that has to hold a
-handle, follow a swinging door and change grips looks wrong when it is worked out on the fly.
-`tools/player_animations.py` builds the locker in Blender at the game's measurements, poses the body, the arm,
-the view and the door together frame by frame and exports each move as `props/locker/locker_<move>.glb`. Getting in
-(`locker_hide`), the right hand takes the door's pull bar from the side and pulls the door open, the player steps in
-turning around, hooks their fingers into the lowest vent slit and pulls the door shut while backing in. Getting
-out (`locker_exit`), the hand pushes the door open flat-handed and the player steps out after it. Both play one and a
-half times as fast as authored, since hiding is usually done on the run. Run the script with Blender after
-changing the locker, a move or the arms:
+Getting into and out of a locker, hiding under a bed and picking a battery up off the floor are hand-made
+animations instead of IK, because a hand that has to hold a handle, follow a swinging door, change grips or
+carry the body looks wrong when it is worked out on the fly. `tools/player_animations.py` builds each prop in
+Blender at the game's measurements, poses the body, the arm, the view and the prop together frame by frame and
+exports each move as `props/<prop>/<move>.glb`:
+
+| Move | What happens | Speed |
+|---|---|---|
+| `locker_hide` | The right hand takes the door's pull bar from the side and pulls the door open, the player steps in turning around, hooks their fingers into the lowest vent slit and pulls the door shut while backing in | 1.5× |
+| `locker_exit` | The hand pushes the door open flat-handed and the player steps out after it | 1.5× |
+| `bed_hide` | The player drops flat alongside the bed and slides sideways under it in one go, pushing off the floor with the left hand while the right one holds the camera, then turns their head to watch the room; the hand stays on the floor while they hide | 1.3× |
+| `battery_pickup` | The player squats, takes the battery from above, glances at it on the way up and pockets it | 1.2× |
+
+Hiding is usually done on the run, so the moves play faster than authored. The camera sits in the middle of the
+head; the head, the neck and the legs are cut out of the body, since the view never shows them. Run the script
+with Blender after changing a prop, a move or the arms, for example:
 
 ```bash
 /Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/player_animations.py -- export locker_hide
-/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/player_animations.py -- export locker_exit
 ```
 
 `interaction/PlayerAnimation.cs` plays such an animation in the prop's space: the player's camera sits on the
 animated eye, the prop's parts copy their animated twins and the animated body stands in for the player's arms.
 Since the animation always starts from the same spot, the player first walks there from wherever they pressed
-the key, so the hand lands on the handle from any angle. A locker whose door is already open skips to stepping
-in, and a player who looked around while hiding turns back to the door before pushing it.
+the key, so the hand lands on the handle from any angle. A battery looks the same from every side, so its
+animation turns to face the player first; one lying on a table is still just taken. A locker whose door is
+already open skips to stepping in, and a player who looked around while hiding turns back to the door before
+pushing it. Crawling out from under a bed is still a scripted walk.
 
 Lockers and beds are hiding spots (`IHidingSpot`): each has a search point where the enemy stands to check it,
 a point it looks at, and a way to drag out whoever hides there. A bed's open side is its local -X, so beds whose

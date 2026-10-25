@@ -5,6 +5,8 @@
 [ext_resource type="Script" path="res://props/furniture/Bed.cs" id="3_bed"]
 [ext_resource type="AudioStream" path="res://assets/sounds/player/cloth.tres" id="4_cloth"]
 [ext_resource type="AudioStream" path="res://assets/sounds/ambience/bed_creak.tres" id="5_creak"]
+[ext_resource type="Script" path="res://interaction/PlayerAnimation.cs" id="6_animation"]
+[ext_resource type="PackedScene" path="res://props/furniture/bed_hide.glb" id="7_hide"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_mattress"]
 material = ExtResource("2_fabric")
@@ -45,13 +47,12 @@ rings = 1
 [sub_resource type="BoxShape3D" id="BoxShape3D_bed"]
 size = Vector3(0.94, 0.6, 2)
 
-[node name="Bed" type="StaticBody3D" node_paths=PackedStringArray("CrawlSound", "CreakSound", "ApproachPoint", "HidePoint", "ExitPoint", "SearchPoint", "LookPoint")]
+[node name="Bed" type="StaticBody3D" node_paths=PackedStringArray("CrawlSound", "CreakSound", "HideAnimation", "ExitPoint", "SearchPoint", "LookPoint")]
 collision_layer = 9
 script = ExtResource("3_bed")
 CrawlSound = NodePath("Sounds/Crawl")
 CreakSound = NodePath("Sounds/Creak")
-ApproachPoint = NodePath("ApproachPoint")
-HidePoint = NodePath("HidePoint")
+HideAnimation = NodePath("HideAnimation")
 ExitPoint = NodePath("ExitPoint")
 SearchPoint = NodePath("SearchPoint")
 LookPoint = NodePath("LookPoint")
@@ -110,12 +111,6 @@ transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 0.72, 0.98)
 visibility_range_end = 35.0
 mesh = SubResource("CylinderMesh_rail")
 
-[node name="ApproachPoint" type="Marker3D" parent="."]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -0.9, 0, 0)
-
-[node name="HidePoint" type="Marker3D" parent="."]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.05, 0, 0)
-
 [node name="ExitPoint" type="Marker3D" parent="."]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.75, 0, 0.35)
 
@@ -124,6 +119,21 @@ transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -1.25, 0, -0.45)
 
 [node name="LookPoint" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+
+[node name="HideAnimation" type="Node3D" parent="." node_paths=PackedStringArray("AnimationPlayer", "AnimatedScene", "AnimatedRoot", "Eye")]
+script = ExtResource("6_animation")
+AnimationPlayer = NodePath("BedHide/AnimationPlayer")
+AnimationName = &"BedHide"
+AnimatedScene = NodePath("BedHide")
+AnimatedRoot = NodePath("BedHide/PlayerRoot")
+Eye = NodePath("BedHide/PlayerRoot/Eye")
+Speed = 1.3
+HoldsLastPose = true
+
+[node name="BedHide" parent="HideAnimation" instance=ExtResource("7_hide")]
+
+[node name="m007_hipoly_81_bones" parent="HideAnimation/BedHide/PlayerRoot/Bip01/Skeleton3D" index="0"]
+cast_shadow = 0
 
 [node name="Sounds" type="Node3D" parent="."]
 
@@ -142,3 +152,5 @@ volume_db = -8.0
 unit_size = 2.0
 max_distance = 15.0
 bus = &"Sfx"
+
+[editable path="HideAnimation/BedHide"]

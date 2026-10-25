@@ -5,7 +5,8 @@ together frame by frame, so a hand never slips off what it holds:
   locker_exit:    the right hand pushes the locker door open flat-handed and the player steps out after it.
   battery_pickup: the player squats, picks a battery up off the floor, glances at it and pockets it.
   bed_hide:       the player drops flat alongside a bed, slides sideways under it in one go pushing off the
-                  floor with the left hand (the right one holds the camera) and turns their head to watch the room.
+                  floor with the left hand (the right one holds the camera by the hip) and turns their head to
+                  watch the room.
 
 Usage (Blender 5):
   Blender --background --factory-startup --python tools/player_animations.py -- export <move>
@@ -21,6 +22,7 @@ import math
 import sys
 from pathlib import Path
 
+import bmesh
 import bpy
 from mathutils import Matrix, Quaternion, Vector
 
@@ -203,7 +205,7 @@ def build_bed():
     box("FarWall", (-2.6, 0, 1.5), (0.1, 6, 3), material("wall", (0.32, 0.33, 0.30), roughness=0.9))
 
 
-def build_player(hidden_bones):
+def build_player():
     root = empty("PlayerRoot", (0, 0, 0))
 
     bpy.ops.import_scene.fbx(filepath=FBX)
@@ -211,13 +213,11 @@ def build_player(hidden_bones):
     for o in bpy.context.selected_objects:
         if o.type == "MESH":
             skin_material(o)
+            cut_away(o, arm)
     # The model comes with a take that would hold the armature in place.
     arm.animation_data_clear()
     arm.parent = root
     arm.location.z -= HEAD_CENTER.z - HEAD_HEIGHT
-    # Shrunk as HideBonesModifier does in the game.
-    for name in hidden_bones:
-        arm.pose.bones[name].scale = (0.001, 0.001, 0.001)
 
     # The eye carries the view; the game reads it from the exported animation.
     eye_at = Vector((HEAD_CENTER.x, HEAD_CENTER.y, HEAD_HEIGHT))
@@ -233,6 +233,26 @@ def build_player(hidden_bones):
     cam.data.angle_y = math.radians(75)
     cam.data.clip_start = 0.02
     return root, arm, eye, cam
+
+
+def cut_away(mesh, arm):
+    """
+    Deletes what the view never shows: the head and neck, which the camera sits in, and the legs. Shrinking their
+    bones instead would stretch the collar towards the camera.
+    """
+    bones = arm.data.bones
+    cut = {"Bip01 Neck"}  # alone: the arms hang from it too
+    for name in ("Bip01 Head", "Bip01 L Thigh", "Bip01 R Thigh"):
+        cut |= {b.name for b in (bones[name], *bones[name].children_recursive)}
+    groups = {g.index for g in mesh.vertex_groups if g.name in cut}
+
+    bm = bmesh.new()
+    bm.from_mesh(mesh.data)
+    deform = bm.verts.layers.deform.active
+    doomed = [v for v in bm.verts if sum(w for g, w in v[deform].items() if g in groups) >= 0.5]
+    bmesh.ops.delete(bm, geom=doomed, context="VERTS")
+    bm.to_mesh(mesh.data)
+    bm.free()
 
 
 def skin_material(mesh):
@@ -522,8 +542,6 @@ class Move:
     """A move's timeline. Positions and yaw are the player's root in the prop's space; the player faces -Y at yaw 0."""
     end = 0
     walls = False
-    # Bones shrunk away: the game hides the head and never shows the legs.
-    hidden_bones = ("Bip01 Head", "Bip01 L Thigh", "Bip01 R Thigh")
     # Preview lights: location, energy, colour; and whether a light on the camera stands in for the camcorder's
     # night vision in the dark.
     lights = (((-0.6, 1.6, 2.6), 120, WARM), ((0.8, 1.2, 1.4), 25, COOL))
@@ -759,6 +777,7 @@ class BatteryPickup(Move):
         if self.held is None:
             self.held = hand.inverted() @ self.rest_matrix
         self.battery.matrix_world = hand @ self.held
+        self.battery.scale = (1, 1, 1)  # the hand's scaled matrix leaves rounding errors
 
     def key_prop(self, f):
         self.battery.keyframe_insert("location", frame=f)
@@ -768,13 +787,12 @@ class BatteryPickup(Move):
 class BedHide(Move):
     """
     Drops flat on the floor alongside the bed, slides sideways under it in one go pushing off the floor with the
-    left hand, and turns the head to watch the room. The right hand holds the camera, so it is never seen.
+    left hand, and turns the head to watch the room. The right hand holds the camera down by the hip, out of view.
     The bed's open side is -X and its head end +Y.
     """
     name = "BedHide"
     prop = "furniture"
     end = 46
-    hidden_bones = Move.hidden_bones + ("Bip01 R UpperArm",)
     lights = (((-1.4, -0.6, 2.4), 150, WARM), ((-0.6, 1.4, 0.6), 30, COOL))
     camera_light = True
     debug_views = {
@@ -833,8 +851,17 @@ class BedHide(Move):
         return arm.wrist_for_grip(rot, fr.to_arm @ (point + Vector((0, 0, 0.004)))), rot
 
     def hand(self, fr):
-        # The right hand holds the camera; it is hidden.
-        return BAR, fr.rest, fr.rest_rot, 0.2
+        # The right hand holds the camera; lying down, it stays by the hip, behind the view.
+        f = fr.f
+        by_hip = fr.body(-0.26, 0.15, 0.1)
+        hip_rot = fr.right.hand_rotation(fr.heading(0, 1, 0), fr.heading(1, 0, 0))
+        lying = smooth(4, 14, f)
+        wrist = fr.rest.lerp(by_hip, lying)
+        return BAR, wrist, fr.turn(fr.rest_rot, hip_rot, lying), 0.5
+
+    @staticmethod
+    def elbow(fr):
+        return fr.body(-0.6, 0.15, 0.6).lerp(fr.body(-0.5, 0.0, 0.6), smooth(4, 14, fr.f))
 
     def left_hand(self, fr, left):
         f = fr.f
@@ -939,7 +966,7 @@ def main():
     move_type = MOVES[MOVE]
     build_room(move_type.walls, move_type.lights)
     move = move_type()
-    root, arm_obj, eye, cam = build_player(move_type.hidden_bones)
+    root, arm_obj, eye, cam = build_player()
     bpy.context.view_layer.update()
     # The eye rides in the head, so it follows the body when it bends.
     head = arm_obj.matrix_world @ arm_obj.pose.bones["Bip01 Head"].matrix
