@@ -23,9 +23,25 @@ public partial class Story : Node
 	[Export] public Door HideoutDoor { get; set; }
 	[Export] public string BarredDoorMemo { get; set; } = "";
 
+	[ExportGroup("Act 2")]
+	[Export] public TapeRecording Trial13Tape { get; set; }
+	[Export] public string TapeMemo { get; set; } = "";
+	[Export] public MainBreaker MainBreaker { get; set; }
+	/// <summary>The lights that burst when the breaker sends the power to the lift.</summary>
+	[Export] public Light3D[] BasementLights { get; set; } = [];
+	[Export] public AudioStream LightBurstSound { get; set; }
+	[Export] public float SecondsBetweenBursts { get; set; } = 0.3f;
+	[Export] public Remnant Remnant { get; set; }
+	[Export] public string BreakerMemo { get; set; } = "";
+	[Export] public ServiceLift Lift { get; set; }
+	[Export] public Enemy Sentinel { get; set; }
+
 	public override void _Ready()
 	{
 		HideoutDoor.TriedWhileBarred += OnHideoutDoorTried;
+		Trial13Tape.Finished += OnTapeWatched;
+		MainBreaker.Thrown += OnBreakerThrown;
+		Lift.DoorsOpened += OnLiftDoorsOpened;
 		PlayPrologue();
 	}
 
@@ -55,5 +71,50 @@ public partial class Story : Node
 	{
 		HideoutDoor.TriedWhileBarred -= OnHideoutDoorTried;
 		Player.ObjectiveDisplay.Announce(BarredDoorMemo);
+	}
+
+	private void OnTapeWatched()
+	{
+		Trial13Tape.Finished -= OnTapeWatched;
+		Player.ObjectiveDisplay.Announce(TapeMemo);
+	}
+
+	/// <summary>The lights burst one after another, the lift gets its power and the Remnant gets out.</summary>
+	private void OnBreakerThrown()
+	{
+		Lift.HasPower = true;
+		Tween tween = CreateTween();
+		foreach (Light3D light in BasementLights)
+		{
+			tween.TweenCallback(Callable.From(() => BurstLight(light)));
+			tween.TweenInterval(SecondsBetweenBursts);
+		}
+		tween.TweenCallback(Callable.From(Remnant.Release));
+		tween.TweenInterval(2f);
+		tween.TweenCallback(Callable.From(() => Player.ObjectiveDisplay.Announce(BreakerMemo)));
+	}
+
+	private void BurstLight(Light3D light)
+	{
+		light.Visible = false;
+		light.ProcessMode = ProcessModeEnum.Disabled;
+		foreach (Node child in light.GetChildren())
+		{
+			if (child is AudioStreamPlayer3D sound)
+				sound.Stop();
+		}
+
+		var pop = new AudioStreamPlayer3D { Stream = LightBurstSound, Bus = "Sfx", UnitSize = 5f, MaxDistance = 40f };
+		light.GetParent().AddChild(pop);
+		pop.GlobalPosition = light.GlobalPosition;
+		pop.Finished += pop.QueueFree;
+		pop.Play();
+	}
+
+	/// <summary>The lift's chime carries through the floor: the Sentinel comes to see who called it.</summary>
+	private void OnLiftDoorsOpened(LiftLanding landing)
+	{
+		if (landing == Lift.GroundLanding)
+			Sentinel.HearNoise(landing.GlobalPosition);
 	}
 }

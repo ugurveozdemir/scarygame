@@ -115,6 +115,8 @@ public partial class Enemy : CharacterBody3D
 	{
 		_patrolPoints = PatrolRoute.GetChildren().OfType<Node3D>().ToArray();
 		NavigationAgent.TargetPosition = GlobalPosition;
+		// So recordings of earlier trials don't show where it is now.
+		VisualLayers.Assign(this, VisualLayers.Enemies);
 		AnimationPlayer.AddAnimationLibrary("ual1", Ual1Animations);
 		AnimationPlayer.AddAnimationLibrary("ual2", Ual2Animations);
 	}

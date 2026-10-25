@@ -28,6 +28,8 @@ public partial class Camcorder : Node3D
 	[Export] public float GainAdjustSpeed { get; set; } = 8f;
 
 	[ExportGroup("Nodes")]
+	/// <summary>The player's view, which only shows what night vision reveals while it is on.</summary>
+	[Export] public Camera3D Camera { get; set; }
 	[Export] public Light3D InfraredLight { get; set; }
 	[Export] public RayCast3D AutoGainProbe { get; set; }
 	[Export] public ColorRect ScreenEffect { get; set; }
@@ -56,6 +58,11 @@ public partial class Camcorder : Node3D
 	public float Charge { get; private set; } = 1f;
 	public int SpareBatteries { get; private set; }
 
+	/// <summary>How many times faster than normal night vision drains the battery, like near the Remnant.</summary>
+	public float DrainMultiplier { get; set; } = 1f;
+	/// <summary>How badly the picture breaks up, from 0 for a clean picture to 1.</summary>
+	public float Interference { get; set; }
+
 	private ShaderMaterial _screenMaterial;
 	private float _infraredEnergy;
 	private float _gain = 1f;
@@ -64,6 +71,7 @@ public partial class Camcorder : Node3D
 	public override void _Ready()
 	{
 		Charge = StartCharge;
+		Camera.CullMask &= ~VisualLayers.Past;
 		_screenMaterial = (ShaderMaterial)ScreenEffect.Material;
 		_infraredEnergy = InfraredLight.LightEnergy;
 		AutoGainProbe.TargetPosition = Vector3.Forward * AutoGainDistance;
@@ -83,10 +91,11 @@ public partial class Camcorder : Node3D
 
 	public override void _Process(double delta)
 	{
+		_screenMaterial.SetShaderParameter("interference", Interference);
 		if (!IsNightVisionOn)
 			return;
 
-		Charge = Mathf.Max(Charge - (float)delta / BatteryLifeSeconds, 0f);
+		Charge = Mathf.Max(Charge - (float)delta * DrainMultiplier / BatteryLifeSeconds, 0f);
 		if (Charge == 0f)
 		{
 			BatteryDeadSound.Play();
@@ -180,6 +189,7 @@ public partial class Camcorder : Node3D
 	private void UpdateEffects()
 	{
 		InfraredLight.Visible = IsNightVisionOn;
+		Camera.CullMask = IsNightVisionOn ? Camera.CullMask | VisualLayers.NightVisionOnly : Camera.CullMask & ~VisualLayers.NightVisionOnly;
 		KeepPlaying(NightVisionHum, IsNightVisionOn);
 		KeepPlaying(TapeMotor, IsRaised);
 

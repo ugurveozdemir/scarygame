@@ -82,6 +82,32 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/story/intercom_click.wav" id="80_click"]
 [ext_resource type="AudioStream" path="res://assets/sounds/locker/latch.tres" id="81_latch"]
 [ext_resource type="Material" path="res://materials/door_wood.tres" id="82_wood"]
+[ext_resource type="Script" path="res://story/TapeRecording.cs" id="83_tape_recording"]
+[ext_resource type="Script" path="res://props/archive/TapeDeck.cs" id="84_tape_deck"]
+[ext_resource type="Script" path="res://props/archive/TapeRow.cs" id="85_tape_row"]
+[ext_resource type="Shader" path="res://materials/tape_screen.gdshader" id="86_tape_shader"]
+[ext_resource type="PackedScene" path="res://assets/rocketbox/medical_male_04/Medical_Male_04.fbx" id="87_surgeon_model"]
+[ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual1_standard.glb" id="88_ual1"]
+[ext_resource type="Script" path="res://props/electrical/MainBreaker.cs" id="89_breaker"]
+[ext_resource type="PackedScene" path="res://enemy/remnant.tscn" id="90_remnant"]
+[ext_resource type="Script" path="res://props/lift/ServiceLift.cs" id="91_lift"]
+[ext_resource type="Script" path="res://props/lift/LiftLanding.cs" id="92_landing"]
+[ext_resource type="Script" path="res://props/lift/Keypad.cs" id="93_keypad"]
+[ext_resource type="Script" path="res://story/KeypadScreen.cs" id="94_keypad_screen"]
+[ext_resource type="AudioStream" path="res://assets/sounds/footsteps/tile.tres" id="95_tile_steps"]
+[ext_resource type="AudioStream" path="res://assets/sounds/player/breath.ogg" id="96_breath"]
+[ext_resource type="AudioStream" path="res://assets/sounds/enemy/roar.tres" id="97_roar"]
+[ext_resource type="AudioStream" path="res://assets/sounds/enemy/punch_hit.tres" id="98_punch_hit"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/tv_static.wav" id="99_tv_static"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/tape_insert.wav" id="100_tape_insert"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/breaker.wav" id="101_breaker_sound"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/light_burst.wav" id="102_light_burst"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/lift_ding.wav" id="103_lift_ding"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/lift_doors.wav" id="104_lift_doors"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/lift_ride.wav" id="105_lift_ride"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/keypad_beep.wav" id="106_keypad_beep"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/keypad_accept.wav" id="107_keypad_accept"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/keypad_error.wav" id="108_keypad_error"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_stair_ramp"]
 size = Vector3(3, 0.2, 5.92)
@@ -236,6 +262,76 @@ size = Vector3(0.35, 0.12, 0.35)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_corridor_north"]
 size = Vector3(3.4, 3, 2.4)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tape_screen"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("86_tape_shader")
+
+[sub_resource type="QuadMesh" id="QuadMesh_monitor_screen"]
+size = Vector2(0.42, 0.315)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_black_plastic"]
+albedo_color = Color(0.06, 0.055, 0.05, 1)
+roughness = 0.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_monitor"]
+material = SubResource("StandardMaterial3D_black_plastic")
+size = Vector3(0.52, 0.42, 0.44)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vcr"]
+material = SubResource("StandardMaterial3D_black_plastic")
+size = Vector3(0.36, 0.08, 0.26)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_small_interact"]
+radius = 0.25
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tape_case"]
+albedo_color = Color(0.72, 0.7, 0.64, 1)
+roughness = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_lever_arm"]
+material = ExtResource("3_prop")
+size = Vector3(0.05, 0.36, 0.05)
+
+[sub_resource type="SphereMesh" id="SphereMesh_lever_knob"]
+material = SubResource("StandardMaterial3D_led")
+radius = 0.045
+height = 0.09
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_lever"]
+radius = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_lift_door"]
+material = ExtResource("15_duct")
+size = Vector3(0.58, 2.1, 0.04)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lift_door"]
+size = Vector3(0.58, 2.1, 0.06)
+
+[sub_resource type="BoxMesh" id="BoxMesh_keypad"]
+material = SubResource("StandardMaterial3D_black_plastic")
+size = Vector3(0.02, 0.2, 0.14)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sticky_note"]
+albedo_color = Color(0.95, 0.85, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="QuadMesh" id="QuadMesh_sticky_note"]
+material = SubResource("StandardMaterial3D_sticky_note")
+size = Vector2(0.09, 0.09)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_keypad"]
+bg_color = Color(0.08, 0.08, 0.09, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.3, 0.3, 0.32, 1)
+content_margin_left = 40.0
+content_margin_top = 30.0
+content_margin_right = 40.0
+content_margin_bottom = 30.0
 
 [node name="TestLevel" type="Node3D"]
 
@@ -662,12 +758,6 @@ operation = 2
 size = Vector3(0.8, 1.2, 1.4)
 material = ExtResource("2_wall")
 
-[node name="WindowRoomLeft2" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 1.7, 0)
-operation = 2
-size = Vector3(0.8, 1.2, 1.4)
-material = ExtResource("2_wall")
-
 [node name="WindowRoomLeft3" type="CSGBox3D" parent="Navigation/Building"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 1.7, 9.3)
 operation = 2
@@ -732,31 +822,6 @@ material = ExtResource("3_prop")
 
 [node name="WindowRoomLeft1Bar5" type="CSGBox3D" parent="Navigation/Building"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 1.7, -8.74)
-size = Vector3(0.03, 1.2, 0.03)
-material = ExtResource("3_prop")
-
-[node name="WindowRoomLeft2Bar1" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 1.7, -0.56)
-size = Vector3(0.03, 1.2, 0.03)
-material = ExtResource("3_prop")
-
-[node name="WindowRoomLeft2Bar2" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 1.7, -0.28)
-size = Vector3(0.03, 1.2, 0.03)
-material = ExtResource("3_prop")
-
-[node name="WindowRoomLeft2Bar3" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 1.7, 0)
-size = Vector3(0.03, 1.2, 0.03)
-material = ExtResource("3_prop")
-
-[node name="WindowRoomLeft2Bar4" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 1.7, 0.28)
-size = Vector3(0.03, 1.2, 0.03)
-material = ExtResource("3_prop")
-
-[node name="WindowRoomLeft2Bar5" type="CSGBox3D" parent="Navigation/Building"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 1.7, 0.56)
 size = Vector3(0.03, 1.2, 0.03)
 material = ExtResource("3_prop")
 
@@ -960,9 +1025,6 @@ material = ExtResource("17_concrete")
 
 [node name="BedLeft1" parent="Navigation" instance=ExtResource("11_bed")]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -10, 0, -10.1)
-
-[node name="BedLeft2" parent="Navigation" instance=ExtResource("11_bed")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -10, 0, 0)
 
 [node name="BedRight1" parent="Navigation" instance=ExtResource("11_bed")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -9.3)
@@ -3054,7 +3116,7 @@ MaxSeconds = 35.0
 [node name="Camcorder" parent="Player/Head/CameraRig/Camera3D"]
 StartCharge = 0.18
 
-[node name="Story" type="Node" parent="." node_paths=PackedStringArray("Player", "TitleCard", "HideoutDoor")]
+[node name="Story" type="Node" parent="." node_paths=PackedStringArray("Player", "TitleCard", "HideoutDoor", "Trial13Tape", "MainBreaker", "BasementLights", "Remnant", "Lift", "Sentinel")]
 script = ExtResource("69_story")
 Player = NodePath("../Player")
 TitleCard = NodePath("../StoryScreen/TitleCard")
@@ -3062,6 +3124,15 @@ FirstMemo = "They wiped you again. I hid a battery in the trash can by the fount
 FirstMemoAfterTheLoop = "You opened the gate last time. That is where they reset you. The trash can by the fountain."
 HideoutDoor = NodePath("../DoorRight1")
 BarredDoorMemo = "I barred it from inside. Crawl in through the vent from the showers in the north wing."
+Trial13Tape = NodePath("../Act2/Trial13Tape")
+TapeMemo = "4719. The lift needs power first: the main breaker is in the electrical room across the corridor."
+MainBreaker = NodePath("../Act2/MainBreaker")
+BasementLights = [NodePath("../ElectricalLight"), NodePath("../ArchiveLight"), NodePath("../BasementStairFootLight"), NodePath("../MorgueLight"), NodePath("../BoilerRoomLamp")]
+LightBurstSound = ExtResource("102_light_burst")
+Remnant = NodePath("../Remnant")
+BreakerMemo = "It got out again. You only see it through night vision. Don't let it touch you. The lift is in the left middle room upstairs."
+Lift = NodePath("../Act2/ServiceLift")
+Sentinel = NodePath("../Enemy")
 
 [node name="StoryScreen" type="CanvasLayer" parent="."]
 layer = 10
@@ -3244,3 +3315,723 @@ Objective = "The intercom at the nurse station pages the south rooms. He goes wh
 
 [node name="Shape" type="CollisionShape3D" parent="Objectives/IntercomHint"]
 shape = SubResource("BoxShape3D_corridor_north")
+
+[node name="Archive" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, -4.65, -10.3)
+operation = 2
+size = Vector3(7.6, 2.7, 6)
+material = ExtResource("17_concrete")
+[node name="DoorwayArchive" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, -4.775, -10.3)
+operation = 2
+size = Vector3(0.4, 2.45, 1.1)
+material = ExtResource("17_concrete")
+[node name="ElectricalRoom" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, -4.65, -7.2)
+operation = 2
+size = Vector3(7, 2.7, 7.6)
+material = ExtResource("17_concrete")
+[node name="DoorwayElectrical" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, -4.775, -7.2)
+operation = 2
+size = Vector3(0.4, 2.45, 1.1)
+material = ExtResource("17_concrete")
+[node name="ArchiveShelfEast1SideSouth" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5, -11.3)
+size = Vector3(0.5, 2, 0.04)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast1SideNorth" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5, -13.1)
+size = Vector3(0.5, 2, 0.04)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast1Board1" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5.9, -12.2)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast1Board2" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5.3, -12.2)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast1Board3" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -4.7, -12.2)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast1Board4" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -4.1, -12.2)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast2SideSouth" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5, -9.4)
+size = Vector3(0.5, 2, 0.04)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast2SideNorth" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5, -11.2)
+size = Vector3(0.5, 2, 0.04)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast2Board1" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5.9, -10.3)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast2Board2" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5.3, -10.3)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast2Board3" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -4.7, -10.3)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast2Board4" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -4.1, -10.3)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast3SideSouth" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5, -7.5)
+size = Vector3(0.5, 2, 0.04)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast3SideNorth" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5, -9.3)
+size = Vector3(0.5, 2, 0.04)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast3Board1" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5.9, -8.4)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast3Board2" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -5.3, -8.4)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast3Board3" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -4.7, -8.4)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfEast3Board4" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -4.1, -8.4)
+size = Vector3(0.5, 0.04, 1.8)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth1SideWest" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7, -5, -13)
+size = Vector3(0.04, 2, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth1SideEast" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, -5, -13)
+size = Vector3(0.04, 2, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth1Board1" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, -5.9, -13)
+size = Vector3(1.8, 0.04, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth1Board2" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, -5.3, -13)
+size = Vector3(1.8, 0.04, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth1Board3" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, -4.7, -13)
+size = Vector3(1.8, 0.04, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth1Board4" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, -4.1, -13)
+size = Vector3(1.8, 0.04, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth2SideWest" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7, -5, -13)
+size = Vector3(0.04, 2, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth2SideEast" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, -5, -13)
+size = Vector3(0.04, 2, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth2Board1" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, -5.9, -13)
+size = Vector3(1.8, 0.04, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth2Board2" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, -5.3, -13)
+size = Vector3(1.8, 0.04, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth2Board3" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, -4.7, -13)
+size = Vector3(1.8, 0.04, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveShelfNorth2Board4" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, -4.1, -13)
+size = Vector3(1.8, 0.04, 0.5)
+material = ExtResource("3_prop")
+[node name="ArchiveDesk" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, -5.625, -7.75)
+size = Vector3(1.6, 0.75, 0.7)
+material = ExtResource("82_wood")
+[node name="BreakerCabinet" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.95, -5, -7.2)
+size = Vector3(0.5, 2, 1.3)
+material = ExtResource("15_duct")
+[node name="TransformerLarge" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, -5.4, -10.6)
+size = Vector3(1.4, 1.2, 0.7)
+material = ExtResource("15_duct")
+[node name="TransformerSmall" type="CSGBox3D" parent="Navigation/Basement"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, -5.5, -10.65)
+size = Vector3(1, 1, 0.6)
+material = ExtResource("15_duct")
+[node name="ConduitNorth" type="CSGCylinder3D" parent="Navigation/Basement"]
+transform = Transform3D(6.123e-17, -1, 0, 1, 6.123e-17, 0, 0, 0, 1, -4.7, -3.45, -7)
+radius = 0.04
+height = 6.9
+sides = 12
+material = ExtResource("15_duct")
+[node name="ConduitSouth" type="CSGCylinder3D" parent="Navigation/Basement"]
+transform = Transform3D(6.123e-17, -1, 0, 1, 6.123e-17, 0, 0, 0, 1, -4.7, -3.45, -7.4)
+radius = 0.04
+height = 6.9
+sides = 12
+material = ExtResource("15_duct")
+[node name="LiftShaft" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.85, 1.5, 0)
+size = Vector3(2.3, 3, 3.2)
+material = ExtResource("2_wall")
+[node name="LiftCar" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.9, 1.2, 0)
+operation = 2
+size = Vector3(1.9, 2.4, 1.9)
+material = ExtResource("15_duct")
+[node name="LiftDoorway" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.82, 1.05, 0)
+operation = 2
+size = Vector3(0.3, 2.1, 1.1)
+material = ExtResource("15_duct")
+
+[node name="Act2" type="Node3D" parent="."]
+
+[node name="DoorArchive" parent="." instance=ExtResource("6_door")]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 1.05, -6, -10.8)
+
+[node name="DoorElectrical" parent="." instance=ExtResource("6_door")]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, -1.05, -6, -7.7)
+
+[node name="ArchiveLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.0, -3.6, -10.3)
+light_color = Color(0.8, 0.9, 1, 1)
+light_energy = 0.45
+shadow_enabled = true
+omni_range = 8.0
+
+[node name="Hum" parent="ArchiveLight" instance=ExtResource("48_light_hum")]
+pitch_scale = 1.06
+
+[node name="ElectricalLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, -3.6, -6.0)
+light_color = Color(1, 0.85, 0.6, 1)
+light_energy = 0.4
+shadow_enabled = true
+omni_range = 7.0
+
+[node name="Hum" parent="ElectricalLight" instance=ExtResource("48_light_hum")]
+pitch_scale = 0.9
+
+[node name="TapesEast12" type="Node3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -5.28, -11.38)
+script = ExtResource("85_tape_row")
+Count = 31
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesEast13" type="Node3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.68, -11.38)
+script = ExtResource("85_tape_row")
+Count = 48
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesEast14" type="Node3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.08, -11.38)
+script = ExtResource("85_tape_row")
+Count = 48
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesEast22" type="Node3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -5.28, -9.48)
+script = ExtResource("85_tape_row")
+Count = 48
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesEast23" type="Node3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.68, -9.48)
+script = ExtResource("85_tape_row")
+Count = 48
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesEast24" type="Node3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.08, -9.48)
+script = ExtResource("85_tape_row")
+Count = 31
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesEast32" type="Node3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -5.28, -7.58)
+script = ExtResource("85_tape_row")
+Count = 48
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesEast33" type="Node3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.68, -7.58)
+script = ExtResource("85_tape_row")
+Count = 31
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesEast34" type="Node3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.08, -7.58)
+script = ExtResource("85_tape_row")
+Count = 48
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesNorth12" type="Node3D" parent="Act2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.78, -5.28, -12.95)
+script = ExtResource("85_tape_row")
+Count = 37
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesNorth13" type="Node3D" parent="Act2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.78, -4.68, -12.95)
+script = ExtResource("85_tape_row")
+Count = 44
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesNorth14" type="Node3D" parent="Act2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.78, -4.08, -12.95)
+script = ExtResource("85_tape_row")
+Count = 37
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesNorth22" type="Node3D" parent="Act2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78, -5.28, -12.95)
+script = ExtResource("85_tape_row")
+Count = 37
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesNorth23" type="Node3D" parent="Act2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78, -4.68, -12.95)
+script = ExtResource("85_tape_row")
+Count = 37
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="TapesNorth24" type="Node3D" parent="Act2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78, -4.08, -12.95)
+script = ExtResource("85_tape_row")
+Count = 37
+Material = SubResource("StandardMaterial3D_tape_case")
+
+[node name="ShelfLabel1" type="Label3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 8.2, -3.88, -12.2)
+pixel_size = 0.0012
+modulate = Color(0.85, 0.83, 0.75, 1)
+text = "SUBJECT 14 · TRIALS 01–05"
+font_size = 48
+outline_size = 0
+
+[node name="ShelfLabel2" type="Label3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 8.2, -3.88, -10.3)
+pixel_size = 0.0012
+modulate = Color(0.85, 0.83, 0.75, 1)
+text = "SUBJECT 14 · TRIALS 06–10"
+font_size = 48
+outline_size = 0
+
+[node name="ShelfLabel3" type="Label3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 8.2, -3.88, -8.4)
+pixel_size = 0.0012
+modulate = Color(0.85, 0.83, 0.75, 1)
+text = "SUBJECT 14 · TRIALS 11–13"
+font_size = 48
+outline_size = 0
+
+[node name="ShelfLabel4" type="Label3D" parent="Act2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, -3.88, -12.72)
+pixel_size = 0.0012
+modulate = Color(0.85, 0.83, 0.75, 1)
+text = "SUBJECT 09"
+font_size = 48
+outline_size = 0
+
+[node name="ShelfLabel5" type="Label3D" parent="Act2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, -3.88, -12.72)
+pixel_size = 0.0012
+modulate = Color(0.85, 0.83, 0.75, 1)
+text = "SUBJECT 11"
+font_size = 48
+outline_size = 0
+
+[node name="ArchiveMonitor" type="MeshInstance3D" parent="Act2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0, -5.04, -7.68)
+mesh = SubResource("BoxMesh_monitor")
+
+[node name="ArchiveMonitorScreen" type="MeshInstance3D" parent="Act2"]
+transform = Transform3D(-1, 0, 1.225e-16, 0, 1, 0, -1.225e-16, 0, -1, 3, -5.03, -7.905)
+material_override = SubResource("ShaderMaterial_tape_screen")
+mesh = SubResource("QuadMesh_monitor_screen")
+
+[node name="TapeDeck" type="StaticBody3D" parent="Act2" node_paths=PackedStringArray("Recording", "InsertSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.75, -5.21, -7.75)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("84_tape_deck")
+TapeLabel = "Trial 13"
+Recording = NodePath("../Trial13Tape")
+InsertSound = NodePath("InsertSound")
+
+[node name="Body" type="MeshInstance3D" parent="Act2/TapeDeck"]
+mesh = SubResource("BoxMesh_vcr")
+
+[node name="Shape" type="CollisionShape3D" parent="Act2/TapeDeck"]
+shape = SubResource("SphereShape3D_small_interact")
+
+[node name="InsertSound" type="AudioStreamPlayer3D" parent="Act2/TapeDeck"]
+stream = ExtResource("100_tape_insert")
+unit_size = 2.0
+max_distance = 15.0
+bus = &"Sfx"
+
+[node name="ArchiveLog" parent="Act2" instance=ExtResource("71_note")]
+transform = Transform3D(0.9659, 0, -0.2588, 0, 1, 0, 0.2588, 0, 0.9659, 2.35, -5.245, -7.8)
+Title = "Archive log. Subject 14."
+Text = "Copy every tape after each reset. File the copy here, under the trial number.
+
+Return the camcorder to the subject with the tape wiped and the battery drained.
+
+Per Dr. Aldren: the subject keeps the camera. Do not take it from him again. Trial 6 shows what happens when we do."
+
+[node name="Trial13Tape" type="Node3D" parent="Act2" node_paths=PackedStringArray("Picture", "Operator", "Camera", "Overlay", "Screen", "Path", "Surgeon", "SurgeonAnimations", "SurgeonStart", "SurgeonEnd", "Steps", "Breath", "Roar", "Hit", "Snow")]
+script = ExtResource("83_tape_recording")
+Picture = NodePath("Picture")
+Operator = NodePath("Picture/Operator")
+Camera = NodePath("Picture/Operator/Camera")
+Overlay = NodePath("Picture/Overlay")
+Screen = NodePath("../ArchiveMonitorScreen")
+Path = NodePath("Path")
+Surgeon = NodePath("Surgeon")
+SurgeonAnimations = NodePath("Surgeon/Model/AnimationPlayer")
+Ual1Animations = ExtResource("88_ual1")
+SurgeonStart = NodePath("SurgeonStart")
+SurgeonEnd = NodePath("SurgeonEnd")
+Steps = NodePath("Sounds/Steps")
+Breath = NodePath("Sounds/Breath")
+Roar = NodePath("Sounds/Roar")
+Hit = NodePath("Sounds/Hit")
+Snow = NodePath("Sounds/Snow")
+
+[node name="Picture" type="SubViewport" parent="Act2/Trial13Tape"]
+size = Vector2i(320, 240)
+render_target_update_mode = 0
+
+[node name="Operator" type="Node3D" parent="Act2/Trial13Tape/Picture"]
+transform = Transform3D(0.8716, -0.01068, 0.4901, 0, 0.9998, 0.02178, -0.4903, -0.01899, 0.8714, 0.4, 1.55, 4)
+
+[node name="Camera" type="Camera3D" parent="Act2/Trial13Tape/Picture/Operator"]
+cull_mask = 1025
+current = true
+fov = 62.0
+
+[node name="Overlay" type="Label" parent="Act2/Trial13Tape/Picture"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 312.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 13
+
+[node name="Path" type="Node3D" parent="Act2/Trial13Tape"]
+
+[node name="Corridor" type="Marker3D" parent="Act2/Trial13Tape/Path"]
+transform = Transform3D(0.8716, -0.01068, 0.4901, 0, 0.9998, 0.02178, -0.4903, -0.01899, 0.8714, 0.4, 1.55, 4)
+
+[node name="LobbyDoor" type="Marker3D" parent="Act2/Trial13Tape/Path"]
+transform = Transform3D(-0.07125, -0.02841, 0.9971, 0, 0.9996, 0.02849, -0.9975, 0.00203, -0.07122, -1.7, 1.55, 0.3)
+
+[node name="Lobby" type="Marker3D" parent="Act2/Trial13Tape/Path"]
+transform = Transform3D(-0.128, -0.07907, 0.9886, 0, 0.9968, 0.07973, -0.9918, 0.0102, -0.1276, -5.6, 1.5, 0.9)
+
+[node name="Keypad" type="Marker3D" parent="Act2/Trial13Tape/Path"]
+transform = Transform3D(-0.03736, -0.2186, 0.9751, 0, 0.9758, 0.2187, -0.9993, 0.008171, -0.03645, -8.15, 1.27, 1.33)
+
+[node name="Waiting" type="Marker3D" parent="Act2/Trial13Tape/Path"]
+transform = Transform3D(-0.5369, -0.1279, 0.8339, 0, 0.9884, 0.1516, -0.8437, 0.0814, -0.5307, -7.6, 1.5, -0.7)
+
+[node name="Turn" type="Marker3D" parent="Act2/Trial13Tape/Path"]
+transform = Transform3D(-0.123, 0.03484, -0.9918, 0, 0.9994, 0.03511, 0.9924, 0.004317, -0.1229, -7.5, 1.5, -0.6)
+
+[node name="Fallen" type="Marker3D" parent="Act2/Trial13Tape/Path"]
+transform = Transform3D(-0.05671, 0.22, -0.9738, 0.9846, 0.1736, -0.01812, 0.1651, -0.9599, -0.2265, -7.3, 0.22, -0.4)
+
+[node name="Surgeon" type="Node3D" parent="Act2/Trial13Tape"]
+transform = Transform3D(0.1483, -0, 0.9889, 0, 1, 0, -0.9889, 0, 0.1483, 0.6, 0, 0.6)
+
+[node name="Model" parent="Act2/Trial13Tape/Surgeon" instance=ExtResource("87_surgeon_model")]
+transform = Transform3D(-1.18, 0, 0, 0, 1.18, 0, 0, 0, -1.18, 0, 0, 0)
+
+[node name="SurgeonStart" type="Marker3D" parent="Act2/Trial13Tape"]
+transform = Transform3D(0.1483, -0, 0.9889, 0, 1, 0, -0.9889, 0, 0.1483, 0.6, 0, 0.6)
+
+[node name="SurgeonEnd" type="Marker3D" parent="Act2/Trial13Tape"]
+transform = Transform3D(0.1483, -0, 0.9889, 0, 1, 0, -0.9889, 0, 0.1483, -6.4, 0, -0.45)
+
+[node name="Sounds" type="Node3D" parent="Act2/Trial13Tape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0, -5.0, -7.9)
+
+[node name="Steps" type="AudioStreamPlayer3D" parent="Act2/Trial13Tape/Sounds"]
+stream = ExtResource("95_tile_steps")
+volume_db = -14.0
+unit_size = 2.0
+max_distance = 15.0
+bus = &"Sfx"
+
+[node name="Breath" type="AudioStreamPlayer3D" parent="Act2/Trial13Tape/Sounds"]
+stream = ExtResource("96_breath")
+volume_db = -16.0
+unit_size = 2.0
+max_distance = 15.0
+bus = &"Sfx"
+
+[node name="Roar" type="AudioStreamPlayer3D" parent="Act2/Trial13Tape/Sounds"]
+stream = ExtResource("97_roar")
+volume_db = -8.0
+unit_size = 2.0
+max_distance = 20.0
+bus = &"Sfx"
+
+[node name="Hit" type="AudioStreamPlayer3D" parent="Act2/Trial13Tape/Sounds"]
+stream = ExtResource("98_punch_hit")
+volume_db = -6.0
+unit_size = 2.0
+max_distance = 20.0
+bus = &"Sfx"
+
+[node name="Snow" type="AudioStreamPlayer3D" parent="Act2/Trial13Tape/Sounds"]
+stream = ExtResource("99_tv_static")
+volume_db = -16.0
+unit_size = 2.0
+max_distance = 15.0
+bus = &"Sfx"
+
+[node name="MainBreaker" type="StaticBody3D" parent="Act2" node_paths=PackedStringArray("Lever", "ThrowSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.66, -4.85, -7.2)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("89_breaker")
+Lever = NodePath("Lever")
+ThrownAngleDegrees = 100.0
+ThrowSound = NodePath("ThrowSound")
+
+[node name="Lever" type="Node3D" parent="Act2/MainBreaker"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 0, 0, 0)
+
+[node name="Arm" type="MeshInstance3D" parent="Act2/MainBreaker/Lever"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 0)
+mesh = SubResource("BoxMesh_lever_arm")
+
+[node name="Knob" type="MeshInstance3D" parent="Act2/MainBreaker/Lever"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, 0)
+mesh = SubResource("SphereMesh_lever_knob")
+
+[node name="Shape" type="CollisionShape3D" parent="Act2/MainBreaker"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0.15, 0)
+shape = SubResource("SphereShape3D_lever")
+
+[node name="ThrowSound" type="AudioStreamPlayer3D" parent="Act2/MainBreaker"]
+stream = ExtResource("101_breaker_sound")
+unit_size = 6.0
+max_distance = 50.0
+bus = &"Sfx"
+
+[node name="BreakerSign" type="Label3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -7.69, -4.32, -7.2)
+pixel_size = 0.0012
+modulate = Color(0.9, 0.9, 0.85, 1)
+text = "MAIN FEED · SERVICE LIFT"
+font_size = 40
+outline_size = 0
+
+[node name="DangerSign" type="Label3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -7.69, -4.12, -7.2)
+pixel_size = 0.0012
+modulate = Color(0.95, 0.75, 0.1, 1)
+text = "DANGER · HIGH VOLTAGE"
+font_size = 48
+outline_size = 0
+
+[node name="Remnant" parent="." node_paths=PackedStringArray("Player", "Lair") instance=ExtResource("90_remnant")]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, -8.9, -6, 2)
+Player = NodePath("../Player")
+Lair = NodePath("../Act2/RemnantLair")
+
+[node name="RemnantLair" type="Marker3D" parent="Act2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0, -6, 3.5)
+
+[node name="ServiceLift" type="Node3D" parent="Act2" node_paths=PackedStringArray("GroundLanding", "GroundCar", "RideSound")]
+script = ExtResource("91_lift")
+Code = "4719"
+GroundLanding = NodePath("GroundLanding")
+GroundCar = NodePath("GroundCar")
+RideSound = NodePath("RideSound")
+
+[node name="GroundLanding" type="Node3D" parent="Act2/ServiceLift" node_paths=PackedStringArray("LeftDoor", "RightDoor", "Chime", "DoorSound")]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -8.66, 0, 0)
+script = ExtResource("92_landing")
+LeftDoor = NodePath("LeftDoor")
+RightDoor = NodePath("RightDoor")
+Chime = NodePath("Chime")
+DoorSound = NodePath("DoorSound")
+
+[node name="LeftDoor" type="AnimatableBody3D" parent="Act2/ServiceLift/GroundLanding"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 1.05, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Act2/ServiceLift/GroundLanding/LeftDoor"]
+mesh = SubResource("BoxMesh_lift_door")
+
+[node name="Shape" type="CollisionShape3D" parent="Act2/ServiceLift/GroundLanding/LeftDoor"]
+shape = SubResource("BoxShape3D_lift_door")
+
+[node name="RightDoor" type="AnimatableBody3D" parent="Act2/ServiceLift/GroundLanding"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 1.05, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Act2/ServiceLift/GroundLanding/RightDoor"]
+mesh = SubResource("BoxMesh_lift_door")
+
+[node name="Shape" type="CollisionShape3D" parent="Act2/ServiceLift/GroundLanding/RightDoor"]
+shape = SubResource("BoxShape3D_lift_door")
+
+[node name="Chime" type="AudioStreamPlayer3D" parent="Act2/ServiceLift/GroundLanding"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+stream = ExtResource("103_lift_ding")
+unit_size = 8.0
+max_distance = 50.0
+bus = &"Sfx"
+
+[node name="DoorSound" type="AudioStreamPlayer3D" parent="Act2/ServiceLift/GroundLanding"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+stream = ExtResource("104_lift_doors")
+unit_size = 4.0
+max_distance = 30.0
+bus = &"Sfx"
+
+[node name="GroundCar" type="Marker3D" parent="Act2/ServiceLift"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.9, 1.2, 0)
+
+[node name="RideSound" type="AudioStreamPlayer3D" parent="Act2/ServiceLift"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.9, 1.6, 0)
+stream = ExtResource("105_lift_ride")
+unit_size = 4.0
+max_distance = 30.0
+bus = &"Sfx"
+
+[node name="Keypad" type="StaticBody3D" parent="Act2" node_paths=PackedStringArray("Lift", "Screen", "AcceptSound", "ErrorSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.685, 1.35, 1.35)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("93_keypad")
+Lift = NodePath("../ServiceLift")
+Screen = NodePath("../../StoryScreen/KeypadScreen")
+AcceptSound = NodePath("AcceptSound")
+ErrorSound = NodePath("ErrorSound")
+
+[node name="Body" type="MeshInstance3D" parent="Act2/Keypad"]
+mesh = SubResource("BoxMesh_keypad")
+
+[node name="Led" type="MeshInstance3D" parent="Act2/Keypad"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.01, 0.075, 0.045)
+mesh = SubResource("BoxMesh_led")
+
+[node name="Shape" type="CollisionShape3D" parent="Act2/Keypad"]
+shape = SubResource("SphereShape3D_small_interact")
+
+[node name="AcceptSound" type="AudioStreamPlayer3D" parent="Act2/Keypad"]
+stream = ExtResource("107_keypad_accept")
+unit_size = 2.0
+max_distance = 15.0
+bus = &"Sfx"
+
+[node name="ErrorSound" type="AudioStreamPlayer3D" parent="Act2/Keypad"]
+stream = ExtResource("108_keypad_error")
+unit_size = 2.0
+max_distance = 15.0
+bus = &"Sfx"
+
+[node name="PastStickyNote" type="MeshInstance3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -8.684, 1.12, 1.35)
+layers = 1024
+mesh = SubResource("QuadMesh_sticky_note")
+
+[node name="PastStickyNoteCode" type="Label3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -8.682, 1.12, 1.35)
+layers = 1024
+pixel_size = 0.0008
+modulate = Color(0.1, 0.15, 0.45, 1)
+text = "LIFT
+4719"
+font_size = 40
+outline_size = 0
+
+[node name="LiftSign" type="Label3D" parent="Act2"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -8.684, 2.45, 0)
+pixel_size = 0.0015
+modulate = Color(0.85, 0.85, 0.8, 1)
+text = "SERVICE LIFT · STAFF ONLY"
+font_size = 48
+outline_size = 0
+
+[node name="KeypadScreen" type="Control" parent="StoryScreen" node_paths=PackedStringArray("Display", "KeySound")]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("94_keypad_screen")
+Display = NodePath("Panel/Lines/Display")
+KeySound = NodePath("KeySound")
+
+[node name="Panel" type="PanelContainer" parent="StoryScreen/KeypadScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -110.0
+offset_right = 200.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_keypad")
+
+[node name="Lines" type="VBoxContainer" parent="StoryScreen/KeypadScreen/Panel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="StoryScreen/KeypadScreen/Panel/Lines"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "SERVICE LIFT · ENTER CODE"
+horizontal_alignment = 1
+
+[node name="Display" type="Label" parent="StoryScreen/KeypadScreen/Panel/Lines"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.25, 0.15, 1)
+theme_override_font_sizes/font_size = 48
+text = "_ _ _ _"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="StoryScreen/KeypadScreen/Panel/Lines"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 15
+text = "Type the code with the number keys · [E] Step away"
+horizontal_alignment = 1
+
+[node name="KeySound" type="AudioStreamPlayer" parent="StoryScreen/KeypadScreen"]
+stream = ExtResource("106_keypad_beep")
+volume_db = -10.0
+bus = &"Sfx"

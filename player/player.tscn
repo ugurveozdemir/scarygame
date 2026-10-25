@@ -111,7 +111,8 @@ Camera = NodePath("Camera3D")
 [node name="Camera3D" type="Camera3D" parent="Head/CameraRig" unique_id=1761955948]
 current = true
 
-[node name="Camcorder" parent="Head/CameraRig/Camera3D" unique_id=252635013 instance=ExtResource("2_camcorder")]
+[node name="Camcorder" parent="Head/CameraRig/Camera3D" unique_id=252635013 node_paths=PackedStringArray("Camera") instance=ExtResource("2_camcorder")]
+Camera = NodePath("..")
 
 [node name="ViewHands" parent="Head/CameraRig/Camera3D" unique_id=824592695 instance=ExtResource("6_view_hands")]
 

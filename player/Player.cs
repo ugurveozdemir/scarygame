@@ -198,6 +198,13 @@ public partial class Player : CharacterBody3D
 		_previousPosition = GlobalPosition;
 	}
 
+	/// <summary>Moves the player without it counting as movement, like the lift arriving on another floor.</summary>
+	public void Teleport(Vector3 offset)
+	{
+		GlobalPosition += offset;
+		_previousPosition += offset;
+	}
+
 	public void LockControls()
 	{
 		AreControlsLocked = true;
