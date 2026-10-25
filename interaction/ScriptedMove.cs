@@ -44,10 +44,21 @@ public class ScriptedMove
 	/// </summary>
 	public void Walk(Node3D point, float headPitchDegrees, float start, float seconds, Vector3 startVelocity = default)
 	{
+		Walk(() => point.GlobalTransform, headPitchDegrees, start, seconds, startVelocity);
+	}
+
+	/// <summary>Walks the player to stand at <paramref name="end"/>, like <see cref="Walk(Node3D, float, float, float, Vector3)"/>.</summary>
+	public void Walk(Transform3D end, float headPitchDegrees, float start, float seconds, Vector3 startVelocity = default)
+	{
+		Walk(() => end, headPitchDegrees, start, seconds, startVelocity);
+	}
+
+	private void Walk(Func<Transform3D> destination, float headPitchDegrees, float start, float seconds, Vector3 startVelocity)
+	{
 		At(start, () => _walkStart = _player.GlobalTransform);
 		Tween.TweenMethod(Callable.From<float>(t =>
 		{
-			Transform3D end = point.GlobalTransform;
+			Transform3D end = destination();
 			float t2 = t * t;
 			float t3 = t2 * t;
 			Vector3 position = (2f * t3 - 3f * t2 + 1f) * _walkStart.Origin
