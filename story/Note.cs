@@ -19,6 +19,8 @@ public partial class Note : StaticBody3D, IInteractable
 
 	public string InteractionPrompt => "Read";
 
+	public bool WasRead => _wasRead;
+
 	public void Interact(Player player)
 	{
 		string text = GameState.HasSeenTheLoop && TextAfterTheLoop != "" ? TextAfterTheLoop : Text;
@@ -27,10 +29,11 @@ public partial class Note : StaticBody3D, IInteractable
 
 	private void OnRead(Player player)
 	{
-		if (_wasRead || Memo == "")
+		bool isFirstRead = !_wasRead;
+		_wasRead = true;
+		if (!isFirstRead || Memo == "")
 			return;
 
-		_wasRead = true;
 		if (IsOwnMemo)
 			player.ObjectiveDisplay.AnnounceOwn(Memo);
 		else

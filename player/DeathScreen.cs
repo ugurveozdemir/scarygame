@@ -1,7 +1,8 @@
 using Godot;
 
 /// <summary>
-/// Fades the screen to black when the player is caught, then restarts the level.
+/// Fades the screen to black when the player is caught, then restarts the level as the next trial: getting
+/// caught means another reset.
 /// Keeps running while the game is paused, and so does its sound, while everything else falls silent.
 /// </summary>
 public partial class DeathScreen : Control
@@ -28,6 +29,7 @@ public partial class DeathScreen : Control
 
 	private void RestartLevel()
 	{
+		GameState.StartNextTrial(reachedTheGate: false);
 		GetTree().Paused = false;
 		GetTree().ReloadCurrentScene();
 	}

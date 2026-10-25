@@ -39,8 +39,39 @@ public partial class Story : Node
 	[ExportGroup("Act 3")]
 	/// <summary>The first memo of the player's own, when they reach the floor no earlier trial reached.</summary>
 	[Export] public string UpperFloorMemo { get; set; } = "";
+	[Export] public LockConsole LockConsole { get; set; }
+	[Export] public Note CaseFile { get; set; }
+
+	[ExportGroup("Act 4")]
+	[Export] public IronGate Gate { get; set; }
+	[Export] public Door FireDoor { get; set; }
+	[Export] public AudioStreamPlayer Siren { get; set; }
+	[Export] public float SirenFadeSeconds { get; set; } = 3f;
+	/// <summary>The lamps on the grounds, which turn red when the alarm sounds.</summary>
+	[Export] public Light3D[] GroundLamps { get; set; } = [];
+	[Export] public Color AlarmColor { get; set; } = new(1f, 0.12f, 0.08f);
+	[Export] public AlarmLight[] AlarmLights { get; set; } = [];
+	[Export] public WorldEnvironment World { get; set; }
+	/// <summary>How much thicker the fog gets once the alarm sounds.</summary>
+	[Export] public float AlarmFogMultiplier { get; set; } = 1.8f;
+	[Export] public float FogChangeSeconds { get; set; } = 20f;
+	/// <summary>Where the Sentinel walks its rounds once it is sent out onto the grounds.</summary>
+	[Export] public Node3D GroundsPatrolRoute { get; set; }
+	/// <summary>Where the Sentinel comes out of the building, out of the player's sight.</summary>
+	[Export] public Node3D SentinelExit { get; set; }
+	[Export] public string LocksMemo { get; set; } = "";
+	/// <summary>The memo instead of <see cref="LocksMemo"/> once the player has read their case file.</summary>
+	[Export] public string LocksMemoKnowingTheTruth { get; set; } = "";
+
+	[ExportGroup("The Loop")]
+	[Export] public Area3D GateResetZone { get; set; }
+	[Export] public SpotLight3D Floodlight { get; set; }
+	[Export] public float FloodlightEnergy { get; set; } = 40f;
+	[Export] public AudioStreamPlayer ResetWhine { get; set; }
+	[Export] public ColorRect WhiteFlash { get; set; }
 
 	private bool _hasBeenUpstairs;
+	private bool _isEnding;
 
 	public override void _Ready()
 	{
@@ -49,6 +80,8 @@ public partial class Story : Node
 		MainBreaker.Thrown += OnBreakerThrown;
 		Lift.DoorsOpened += OnLiftDoorsOpened;
 		Lift.Arrived += OnLiftArrived;
+		LockConsole.Released += OnLocksReleased;
+		GateResetZone.BodyEntered += OnGateCrossed;
 		PlayPrologue();
 	}
 
@@ -125,6 +158,76 @@ public partial class Story : Node
 
 		_hasBeenUpstairs = true;
 		Player.ObjectiveDisplay.AnnounceOwn(UpperFloorMemo);
+	}
+
+	/// <summary>
+	/// Every magnetic lock opens and the reset siren starts: the lamps outside turn red, the fog rolls in, the lift
+	/// loses its power and the Sentinel is sent out onto the grounds.
+	/// </summary>
+	private void OnLocksReleased()
+	{
+		Gate.Open();
+		FireDoor.Unbar();
+		HideoutDoor.Unbar();
+		Lift.HasPower = false;
+
+		Siren.Play();
+		CreateTween().TweenProperty(Siren, "volume_linear", Siren.VolumeLinear, SirenFadeSeconds).From(0f);
+		foreach (Light3D lamp in GroundLamps)
+			CreateTween().TweenProperty(lamp, "light_color", AlarmColor, SirenFadeSeconds);
+		foreach (AlarmLight light in AlarmLights)
+			light.Sound();
+		ThickenFog();
+
+		if (!Sentinel.IsHunting)
+			Sentinel.GlobalTransform = SentinelExit.GlobalTransform;
+		Sentinel.ChangePatrolRoute(GroundsPatrolRoute);
+
+		Player.ObjectiveDisplay.AnnounceOwn(CaseFile.WasRead ? LocksMemoKnowingTheTruth : LocksMemo);
+	}
+
+	private void ThickenFog()
+	{
+		// The environment is a shared resource, so this level gets its own copy before changing it.
+		var environment = (Environment)World.Environment.Duplicate();
+		World.Environment = environment;
+		Tween tween = CreateTween().SetParallel();
+		tween.TweenProperty(environment, "fog_density", environment.FogDensity * AlarmFogMultiplier, FogChangeSeconds);
+		tween.TweenProperty(environment, "volumetric_fog_density", environment.VolumetricFogDensity * AlarmFogMultiplier,
+			FogChangeSeconds);
+	}
+
+	/// <summary>
+	/// Through the open gate the floodlight flares, the whine rises and the trial ends the way every trial ends:
+	/// the player wakes in the parking lot again, one trial later.
+	/// </summary>
+	private void OnGateCrossed(Node3D body)
+	{
+		if (body != Player || !Gate.IsOpen || _isEnding)
+			return;
+
+		_isEnding = true;
+		Player.LockControls();
+		Player.CameraRig.AddShake(0.6f);
+		ResetWhine.Play();
+		Siren.Stop();
+
+		Tween tween = CreateTween().SetTrans(Tween.TransitionType.Expo).SetEase(Tween.EaseType.In);
+		tween.TweenProperty(Floodlight, "light_energy", FloodlightEnergy, 3.5f).From(0f);
+		tween.Parallel().TweenProperty(WhiteFlash, "color:a", 1f, 4.5f).From(0f);
+		tween.TweenCallback(Callable.From(() =>
+		{
+			TitleCard.Cover($"TRIAL {GameState.Trial} · COMPLETE\nSUBJECT COMPLIANT\n\nRESETTING");
+			WhiteFlash.Color = WhiteFlash.Color with { A = 0f };
+		}));
+		tween.TweenInterval(4f);
+		tween.TweenCallback(Callable.From(() => TitleCard.Lines.Text = "THE LOOP\n\nENDING 1 OF 2"));
+		tween.TweenInterval(3.5f);
+		tween.TweenCallback(Callable.From(() =>
+		{
+			GameState.StartNextTrial(reachedTheGate: true);
+			GetTree().ReloadCurrentScene();
+		}));
 	}
 
 	/// <summary>The lift's chime carries through the floor: the Sentinel comes to see who called it.</summary>

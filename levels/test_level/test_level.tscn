@@ -115,6 +115,9 @@
 [ext_resource type="Script" path="res://props/security/SecurityFeed.cs" id="113_security_feed"]
 [ext_resource type="Script" path="res://props/lift/LiftButton.cs" id="114_lift_button"]
 [ext_resource type="AudioStream" path="res://assets/sounds/camcorder/pick_up_battery.wav" id="115_pick_up"]
+[ext_resource type="Script" path="res://lighting/AlarmLight.cs" id="116_alarm_light"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/siren.wav" id="117_siren"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/reset_whine.wav" id="118_reset_whine"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_stair_ramp"]
 size = Vector3(3, 0.2, 5.92)
@@ -428,6 +431,35 @@ material = SubResource("StandardMaterial3D_black_plastic")
 radius = 0.12
 height = 0.12
 is_hemisphere = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gate_reset"]
+size = Vector3(4.5, 3, 1.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_beacon"]
+albedo_color = Color(0.4, 0.02, 0.02, 1)
+emission_enabled = true
+emission = Color(1, 0.1, 0.05, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_beacon"]
+material = SubResource("StandardMaterial3D_beacon")
+top_radius = 0.07
+bottom_radius = 0.09
+height = 0.16
+radial_segments = 12
+rings = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_floodlight"]
+material = SubResource("StandardMaterial3D_black_plastic")
+size = Vector3(0.6, 0.4, 0.3)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pole"]
+material = ExtResource("3_prop")
+top_radius = 0.06
+bottom_radius = 0.08
+height = 5.6
+radial_segments = 10
+rings = 1
 
 [node name="TestLevel" type="Node3D"]
 
@@ -3212,7 +3244,7 @@ MaxSeconds = 35.0
 [node name="Camcorder" parent="Player/Head/CameraRig/Camera3D"]
 StartCharge = 0.18
 
-[node name="Story" type="Node" parent="." node_paths=PackedStringArray("Player", "TitleCard", "HideoutDoor", "Trial13Tape", "MainBreaker", "BasementLights", "Remnant", "Lift", "Sentinel")]
+[node name="Story" type="Node" parent="." node_paths=PackedStringArray("Player", "TitleCard", "HideoutDoor", "Trial13Tape", "MainBreaker", "BasementLights", "Remnant", "Lift", "Sentinel", "LockConsole", "CaseFile", "Gate", "FireDoor", "Siren", "GroundLamps", "AlarmLights", "World", "GroundsPatrolRoute", "SentinelExit", "GateResetZone", "Floodlight", "ResetWhine", "WhiteFlash")]
 script = ExtResource("69_story")
 Player = NodePath("../Player")
 TitleCard = NodePath("../StoryScreen/TitleCard")
@@ -3229,6 +3261,22 @@ Remnant = NodePath("../Remnant")
 BreakerMemo = "It got out again. You only see it through night vision. Don't let it touch you. The lift is in the left middle room upstairs."
 Lift = NodePath("../Act2/ServiceLift")
 Sentinel = NodePath("../Enemy")
+LockConsole = NodePath("../Act3/LockConsole")
+CaseFile = NodePath("../Act3/CaseFile")
+Gate = NodePath("../Navigation/Gate")
+FireDoor = NodePath("../FireDoor")
+Siren = NodePath("../Audio/Siren")
+GroundLamps = [NodePath("../Navigation/LampStairs/Light"), NodePath("../Navigation/LampPlazaWest/Light"), NodePath("../Navigation/LampPlazaEast/Light"), NodePath("../Navigation/LampParkingWest/Light"), NodePath("../Navigation/LampParkingEast/Light"), NodePath("../Navigation/LampRoad/Light"), NodePath("../ExitLamp/Light")]
+AlarmLights = [NodePath("../Act4/AlarmBuildingSouth"), NodePath("../Act4/AlarmGate"), NodePath("../Act4/AlarmFireEscape")]
+World = NodePath("../WorldEnvironment")
+GroundsPatrolRoute = NodePath("../Act4/GroundsPatrolRoute")
+SentinelExit = NodePath("../Act4/SentinelExit")
+LocksMemo = "Every lock is open. Out through the fire escape in the pharmacy, then the gate. I'm leaving."
+LocksMemoKnowingTheTruth = "Every lock is open. Out through the fire escape in the pharmacy. Not the gate: the fountain."
+GateResetZone = NodePath("../Act4/GateResetZone")
+Floodlight = NodePath("../Act4/Floodlight")
+ResetWhine = NodePath("../Audio/ResetWhine")
+WhiteFlash = NodePath("../StoryScreen/WhiteFlash")
 UpperFloorMemo = "No trial got this far before. From here the memos are mine. They can't see, but they hear everything. Stay low."
 
 [node name="StoryScreen" type="CanvasLayer" parent="."]
@@ -5379,3 +5427,106 @@ material = ExtResource("3_prop")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 5.3, 13.55)
 size = Vector3(5, 0.03, 0.4)
 material = ExtResource("3_prop")
+
+[node name="Act4" type="Node3D" parent="."]
+
+[node name="GroundsPatrolRoute" type="Node3D" parent="Act4"]
+
+[node name="SouthStairs" type="Marker3D" parent="Act4/GroundsPatrolRoute"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, -3, 21)
+
+[node name="Plaza" type="Marker3D" parent="Act4/GroundsPatrolRoute"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3, 31)
+
+[node name="ParkingWest" type="Marker3D" parent="Act4/GroundsPatrolRoute"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, -3, 58)
+
+[node name="GateInside" type="Marker3D" parent="Act4/GroundsPatrolRoute"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -3, 71)
+
+[node name="ParkingEast" type="Marker3D" parent="Act4/GroundsPatrolRoute"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, -3, 58)
+
+[node name="FountainSouth" type="Marker3D" parent="Act4/GroundsPatrolRoute"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3, 44)
+
+[node name="EastLawn" type="Marker3D" parent="Act4/GroundsPatrolRoute"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -3, 2)
+
+[node name="AlarmBuildingSouth" type="OmniLight3D" parent="Act4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.3, 14.65)
+light_color = Color(1, 0.1, 0.05, 1)
+light_energy = 3.0
+omni_range = 18.0
+script = ExtResource("116_alarm_light")
+
+[node name="Beacon" type="MeshInstance3D" parent="Act4/AlarmBuildingSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("CylinderMesh_beacon")
+
+[node name="AlarmGate" type="OmniLight3D" parent="Act4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0, -0.6, 74.6)
+light_color = Color(1, 0.1, 0.05, 1)
+light_energy = 2.5
+omni_range = 14.0
+script = ExtResource("116_alarm_light")
+
+[node name="Beacon" type="MeshInstance3D" parent="Act4/AlarmGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("CylinderMesh_beacon")
+
+[node name="AlarmFireEscape" type="OmniLight3D" parent="Act4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.9, 5.8, 11.5)
+light_color = Color(1, 0.1, 0.05, 1)
+light_energy = 2.0
+omni_range = 10.0
+script = ExtResource("116_alarm_light")
+
+[node name="Beacon" type="MeshInstance3D" parent="Act4/AlarmFireEscape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("CylinderMesh_beacon")
+
+[node name="SentinelExit" type="Marker3D" parent="Act4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15.6)
+
+[node name="GateResetZone" type="Area3D" parent="Act4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 76.6)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="Shape" type="CollisionShape3D" parent="Act4/GateResetZone"]
+shape = SubResource("BoxShape3D_gate_reset")
+
+[node name="FloodlightPole" type="MeshInstance3D" parent="Act4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, -0.2, 78.5)
+mesh = SubResource("CylinderMesh_pole")
+
+[node name="FloodlightHousing" type="MeshInstance3D" parent="Act4"]
+transform = Transform3D(0.9041, 0.2389, -0.3544, -0, 0.8293, 0.5589, 0.4274, -0.5053, 0.7497, -2.6, 2.6, 78.5)
+mesh = SubResource("BoxMesh_floodlight")
+
+[node name="Floodlight" type="SpotLight3D" parent="Act4"]
+transform = Transform3D(0.8978, 0.2512, -0.3617, -0, 0.8213, 0.5704, 0.4404, -0.5121, 0.7374, -2.6, 2.6, 78.3)
+light_color = Color(0.92, 0.96, 1, 1)
+light_energy = 0.0
+spot_range = 30.0
+spot_angle = 35.0
+
+[node name="Siren" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("117_siren")
+volume_db = -9.0
+bus = &"Sfx"
+
+[node name="ResetWhine" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("118_reset_whine")
+bus = &"Player"
+
+[node name="WhiteFlash" type="ColorRect" parent="StoryScreen"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0)
