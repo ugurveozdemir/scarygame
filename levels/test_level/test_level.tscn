@@ -901,10 +901,10 @@ depth = 1.4
 material = ExtResource("17_concrete")
 
 [node name="BedLeft1" parent="Navigation" instance=ExtResource("11_bed")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -10.1)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -10, 0, -10.1)
 
 [node name="BedLeft2" parent="Navigation" instance=ExtResource("11_bed")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 0)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -10, 0, 0)
 
 [node name="BedRight1" parent="Navigation" instance=ExtResource("11_bed")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -9.3)
@@ -2125,10 +2125,43 @@ transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 1.52, -6, 7.2)
 transform = Transform3D(0.574, 0, -0.819, 0, 1.0, 0, 0.819, 0, 0.574, 3.2, -6, 6.4)
 
 [node name="BedStorage" parent="Navigation" instance=ExtResource("11_bed")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, -6, 1.9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, -6, 2.05)
 
 [node name="BasementFallenChair" parent="Navigation" instance=ExtResource("13_chair")]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0.1, -5.78, 7.2)
+
+[node name="LockerWard2" parent="Navigation" instance=ExtResource("7_locker")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -8.72, 0, -25.7)
+
+[node name="LockerWard3" parent="Navigation" instance=ExtResource("7_locker")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -7.28, 0, -25.7)
+
+[node name="LockerShowers2" parent="Navigation" instance=ExtResource("7_locker")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.78, 0, -16.3)
+
+[node name="LockerShowers3" parent="Navigation" instance=ExtResource("7_locker")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.22, 0, -16.3)
+
+[node name="LockerBoilerRoom2" parent="Navigation" instance=ExtResource("7_locker")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -6.68, -6, -17.72)
+
+[node name="LockerBoilerRoom3" parent="Navigation" instance=ExtResource("7_locker")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -6.68, -6, -16.28)
+
+[node name="LockerStorage2" parent="Navigation" instance=ExtResource("7_locker")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 1.52, -6, 6.48)
+
+[node name="LockerLeft3B" parent="Navigation" instance=ExtResource("7_locker")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -10.68, 0, 10.38)
+
+[node name="LockerLeft3C" parent="Navigation" instance=ExtResource("7_locker")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -10.68, 0, 11.82)
+
+[node name="LockerCorridor2" parent="Navigation" instance=ExtResource("7_locker")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 1.38, 0, -2.63)
+
+[node name="LockerRight1B" parent="Navigation" instance=ExtResource("7_locker")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 10.68, 0, -11.82)
 
 [node name="LockerLeft3" parent="Navigation" instance=ExtResource("7_locker")]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -10.68, 0, 11.1)
