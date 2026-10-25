@@ -66,6 +66,7 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/ambience/gate_creak.tres" id="64_gate_creak"]
 [ext_resource type="AudioStream" path="res://assets/sounds/ambience/tarp.ogg" id="65_tarp"]
 [ext_resource type="AudioStream" path="res://assets/sounds/ambience/sewer.ogg" id="66_sewer"]
+[ext_resource type="Script" path="res://objectives/ObjectiveTrigger.cs" id="67_objective_trigger"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_stair_ramp"]
 size = Vector3(3, 0.2, 5.92)
@@ -143,6 +144,9 @@ radius = 0.7
 [sub_resource type="BoxMesh" id="BoxMesh_bay_line"]
 material = ExtResource("21_paint")
 size = Vector3(0.1, 0.01, 4.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_objective_start"]
+size = Vector3(8, 3, 6)
 
 [node name="TestLevel" type="Node3D"]
 
@@ -1730,6 +1734,19 @@ PatrolRoute = NodePath("../PatrolRoute")
 
 [node name="Dread" parent="Player" node_paths=PackedStringArray("Enemy")]
 Enemy = NodePath("../../Enemy")
+
+[node name="Objectives" type="Node3D" parent="."]
+
+[node name="ReachTheBasement" type="Area3D" parent="Objectives"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 73)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("67_objective_trigger")
+Objective = "Get down to the basement. The stairs are in the last room on the right of the corridor."
+
+[node name="Shape" type="CollisionShape3D" parent="Objectives/ReachTheBasement"]
+shape = SubResource("BoxShape3D_objective_start")
 
 [node name="SoundZones" type="Node3D" parent="."]
 

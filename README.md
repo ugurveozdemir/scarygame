@@ -55,6 +55,7 @@ Scenes and their scripts live together, grouped by feature.
 | `player/` | First-person controller (movement, crouch, hiding, being grabbed), procedural camera effects and first-person hands |
 | `camcorder/` | Camcorder logic, recording HUD and the screen-effect shader |
 | `interaction/` | `IInteractable` interface and the look-at interactor |
+| `objectives/` | The on-screen objective and the trigger areas that hand out new ones |
 | `enemy/` | Stalker AI (patrol, hearing, sight, chase, search), its voice and its strangle attack |
 | `props/` | Interactable objects (doors, lockers, batteries), furniture (beds, tables, chairs, a TV) and the grounds' props (trees, fountain, lamps, cars, fence) |
 | `levels/` | Levels and their shared environment |
@@ -82,7 +83,8 @@ the enemy's breathing, steps, roars and grunts, the strangling, the player's bre
 lamps, a television left on, dripping showers and knocking pipes, wind in the vents, windows and trees, things
 moving far off in the building, owls and a dog far off, a rattling fence and creaking gate, flapping tarps, the
 fountain, the building's hum and the night outside, a tension drone and chase music.
-Next up: an objective and an exit.
+The objective shows near the top of the screen for a few seconds whenever it changes. An `ObjectiveTrigger`
+area in the level hands out a new one the first time the player walks in; the first one waits at the gate.
 
 ## Sound
 

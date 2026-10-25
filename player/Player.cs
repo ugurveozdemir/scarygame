@@ -67,6 +67,7 @@ public partial class Player : CharacterBody3D
 	[Export] public DeathScreen DeathScreen { get; set; }
 	[Export] public ViewHands Hands { get; set; }
 	[Export] public Footsteps Footsteps { get; set; }
+	[Export] public ObjectiveDisplay ObjectiveDisplay { get; set; }
 
 	public bool IsCrouching { get; private set; }
 	public bool IsSprinting => !IsCrouching && HorizontalSpeed > WalkSpeed + 0.5f;
