@@ -23,11 +23,37 @@ godot --path .
 | Move | W A S D |
 | Sprint | Shift |
 | Crouch | Ctrl or C (hold) |
-| Interact (doors, lockers, beds, batteries) | E |
+| Interact (doors, lockers, beds, batteries, notes, switches) | E |
+| Put a note down, step away from a keypad | E or Esc |
+| Type a code on a keypad | Number keys, Backspace |
 | Raise / lower camcorder | Right mouse button |
 | Night vision | F (camcorder raised) |
 | Replace battery | R |
 | Release mouse | Esc |
+
+## Story
+
+The player is Subject 14 of the Vespera Sleep & Neuro-Rehabilitation Clinic, wiped thirteen times, and the
+objectives on screen are memos their previous trial typed into the camcorder's display. The whole story, its
+threats, acts and the places it needs are in [STORY.md](STORY.md).
+
+A trial runs through four acts and ends one of two ways:
+
+1. **Ground zero.** Wake in the parking lot, find the battery and note in the plaza's trash can, and reach the
+   barred hideout in the last room on the right through the showers' vent. The nurse station's intercom pages the
+   south rooms and draws the surgeon there.
+2. **Ghosts in the archive.** In the basement's archive, Trial 13's tape shows the service lift's code. The main
+   breaker in the electrical room powers the lift, bursts the basement's lights and frees the Remnant.
+3. **The silent ward.** The lift goes up to the new second floor, past where any memo reaches: Sleepwalkers, a
+   wall of security monitors showing the player's own route, the chief physician's office with the case file,
+   the lock console and the pump room key.
+4. **Fog over the grounds.** Releasing the locks sounds the reset siren and sends the surgeon outside. Through the
+   gate is *The Loop*: the floodlight resets the player and the next trial begins. Under the fountain is *Signal
+   Lost*: tearing out the transmitter and escaping through the drainage tunnel.
+
+`story/GameState.cs` keeps the trial number across reloads. Each reset, by getting caught or at the gate, starts
+the next trial: one more tally mark in the hideout, and after the loop a warning on its wall, different first
+memos and a different note in the trash can. `story/Story.cs` ties the acts together; every prop does its own work.
 
 ## Camera
 
@@ -55,30 +81,38 @@ Scenes and their scripts live together, grouped by feature.
 | `player/` | First-person controller (movement, crouch, hiding, getting hit, dying), procedural camera effects and first-person hands |
 | `camcorder/` | Camcorder logic, recording HUD and the screen-effect shader |
 | `interaction/` | `IInteractable` and `IHidingSpot` interfaces, the look-at interactor and the scripted moves into hiding spots |
-| `objectives/` | The on-screen objective and the trigger areas that hand out new ones |
-| `enemy/` | Stalker AI (patrol, hearing, sight, chase, punches, searching hiding spots) and its voice |
-| `props/` | Interactable objects (doors, lockers, batteries), furniture (beds, tables, chairs, a TV) and the grounds' props (trees, fountain, lamps, cars, fence) |
+| `objectives/` | The on-screen memos and the trigger areas that hand out new ones |
+| `story/` | The trial counter, the story's acts and endings, notes and the note reader, captions, the title card, the keypad screen and the render layers that decide who sees what |
+| `enemy/` | The surgeon's AI (patrol, hearing, sight, chase, punches, searching hiding spots) and its voice, the Remnant and the Sleepwalkers |
+| `props/` | Interactable objects (doors and their bars, lockers, batteries, the intercom, the lift and its keypad, the breaker, the tape deck, the lock console, keys, the hatch, ladders and the transmitter), security monitors, furniture (beds, tables, chairs, a TV), decorations (tally marks, rows of boxes, broken glass) and the grounds' props (trees, fountain, lamps, cars, fence, the sliding gate) |
 | `levels/` | Levels and their shared environment |
-| `lighting/` | Light behaviours such as flickering, with its buzz |
+| `lighting/` | Light behaviours such as flickering, with its buzz, and the alarm's beacons |
 | `audio/` | Footsteps and the surfaces they sound on, the ambience and the chase music |
 | `materials/` | PBR materials, the asylum interior shader and the exterior materials (brick, concrete, asphalt, paving, lawn, fountain water) |
 | `assets/` | Third-party models, animations, textures and sounds, see [CREDITS.md](CREDITS.md) |
+| `tools/` | `synthesize_sounds.py`, which makes the story's machine sounds in `assets/sounds/story` |
 
 ## Status
 
 Prototype: a dark, textured asylum to explore with the camcorder. A 28 m corridor with six 9 x 9 m rooms leads
 north into a second wing: a day room with tables, a TV and a nurse station, a ward with four beds, a shower room
 and a balcony outside the day room's barred windows. Two crawl-only ventilation ducts link the first side rooms
-to the ward and the showers; crouch to get through them, the enemy can't follow.
+to the ward and the showers; crouch to get through them, the enemy can't follow. The left middle room is the
+service lift's lobby.
 In the last room on the right a door opens onto a long concrete stairwell, 32 steps down to a basement under the
 building, below the grounds: a service corridor with pipes along the ceiling, a boiler room lit only by the
-boiler's fire and a work lamp, a tiled morgue with a wall of cold chambers and covered bodies, and a pitch-dark
-storage room. It is darker than the floor above, so the camcorder's night vision does most of the seeing there.
+boiler's fire and a work lamp, a tiled morgue with a wall of cold chambers and covered bodies, a pitch-dark
+storage room, an archive of tapes and an electrical room. It is darker than the floor above, so the camcorder's
+night vision does most of the seeing there.
 The ground ends at the building's concrete base, so the stairwell and the basement can pass below it.
-The player starts at the locked iron gate of the asylum grounds at night, under a flickering road lamp, and walks up
-to the building. Behind the corridor's south end a door opens onto stairs down to the grounds: a lawn with trees, a fountain
-on a paved plaza, benches and street lamps, a parking lot of cars under tarps, and a road out to a locked iron
-gate in the chain-link fence around it all. The building stands on a 3 m concrete base, so the balcony overlooks
+Above the main corridor the lift reaches a second floor, the sleep ward: two dormitories, a lift lobby, the chief
+physician's office, an observation room looking through a one-way mirror into a sealed sleep lab, and a pharmacy
+whose fire door opens onto a metal fire escape down the east wall.
+The player wakes up in the parking lot at night and walks up to the building. Behind the corridor's south end a
+door opens onto stairs down to the grounds: a lawn with trees, a fountain on a paved plaza with a padlocked
+maintenance hatch beside it, benches and street lamps, a parking lot of cars under tarps, and a road out to a
+sliding iron gate, held by a magnetic lock, in the chain-link fence around it all. Under the plaza lie the pump
+room and a drainage tunnel that runs east under the fence. The building stands on a 3 m concrete base, so the balcony overlooks
 the grounds. There are doors to open,
 rows of lockers to hide in, beds to crawl under and spare batteries lying around,
 and a masked surgeon that patrols, hears footsteps, chases on sight and punches you when it catches up.
@@ -93,8 +127,9 @@ the enemy's breathing, steps, roars, grunts and punches, the player's breathing,
 lamps, a television left on, dripping showers and knocking pipes, wind in the vents, windows and trees, things
 moving far off in the building, owls and a dog far off, a rattling fence and creaking gate, flapping tarps, the
 fountain, the building's hum and the night outside, a tension drone and chase music.
-The objective shows near the top of the screen for a few seconds whenever it changes. An `ObjectiveTrigger`
-area in the level hands out a new one the first time the player walks in; the first one waits at the gate.
+The objective shows near the top of the screen for a few seconds whenever it changes, typed out like a memo on the
+camcorder's display. An `ObjectiveTrigger` area in the level hands out a new one the first time the player walks
+in; notes, the tape and the story hand out the rest.
 
 ## Sound
 
@@ -136,6 +171,12 @@ The player's fear is heard from inside their head (`player/Dread.cs`): the close
 them, the faster their heart beats, one sampled beat at a time, and the harder they breathe (`player/Breathing.cs`,
 which also gets heavier from sprinting). Hiding muffles the world through the same low-pass filter that dazes
 the player after a hit, and the player holds their breath, so only shaky breaths through the nose escape.
+
+The story's machines are synthesized instead of recorded: the memo beep, the intercom, the keypad, the lift, the
+breaker, the bursting lights, the Remnant's static, the siren, the reset whine, the transmitter and broken glass
+underfoot. `tools/synthesize_sounds.py` makes them with plain Python into `assets/sounds/story`; the loops among
+them are imported with their loop mode set to forward. A step on broken glass carries 8 m however carefully it is
+taken, which the Sleepwalkers hear: every audible footstep is a `Player.MadeNoise` event they listen for.
 
 ## Animation
 
@@ -195,6 +236,15 @@ smooth. The night sky is the `kloppenheim_02` HDRI and a directional moon light;
 shadows, which keeps the grounds above 30 FPS.
 
 ## Level editing
+
+The second floor, the lift, the basement's new rooms, the fire escape and the pump room are CSG boxes in the
+level's combiners like the rest of the building, with the story's pieces under the `Act1` to `Act4` and
+`SignalLost` nodes. The lift's car is the same room on both floors, so the ride moves the player exactly one
+storey (3.4 m); keep both cars identical when changing one.
+
+Recordings and security cameras render the level live from their own cameras. What only a tape should show is on
+render layer 11 (`VisualLayers.Past`), the Remnant only on layer 3, which the player's camera shows during night
+vision, and enemies on layer 2, so tapes of the past leave them out.
 
 The enemy walks on the level's navigation mesh. Its patrol takes it down the stairwell to the boiler room too. After changing walls or lockers, select the
 `Navigation` node in the level and press **Bake NavigationMesh** in the editor toolbar.
