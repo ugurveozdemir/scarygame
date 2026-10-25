@@ -20,7 +20,7 @@ roughness = 0.4
 material = SubResource("StandardMaterial3D_handle")
 size = Vector3(0.025, 0.15, 0.03)
 
-[node name="Locker" type="StaticBody3D" node_paths=PackedStringArray("LatchSound", "CreakSound", "ShutSound", "TearOpenSound", "BumpSound", "Door", "OutsideHandle", "InsideGrip", "ApproachPoint", "PullPoint", "HidePoint", "ExitPoint")]
+[node name="Locker" type="StaticBody3D" node_paths=PackedStringArray("LatchSound", "CreakSound", "ShutSound", "TearOpenSound", "BumpSound", "Door", "OutsideHandle", "InsideGrip", "ApproachPoint", "PullPoint", "HidePoint", "ExitPoint", "SearchPoint", "LookPoint")]
 collision_layer = 9
 script = ExtResource("1_locker")
 LatchSound = NodePath("Sounds/LatchSound")
@@ -35,6 +35,8 @@ ApproachPoint = NodePath("ApproachPoint")
 PullPoint = NodePath("PullPoint")
 HidePoint = NodePath("HidePoint")
 ExitPoint = NodePath("ExitPoint")
+SearchPoint = NodePath("SearchPoint")
+LookPoint = NodePath("LookPoint")
 
 [node name="Collision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
@@ -114,6 +116,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
 
 [node name="ExitPoint" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.8)
+
+[node name="SearchPoint" type="Marker3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.35, 0, -1.45)
+
+[node name="LookPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
 
 [node name="Sounds" type="Node3D" parent="."]
 

@@ -2,7 +2,7 @@ using System;
 using Godot;
 
 /// <summary>
-/// First-person controller: mouse look, walking, sprinting, crouching, hiding and being grabbed.
+/// First-person controller: mouse look, walking, sprinting, crouching, hiding, getting hit and dying.
 /// </summary>
 public partial class Player : CharacterBody3D
 {
@@ -15,8 +15,8 @@ public partial class Player : CharacterBody3D
 	[Export] public float Acceleration { get; set; } = 10f;
 
 	[ExportGroup("Noise")]
-	[Export] public float WalkNoiseRadius { get; set; } = 3f;
-	[Export] public float SprintNoiseRadius { get; set; } = 10f;
+	[Export] public float WalkNoiseRadius { get; set; } = 4f;
+	[Export] public float SprintNoiseRadius { get; set; } = 12f;
 
 	[ExportGroup("Footsteps")]
 	[Export] public float WalkStepVolumeDb { get; set; } = -6f;
@@ -36,26 +36,36 @@ public partial class Player : CharacterBody3D
 	[Export] public float CrouchingHeadHeight { get; set; } = 0.9f;
 	[Export] public float CrouchTransitionSpeed { get; set; } = 8f;
 
-	[ExportGroup("Being Grabbed")]
-	[Export] public float GrabbedTurnSpeed { get; set; } = 8f;
-	[Export] public float StaggerDeceleration { get; set; } = 6f;
-	[Export] public float ChokePitchDegrees { get; set; } = 5f;
-	/// <summary>Parent of the points an attacker grabs; it sways along with the head.</summary>
-	[Export] public Node3D GrabPoints { get; set; }
-	[Export] public Node3D LeftShoulder { get; set; }
-	[Export] public Node3D RightShoulder { get; set; }
-	[Export] public Node3D ThroatLeft { get; set; }
-	[Export] public Node3D ThroatRight { get; set; }
-	[Export] public ColorRect ChokeOverlay { get; set; }
-	/// <summary>Ringing in the ears, as loud as the player is close to passing out.</summary>
+	[ExportGroup("Getting Hit")]
+	/// <summary>How many hits knock the player down for good.</summary>
+	[Export] public int HitsToDie { get; set; } = 4;
+	/// <summary>How fast a hit shoves the player away from the attacker.</summary>
+	[Export] public float KnockbackSpeed { get; set; } = 6f;
+	/// <summary>How long the red flash, the ringing ears and the muffled hearing last after a hit.</summary>
+	[Export] public float HitDazeSeconds { get; set; } = 1.5f;
+	/// <summary>The low-pass cutoff that muffles the world's sounds right after a hit.</summary>
+	[Export] public float DazedHearingHz { get; set; } = 700f;
+	[Export] public ColorRect HurtOverlay { get; set; }
+	/// <summary>The blow landing.</summary>
+	[Export] public AudioStreamPlayer HitSound { get; set; }
+	/// <summary>The player crying out with each hit.</summary>
+	[Export] public AudioStreamPlayer PainSound { get; set; }
+	/// <summary>Ringing in the ears, fading as the daze wears off.</summary>
 	[Export] public AudioStreamPlayer EarRing { get; set; }
-	/// <summary>The low-pass cutoff that muffles the world's sounds just before the player passes out.</summary>
-	[Export] public float PassingOutHearingHz { get; set; } = 400f;
+
+	[ExportGroup("Dying")]
+	[Export] public float FallSeconds { get; set; } = 0.8f;
+	[Export] public float FallenHeadHeight { get; set; } = 0.25f;
+	[Export] public float FallenRollDegrees { get; set; } = 75f;
+	/// <summary>How long the player lies still before the screen fades out.</summary>
+	[Export] public float LieStillSeconds { get; set; } = 1f;
 
 	[ExportGroup("Hiding")]
 	/// <summary>The low-pass cutoff of the world's sounds heard from inside a hiding spot.</summary>
 	[Export] public float HidingHearingHz { get; set; } = 2500f;
 	[Export] public float HidingMuffleSeconds { get; set; } = 0.5f;
+	/// <summary>Head height while lying on the floor, like under a bed.</summary>
+	[Export] public float LyingHeadHeight { get; set; } = 0.22f;
 
 	[ExportGroup("Nodes")]
 	[Export] public Node3D Head { get; set; }
@@ -70,10 +80,14 @@ public partial class Player : CharacterBody3D
 	[Export] public ObjectiveDisplay ObjectiveDisplay { get; set; }
 
 	public bool IsCrouching { get; private set; }
+	public bool IsLyingDown { get; private set; }
 	public bool IsSprinting => !IsCrouching && HorizontalSpeed > WalkSpeed + 0.5f;
-	public IInteractable HidingSpot { get; private set; }
+	public IHidingSpot HidingSpot { get; private set; }
 	public bool IsHiding => HidingSpot is not null;
-	public bool IsGrabbed => _grabLookTarget is not null;
+	public bool IsDead { get; private set; }
+
+	/// <summary>How badly hurt the player is, from 0 to 1 when the next hit would be the last.</summary>
+	public float Hurt => Mathf.Clamp((float)_hits / (HitsToDie - 1), 0f, 1f);
 
 	/// <summary>
 	/// True while something else, like a locker, is moving the player. They can't walk, look or interact.
@@ -81,28 +95,9 @@ public partial class Player : CharacterBody3D
 	public bool AreControlsLocked { get; private set; }
 
 	/// <summary>
-	/// Raised when an attacker grabs the player, so whatever was moving them can stop.
+	/// Raised when something hits the player, so whatever was moving them can stop.
 	/// </summary>
-	public event Action Grabbed;
-
-	/// <summary>
-	/// How far an attacker has pushed or pulled the player's upper body, in the player's own space.
-	/// </summary>
-	public Vector3 BodySway { get; set; }
-
-	/// <summary>
-	/// How close to passing out the player is, from 0 to 1. Darkens the view and shakes it harder.
-	/// </summary>
-	public float ChokeAmount
-	{
-		get => _chokeAmount;
-		set
-		{
-			_chokeAmount = value;
-			_chokeMaterial.SetShaderParameter("amount", value);
-			EarRing.VolumeLinear = _earRingVolume * value;
-		}
-	}
+	public event Action Hit;
 
 	/// <summary>
 	/// How far away enemies can hear the player's footsteps.
@@ -123,10 +118,9 @@ public partial class Player : CharacterBody3D
 	private Vector3 _previousPosition;
 	private Transform3D _hidingExitPoint;
 	private float _headHeight;
-	private Node3D _grabLookTarget;
-	private Vector3 _staggerVelocity;
-	private float _chokeAmount;
-	private ShaderMaterial _chokeMaterial;
+	private int _hits;
+	private float _daze;
+	private ShaderMaterial _hurtMaterial;
 	private AudioEffectLowPassFilter _worldMuffle;
 	private float _hidden;
 	private float _earRingVolume;
@@ -143,17 +137,17 @@ public partial class Player : CharacterBody3D
 		_collisionMask = CollisionMask;
 		_headHeight = StandingHeadHeight;
 		_previousPosition = GlobalPosition;
-		_chokeMaterial = (ShaderMaterial)ChokeOverlay.Material;
+		_hurtMaterial = (ShaderMaterial)HurtOverlay.Material;
 		_worldMuffle = (AudioEffectLowPassFilter)AudioServer.GetBusEffect(AudioServer.GetBusIndex("World"), 0);
 		_earRingVolume = EarRing.VolumeLinear;
-		ChokeAmount = 0f;
+		UpdateDaze(0f);
 		CameraRig.Stepped += OnStepped;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if (IsGrabbed || AreControlsLocked)
+		if (AreControlsLocked)
 			return;
 
 		if (@event is InputEventMouseMotion motion && Input.MouseMode == Input.MouseModeEnum.Captured)
@@ -168,8 +162,7 @@ public partial class Player : CharacterBody3D
 	{
 		float dt = (float)delta;
 		UpdateHeadPosition(dt);
-		if (IsGrabbed)
-			UpdateGrabbedView(dt);
+		UpdateDaze(dt);
 		CameraRig.UpdateCamera(dt);
 		UpdateHearing(dt);
 	}
@@ -177,9 +170,9 @@ public partial class Player : CharacterBody3D
 	public override void _PhysicsProcess(double delta)
 	{
 		float dt = (float)delta;
-		if (IsGrabbed)
+		if (IsDead)
 		{
-			Stagger(dt);
+			SlideToAStop(dt);
 			return;
 		}
 
@@ -207,10 +200,21 @@ public partial class Player : CharacterBody3D
 		AreControlsLocked = false;
 	}
 
+	/// <summary>Brings the head down to the floor, like when crawling under a bed.</summary>
+	public void LieDown()
+	{
+		IsLyingDown = true;
+	}
+
+	public void GetUp()
+	{
+		IsLyingDown = false;
+	}
+
 	/// <summary>
 	/// The player is now inside <paramref name="spot"/>: they can't move or be seen until they stop hiding.
 	/// </summary>
-	public void StartHiding(IInteractable spot, Transform3D exitPoint)
+	public void StartHiding(IHidingSpot spot, Transform3D exitPoint)
 	{
 		HidingSpot = spot;
 		_hidingExitPoint = exitPoint;
@@ -223,31 +227,57 @@ public partial class Player : CharacterBody3D
 		SetCollisionEnabled(true);
 	}
 
-	/// <summary>
-	/// Hands control over to an attacker: the player is knocked back by <paramref name="shove"/>,
-	/// can no longer move and keeps looking at <paramref name="lookTarget"/>.
-	/// </summary>
-	public void GetGrabbed(Node3D lookTarget, Vector3 shove)
+	/// <summary>Dragged out of the hiding spot by an enemy, the player stands in front of it, free to run.</summary>
+	public void PullOutOfHiding()
 	{
-		Grabbed?.Invoke();
+		GlobalTransform = _hidingExitPoint;
+		StopHiding();
+		GetUp();
 		Hands.HideImmediately();
 		AreControlsLocked = false;
-		StandUp();
-		if (IsHiding)
-		{
-			// Dragged out of the hiding spot.
-			GlobalTransform = _hidingExitPoint;
-			StopHiding();
-		}
-
-		_grabLookTarget = lookTarget;
-		_staggerVelocity = shove;
-		CameraRig.AddShake(1f);
 	}
 
-	public void Die()
+	/// <summary>
+	/// A blow from <paramref name="attacker"/> shoves the player away, snaps the head back and dazes them for
+	/// a moment, but leaves them in control, so they can run. The last of <see cref="HitsToDie"/> hits knocks
+	/// them down.
+	/// </summary>
+	public void TakeHit(Node3D attacker)
 	{
-		DeathScreen.Play();
+		if (IsDead)
+			return;
+
+		Hit?.Invoke();
+		Hands.HideImmediately();
+		AreControlsLocked = false;
+		GetUp();
+		_hits++;
+		_daze = 1f;
+		HitSound.Play();
+		PainSound.Play();
+
+		Vector3 away = GlobalPosition - attacker.GlobalPosition;
+		away.Y = 0f;
+		away = away.Normalized();
+		Velocity += away * KnockbackSpeed;
+		CameraRig.AddShake(1f);
+		CameraRig.Flinch(GlobalBasis.Inverse() * away);
+
+		if (_hits >= HitsToDie)
+			Die();
+	}
+
+	private void Die()
+	{
+		IsDead = true;
+		AreControlsLocked = true;
+		StandUp();
+
+		// Collapse onto the floor, lie still for a moment, then fade out.
+		Tween fall = CreateTween().SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.In);
+		fall.TweenProperty(Head, "rotation", new Vector3(0f, 0f, Mathf.DegToRad(FallenRollDegrees)), FallSeconds);
+		fall.TweenInterval(LieStillSeconds);
+		fall.TweenCallback(Callable.From(DeathScreen.Play));
 	}
 
 	private void OnStepped()
@@ -260,22 +290,25 @@ public partial class Player : CharacterBody3D
 		ClothSound.Play();
 	}
 
-	private void Stagger(float delta)
+	private void SlideToAStop(float delta)
 	{
-		Velocity = _staggerVelocity;
+		Vector3 velocity = Velocity.MoveToward(new Vector3(0f, Velocity.Y, 0f), Acceleration * delta);
+		if (!IsOnFloor())
+			velocity += GetGravity() * delta;
+		Velocity = velocity;
 		MoveAndSlide();
-		_staggerVelocity = _staggerVelocity.MoveToward(Vector3.Zero, StaggerDeceleration * delta);
 	}
 
-	private void UpdateGrabbedView(float delta)
+	/// <summary>
+	/// The daze after a hit: a red flash, ringing ears and muffled hearing that wear off together.
+	/// The edges of the view stay red the more hurt the player is.
+	/// </summary>
+	private void UpdateDaze(float delta)
 	{
-		// Keep looking at the attacker. Choking pushes the head back.
-		Vector3 toTarget = _grabLookTarget.GlobalPosition - Head.GlobalPosition;
-		float targetYaw = Mathf.Atan2(-toTarget.X, -toTarget.Z);
-		float targetPitch = Mathf.Atan2(toTarget.Y, new Vector2(toTarget.X, toTarget.Z).Length())
-			+ Mathf.DegToRad(ChokePitchDegrees) * ChokeAmount;
-		Rotation = new Vector3(0f, Mathf.LerpAngle(Rotation.Y, targetYaw, GrabbedTurnSpeed * delta), 0f);
-		Head.Rotation = new Vector3(Mathf.LerpAngle(Head.Rotation.X, targetPitch, GrabbedTurnSpeed * delta), 0f, 0f);
+		_daze = Mathf.MoveToward(_daze, 0f, delta / HitDazeSeconds);
+		_hurtMaterial.SetShaderParameter("hurt", IsDead ? 1f : Hurt);
+		_hurtMaterial.SetShaderParameter("flash", _daze * _daze);
+		EarRing.VolumeLinear = _earRingVolume * _daze;
 	}
 
 	private void SetCollisionEnabled(bool enabled)
@@ -334,15 +367,15 @@ public partial class Player : CharacterBody3D
 	}
 
 	/// <summary>
-	/// Muffles the world's sounds while hiding and, much more, as the player passes out, where the ears also ring.
+	/// Muffles the world's sounds while hiding and, much more, right after a hit.
 	/// Cutoffs move in octaves rather than hertz, so the muffling grows evenly.
 	/// </summary>
 	private void UpdateHearing(float delta)
 	{
 		_hidden = Mathf.MoveToward(_hidden, IsHiding ? 1f : 0f, delta / HidingMuffleSeconds);
 		float hiding = Octaves(FullHearingHz, HidingHearingHz, _hidden);
-		float choking = Octaves(FullHearingHz, PassingOutHearingHz, ChokeAmount);
-		_worldMuffle.CutoffHz = Mathf.Min(hiding, choking);
+		float dazed = Octaves(FullHearingHz, DazedHearingHz, _daze);
+		_worldMuffle.CutoffHz = Mathf.Min(hiding, dazed);
 	}
 
 	private static float Octaves(float fromHz, float toHz, float weight)
@@ -352,10 +385,12 @@ public partial class Player : CharacterBody3D
 
 	private void UpdateHeadPosition(float delta)
 	{
-		// The head eases between standing and crouching height. An attacker can sway the head and grab points.
-		float targetHeight = IsCrouching ? CrouchingHeadHeight : StandingHeadHeight;
+		// The head eases between standing, crouching and lying height, and drops to the floor when the player dies.
+		float targetHeight = IsDead ? FallenHeadHeight
+			: IsLyingDown ? LyingHeadHeight
+			: IsCrouching ? CrouchingHeadHeight
+			: StandingHeadHeight;
 		_headHeight = Mathf.Lerp(_headHeight, targetHeight, CrouchTransitionSpeed * delta);
-		Head.Position = new Vector3(0f, _headHeight, 0f) + BodySway;
-		GrabPoints.Position = BodySway;
+		Head.Position = new Vector3(0f, _headHeight, 0f);
 	}
 }

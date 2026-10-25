@@ -27,7 +27,7 @@ public partial class Dread : Node
 	public override void _Ready()
 	{
 		_heartbeatVolume = Heartbeat.VolumeLinear;
-		Enemy.StateChanged += OnEnemyStateChanged;
+		Enemy.PlayerSpotted += () => Gasp.Play();
 	}
 
 	public override void _Process(double delta)
@@ -48,16 +48,10 @@ public partial class Dread : Node
 
 	private float TargetFear()
 	{
-		if (Enemy.State is Enemy.EnemyState.Chase or Enemy.EnemyState.Strangling)
+		if (Enemy.IsHunting)
 			return 1f;
 
 		float closeness = 1f - Player.GlobalPosition.DistanceTo(Enemy.GlobalPosition) / FearDistance;
 		return Mathf.Clamp(closeness, 0f, 1f);
-	}
-
-	private void OnEnemyStateChanged(Enemy.EnemyState state)
-	{
-		if (state == Enemy.EnemyState.Chase)
-			Gasp.Play();
 	}
 }

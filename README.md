@@ -23,7 +23,7 @@ godot --path .
 | Move | W A S D |
 | Sprint | Shift |
 | Crouch | Ctrl or C (hold) |
-| Interact (doors, lockers, batteries) | E |
+| Interact (doors, lockers, beds, batteries) | E |
 | Raise / lower camcorder | Right mouse button |
 | Night vision | F (camcorder raised) |
 | Replace battery | R |
@@ -35,7 +35,7 @@ The first-person view sits on a small camera rig (`player/PlayerCamera.cs`) betw
 It adds the procedural movement that makes the view feel handheld: a step bob that scales with speed, a lean
 when strafing, an aim that drifts in a figure of eight while sprinting (the head nods with each footfall and turns
 with each stride), a slightly wider field of view while sprinting, and a small roll and yaw lag when turning the
-view. Getting grabbed adds a shake impulse and the strangle adds a continuous shake. The view hands, the
+view. A hit adds a shake impulse and snaps the head away from the blow before it eases back. The view hands, the
 camcorder and the interaction ray are children of the camera, so they all move with these effects.
 
 ## Rendering
@@ -52,11 +52,11 @@ Scenes and their scripts live together, grouped by feature.
 
 | Folder | Contents |
 |---|---|
-| `player/` | First-person controller (movement, crouch, hiding, being grabbed), procedural camera effects and first-person hands |
+| `player/` | First-person controller (movement, crouch, hiding, getting hit, dying), procedural camera effects and first-person hands |
 | `camcorder/` | Camcorder logic, recording HUD and the screen-effect shader |
-| `interaction/` | `IInteractable` interface and the look-at interactor |
+| `interaction/` | `IInteractable` and `IHidingSpot` interfaces, the look-at interactor and the scripted moves into hiding spots |
 | `objectives/` | The on-screen objective and the trigger areas that hand out new ones |
-| `enemy/` | Stalker AI (patrol, hearing, sight, chase, search), its voice and its strangle attack |
+| `enemy/` | Stalker AI (patrol, hearing, sight, chase, punches, searching hiding spots) and its voice |
 | `props/` | Interactable objects (doors, lockers, batteries), furniture (beds, tables, chairs, a TV) and the grounds' props (trees, fountain, lamps, cars, fence) |
 | `levels/` | Levels and their shared environment |
 | `lighting/` | Light behaviours such as flickering, with its buzz |
@@ -80,11 +80,15 @@ to the building. Behind the corridor's south end a door opens onto stairs down t
 on a paved plaza, benches and street lamps, a parking lot of cars under tarps, and a road out to a locked iron
 gate in the chain-link fence around it all. The building stands on a 3 m concrete base, so the balcony overlooks
 the grounds. There are doors to open,
-lockers to hide in and spare batteries lying around,
-and a masked surgeon that patrols, hears footsteps, chases on sight and catches players it sees hiding.
-When it catches you it grabs you by the shoulders and strangles you.
+rows of lockers to hide in, beds to crawl under and spare batteries lying around,
+and a masked surgeon that patrols, hears footsteps, chases on sight and punches you when it catches up.
+Each hit shoves you back, snaps your head away, flashes the screen red and leaves your ears ringing, and the
+edges of the view stay redder the more hurt you are; the fourth hit knocks you down. Between hits you can run:
+you are faster than it when you sprint. Where it loses you it checks a couple of hiding spots nearby at random,
+tearing lockers open and kneeling to look under beds, and drags out whoever it finds to hit them again. It
+always finds a player it saw hiding.
 Everything that matters for the feel has a sound: footsteps on every surface, doors, lockers, the camcorder,
-the enemy's breathing, steps, roars and grunts, the strangling, the player's breathing and racing heart, humming
+the enemy's breathing, steps, roars, grunts and punches, the player's breathing, cries and racing heart, humming
 lamps, a television left on, dripping showers and knocking pipes, wind in the vents, windows and trees, things
 moving far off in the building, owls and a dog far off, a rattling fence and creaking gate, flapping tarps, the
 fountain, the building's hum and the night outside, a tension drone and chase music.
@@ -104,11 +108,11 @@ Buses (`default_bus_layout.tres`):
 | Bus | Sends to | Contents |
 |---|---|---|
 | Master | | A hard limiter, so the loudest moments never clip |
-| World | Master | Everything heard from outside the player's head. A low-pass filter muffles it as the player passes out |
+| World | Master | Everything heard from outside the player's head. A low-pass filter muffles it right after a hit |
 | Sfx | World | Footsteps, doors, lockers, the camcorder, the enemy |
 | Ambience | World | The building's hum, the night, the fountain, buzzing lamps |
 | Reverb | World | The room reverb of sounds made inside the building |
-| Player | Master | The player's own body: breathing, heartbeat, choking, the ringing ears, the death sound |
+| Player | Master | The player's own body: breathing, heartbeat, the blows landing, cries of pain, the ringing ears, the death sound |
 | Music | Master | The tension drone, the chase music and the sting |
 
 Footsteps (`audio/Footsteps.cs`, `audio/footsteps.tscn`) play the sound of the ground under the feet. A floor body
@@ -129,8 +133,8 @@ intervals. The fence rattles where someone walks into it.
 
 The player's fear is heard from inside their head (`player/Dread.cs`): the closer the enemy and the more it hunts
 them, the faster their heart beats, one sampled beat at a time, and the harder they breathe (`player/Breathing.cs`,
-which also gets heavier from sprinting). Hiding in a locker muffles the world through the same low-pass filter that
-choking uses, and the player holds their breath, so only shaky breaths through the nose escape.
+which also gets heavier from sprinting). Hiding muffles the world through the same low-pass filter that dazes
+the player after a hit, and the player holds their breath, so only shaky breaths through the nose escape.
 
 ## Animation
 
@@ -146,13 +150,13 @@ Godot does not notice edits to a bone map, so after changing one, delete the mod
 to reimport it. Importing a Rocketbox FBX logs errors about missing `.tga` files: the FBX still points at the
 author's original textures, which our own materials (`assets/rocketbox/*/*.tres`) replace.
 
-The enemy model is scaled up to about 2.15 m. Its movement speeds are scaled with it so the feet don't slide.
+The enemy model is scaled up to about 2.15 m. Its walking animations play faster or slower to match its speed,
+so the feet don't slide.
 
-The strangle attack (`enemy/StrangleAttack.cs`) is not a canned animation. The enemy lunges in mid-sprint,
-grabs the player's shoulders and shakes them, then pushes them to arm's length and strangles them.
-A `TwoBoneIK3D` modifier moves the hands to grab points on the player (`Player/GrabPoints`) and a
-`LookAtModifier3D` turns the head towards the player's face, so the move fits wherever the player stands.
-The IK needs its elbow pole markers (`LeftElbowPole`, `RightElbowPole`) to solve.
+The enemy punches with the Quaternius jab and cross; the hit lands at the moment the fist is furthest out,
+measured from the animations, and only if the player is still within reach in front of it. It tears lockers
+open with the `Interact` animation and kneels beside beds with `Fixing_Kneeling`. A `LookAtModifier3D` turns
+its head towards the player's face while it punches and into the hiding spot while it checks one.
 
 The player's own hands (`player/view_hands.tscn`) only appear while reaching for something: opening
 or closing a door or locker. They belong to a full body placed around the camera, with its head shrunk away by
@@ -166,9 +170,14 @@ whole view model around the camera until the elbow stays comfortably bent; on sc
 reach but the hand still touches the grip.
 
 Interactions never stop the player abruptly. Doors don't lock the controls at all: the hand pushes the
-door and the player keeps walking. Getting into a locker is one timeline of overlapping steps
-(`Locker.cs`); the walk up to it starts from the player's current velocity along a curve, so it blends
-in from however the player was moving.
+door and the player keeps walking. Getting into a locker or under a bed is one timeline of overlapping steps
+(`interaction/ScriptedMove.cs`); the walk up to it starts from the player's current velocity along a curve, so
+it blends in from however the player was moving. Under a bed the player gets down on the floor and crawls in
+sideways, turning to face out, and watches the room from floor level.
+
+Lockers and beds are hiding spots (`IHidingSpot`): each has a search point where the enemy stands to check it,
+a point it looks at, and a way to drag out whoever hides there. A bed's open side is its local -X, so beds whose
+-X side would face a wall are turned around in the level.
 
 ## Grounds
 

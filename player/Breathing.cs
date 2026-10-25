@@ -30,7 +30,7 @@ public partial class Breathing : Node
 
 	public override void _Process(double delta)
 	{
-		bool isSprinting = Player.IsSprinting && !Player.IsGrabbed;
+		bool isSprinting = Player.IsSprinting;
 		float seconds = isSprinting ? SecondsToExhaust : SecondsToRecover;
 		_exertion = Mathf.MoveToward(_exertion, isSprinting ? 1f : 0f, (float)delta / seconds);
 		_holding = Mathf.MoveToward(_holding, Player.IsHiding ? 1f : 0f, (float)delta / HoldBlendSeconds);

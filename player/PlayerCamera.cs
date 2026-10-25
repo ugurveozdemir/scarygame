@@ -40,7 +40,11 @@ public partial class PlayerCamera : Node3D
 	// Maximum shake offset in metres; the same value is the maximum shake angle in radians.
 	[Export] public float ShakeStrength { get; set; } = 0.03f;
 	[Export] public float ShakeDecay { get; set; } = 2f;
-	[Export] public float ChokeShake { get; set; } = 0.5f;
+
+	[ExportGroup("Flinch")]
+	/// <summary>How far a hit snaps the head away from the blow, in degrees.</summary>
+	[Export] public float FlinchDegrees { get; set; } = 9f;
+	[Export] public float FlinchRecoverSpeed { get; set; } = 5f;
 
 	private const float BobSmoothSpeed = 10f;
 	// The head nods a moment after the foot lands, in radians of bob phase.
@@ -61,6 +65,8 @@ public partial class PlayerCamera : Node3D
 	private float _lookWeight;
 	private float _shake;
 	private float _shakeTime;
+	// Pitch, yaw and roll in degrees.
+	private Vector3 _flinch;
 
 	public override void _Ready()
 	{
@@ -77,18 +83,31 @@ public partial class PlayerCamera : Node3D
 		UpdateLookSway(delta);
 		UpdateFov(delta);
 		UpdateShake(delta);
+		_flinch = _flinch.Lerp(Vector3.Zero, Smoothing(FlinchRecoverSpeed, delta));
 		ApplyTransform();
 	}
 
-	/// <summary>Adds a shake impulse from 0 to 1, e.g. when the player is grabbed.</summary>
+	/// <summary>Adds a shake impulse from 0 to 1, e.g. when the player is hit.</summary>
 	public void AddShake(float amount)
 	{
 		_shake = Mathf.Clamp(_shake + amount, 0f, 1f);
 	}
 
+	/// <summary>
+	/// Snaps the head away from a blow that pushes the player along <paramref name="push"/>, a direction in the
+	/// player's own space. The head then eases back.
+	/// </summary>
+	public void Flinch(Vector3 push)
+	{
+		// Pushed back the head tips up; pushed sideways it turns and tilts with the blow. A straight punch to
+		// the face still lands a little to one side.
+		float side = push.X + (float)GD.RandRange(-0.5, 0.5);
+		_flinch = new Vector3(push.Z, -side, -side) * FlinchDegrees;
+	}
+
 	private void UpdateBob(float delta)
 	{
-		bool isWalking = !Player.IsGrabbed && Player.IsOnFloor() && Player.HorizontalSpeed > 0.1f;
+		bool isWalking = !Player.IsDead && Player.IsOnFloor() && Player.HorizontalSpeed > 0.1f;
 		int steps = StepCount(_bobPhase);
 		_bobPhase += StepsPerSecond(Player.HorizontalSpeed) * Mathf.Tau * delta;
 		if (isWalking && StepCount(_bobPhase) != steps)
@@ -131,8 +150,8 @@ public partial class PlayerCamera : Node3D
 
 	private void UpdateLookSway(float delta)
 	{
-		// Scripted moves and the enemy's grab rotate the body for us; they should not bank the camera.
-		bool canLook = !Player.IsGrabbed && !Player.AreControlsLocked;
+		// Scripted moves rotate the body for us; they should not bank the camera.
+		bool canLook = !Player.AreControlsLocked;
 		float yaw = Player.Rotation.Y;
 		float target = 0f;
 		if (canLook && delta > 0f)
@@ -146,7 +165,7 @@ public partial class PlayerCamera : Node3D
 
 	private void UpdateFov(float delta)
 	{
-		bool isSprinting = !Player.IsGrabbed && !Player.AreControlsLocked && Player.IsSprinting;
+		bool isSprinting = !Player.AreControlsLocked && Player.IsSprinting;
 		float targetFov = _baseFov + (isSprinting ? SprintFovBoost : 0f);
 		Camera.Fov = Mathf.Lerp(Camera.Fov, targetFov, Smoothing(FovSmoothSpeed, delta));
 	}
@@ -159,7 +178,7 @@ public partial class PlayerCamera : Node3D
 
 	private void ApplyTransform()
 	{
-		float shake = (_shake + Player.ChokeAmount * ChokeShake) * ShakeStrength;
+		float shake = _shake * ShakeStrength;
 		float shakeX = Mathf.Sin(_shakeTime) * 0.6f
 			+ Mathf.Sin(_shakeTime * 0.47f + 1.3f) * 0.4f;
 		float shakeY = Mathf.Sin(_shakeTime * 1.13f + 2.1f) * 0.6f
@@ -168,9 +187,9 @@ public partial class PlayerCamera : Node3D
 			+ Mathf.Sin(_shakeTime * 0.37f + 2.5f) * 0.4f;
 
 		Position = _basePosition + _bobOffset + new Vector3(shakeX, shakeY, 0f) * shake;
-		float pitch = Mathf.DegToRad(_bobAngles.X) + shakeY * shake;
-		float yaw = Mathf.DegToRad(_bobAngles.Y - _lookWeight * LookYawLagDegrees) + shakeX * shake;
-		float roll = Mathf.DegToRad(_bobAngles.Z + _lookWeight * LookRollDegrees) + shakeZ * shake;
+		float pitch = Mathf.DegToRad(_bobAngles.X + _flinch.X) + shakeY * shake;
+		float yaw = Mathf.DegToRad(_bobAngles.Y + _flinch.Y - _lookWeight * LookYawLagDegrees) + shakeX * shake;
+		float roll = Mathf.DegToRad(_bobAngles.Z + _flinch.Z + _lookWeight * LookRollDegrees) + shakeZ * shake;
 		Rotation = _baseRotation + new Vector3(pitch, yaw, roll);
 	}
 

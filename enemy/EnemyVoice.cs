@@ -37,13 +37,13 @@ public partial class EnemyVoice : Node
 		_previousState = Enemy.State;
 		_timeToNextWhistle = (float)GD.RandRange(MinWhistleSeconds, MaxWhistleSeconds);
 		Enemy.StateChanged += OnStateChanged;
+		Enemy.PlayerSpotted += OnPlayerSpotted;
 	}
 
 	public override void _Process(double delta)
 	{
 		float dt = (float)delta;
-		bool isHunting = Enemy.State is Enemy.EnemyState.Chase or Enemy.EnemyState.Strangling;
-		_hunting = Mathf.MoveToward(_hunting, isHunting ? 1f : 0f, dt / BreathBlendSeconds);
+		_hunting = Mathf.MoveToward(_hunting, Enemy.IsHunting ? 1f : 0f, dt / BreathBlendSeconds);
 		CalmBreath.VolumeLinear = _calmVolume * (1f - _hunting);
 		HuntingBreath.VolumeLinear = _huntingVolume * _hunting;
 
@@ -71,10 +71,6 @@ public partial class EnemyVoice : Node
 
 		switch (state)
 		{
-			case Enemy.EnemyState.Chase:
-				SpotRoar.Play();
-				_hasChased = true;
-				break;
 			case Enemy.EnemyState.Investigate when _previousState == Enemy.EnemyState.Patrol:
 				SuspiciousGrunt.Play();
 				break;
@@ -84,5 +80,11 @@ public partial class EnemyVoice : Node
 				break;
 		}
 		_previousState = state;
+	}
+
+	private void OnPlayerSpotted()
+	{
+		SpotRoar.Play();
+		_hasChased = true;
 	}
 }

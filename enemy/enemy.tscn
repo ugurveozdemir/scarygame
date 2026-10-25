@@ -1,10 +1,9 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://enemy/Enemy.cs" id="1_enemy"]
 [ext_resource type="PackedScene" path="res://assets/rocketbox/medical_male_04/Medical_Male_04.fbx" id="2_surgeon"]
 [ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual1_standard.glb" id="3_ual1"]
 [ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual2_standard.glb" id="5_ual2"]
-[ext_resource type="Script" path="res://enemy/StrangleAttack.cs" id="4_strangle"]
 [ext_resource type="PackedScene" path="res://audio/footsteps.tscn" id="6_footsteps"]
 [ext_resource type="Script" path="res://audio/SkeletonFootsteps.cs" id="7_skeleton_footsteps"]
 [ext_resource type="Script" path="res://enemy/EnemyVoice.cs" id="8_voice"]
@@ -12,9 +11,6 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/enemy/breath_hunting.ogg" id="10_breath_hunting"]
 [ext_resource type="AudioStream" path="res://assets/sounds/enemy/roar.tres" id="11_roar"]
 [ext_resource type="AudioStream" path="res://assets/sounds/enemy/lunge.tres" id="12_lunge"]
-[ext_resource type="AudioStream" path="res://assets/sounds/enemy/grab.wav" id="13_grab"]
-[ext_resource type="AudioStream" path="res://assets/sounds/enemy/shake.wav" id="14_shake"]
-[ext_resource type="AudioStream" path="res://assets/sounds/enemy/choke.wav" id="15_choke"]
 [ext_resource type="AudioStream" path="res://assets/sounds/enemy/grunt.tres" id="16_grunt"]
 [ext_resource type="AudioStream" path="res://assets/sounds/enemy/snort.tres" id="17_snort"]
 [ext_resource type="AudioStream" path="res://assets/sounds/enemy/growl.tres" id="18_growl"]
@@ -24,7 +20,7 @@
 radius = 0.38
 height = 2.15
 
-[node name="Enemy" type="CharacterBody3D" node_paths=PackedStringArray("AnimationPlayer", "Eyes", "NavigationAgent", "DoorCheck", "StrangleAttack")]
+[node name="Enemy" type="CharacterBody3D" node_paths=PackedStringArray("AnimationPlayer", "Eyes", "NavigationAgent", "DoorCheck", "HeadLookAt", "PunchSound")]
 collision_layer = 4
 script = ExtResource("1_enemy")
 AnimationPlayer = NodePath("Model/AnimationPlayer")
@@ -33,7 +29,8 @@ Ual2Animations = ExtResource("5_ual2")
 Eyes = NodePath("Eyes")
 NavigationAgent = NodePath("NavigationAgent")
 DoorCheck = NodePath("DoorCheck")
-StrangleAttack = NodePath("StrangleAttack")
+HeadLookAt = NodePath("Model/GeneralSkeleton/HeadLookAt")
+PunchSound = NodePath("Sounds/Punch")
 
 [node name="Collision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.075, 0)
@@ -42,55 +39,12 @@ shape = SubResource("CapsuleShape3D_body")
 [node name="Model" parent="." instance=ExtResource("2_surgeon")]
 transform = Transform3D(-1.18, 0, 0, 0, 1.18, 0, 0, 0, -1.18, 0, 0, 0)
 
-[node name="ArmsIK" type="TwoBoneIK3D" parent="Model/GeneralSkeleton"]
-influence = 0.0
-setting_count = 2
-settings/0/target_node = NodePath("../../../LeftHandTarget")
-settings/0/pole_node = NodePath("../../../LeftElbowPole")
-settings/0/root_bone_name = "LeftUpperArm"
-settings/0/middle_bone_name = "LeftLowerArm"
-settings/0/end_bone_name = "LeftHand"
-settings/1/target_node = NodePath("../../../RightHandTarget")
-settings/1/pole_node = NodePath("../../../RightElbowPole")
-settings/1/root_bone_name = "RightUpperArm"
-settings/1/middle_bone_name = "RightLowerArm"
-settings/1/end_bone_name = "RightHand"
-
 [node name="HeadLookAt" type="LookAtModifier3D" parent="Model/GeneralSkeleton"]
 influence = 0.0
 bone_name = "Head"
 
 [node name="Eyes" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.98, -0.14)
-
-[node name="VictimLookTarget" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.66, -0.1)
-
-[node name="LeftHandTarget" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 1, -0.35)
-
-[node name="RightHandTarget" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 1, -0.35)
-
-[node name="LeftElbowPole" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 1.5, -0.1)
-
-[node name="RightElbowPole" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 1.5, -0.1)
-
-[node name="StrangleAttack" type="Node" parent="." node_paths=PackedStringArray("Body", "VictimLookTarget", "Skeleton", "ArmsIK", "HeadLookAt", "LeftHandTarget", "RightHandTarget", "LungeSound", "GrabSound", "ShakeSound", "ChokeSound")]
-script = ExtResource("4_strangle")
-Body = NodePath("..")
-VictimLookTarget = NodePath("../VictimLookTarget")
-Skeleton = NodePath("../Model/GeneralSkeleton")
-ArmsIK = NodePath("../Model/GeneralSkeleton/ArmsIK")
-HeadLookAt = NodePath("../Model/GeneralSkeleton/HeadLookAt")
-LeftHandTarget = NodePath("../LeftHandTarget")
-RightHandTarget = NodePath("../RightHandTarget")
-LungeSound = NodePath("../Sounds/Lunge")
-GrabSound = NodePath("../Sounds/Grab")
-ShakeSound = NodePath("../Sounds/Shake")
-ChokeSound = NodePath("../Sounds/Choke")
 
 [node name="NavigationAgent" type="NavigationAgent3D" parent="."]
 path_desired_distance = 0.5
@@ -154,33 +108,12 @@ unit_size = 8.0
 max_distance = 60.0
 bus = &"Sfx"
 
-[node name="Lunge" type="AudioStreamPlayer3D" parent="Sounds"]
+[node name="Punch" type="AudioStreamPlayer3D" parent="Sounds"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, -0.15)
 stream = ExtResource("12_lunge")
 unit_size = 6.0
 max_distance = 40.0
 bus = &"Sfx"
-
-[node name="Grab" type="AudioStreamPlayer3D" parent="Sounds"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, -0.45)
-stream = ExtResource("13_grab")
-unit_size = 3.0
-max_distance = 25.0
-bus = &"Sfx"
-
-[node name="Shake" type="AudioStreamPlayer3D" parent="Sounds"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, -0.45)
-stream = ExtResource("14_shake")
-unit_size = 3.0
-max_distance = 25.0
-bus = &"Sfx"
-
-[node name="Choke" type="AudioStreamPlayer3D" parent="Sounds"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.55)
-stream = ExtResource("15_choke")
-unit_size = 3.0
-max_distance = 25.0
-bus = &"Player"
 
 [node name="SuspiciousGrunt" type="AudioStreamPlayer3D" parent="Sounds"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, -0.15)

@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://camcorder/camcorder.tscn" id="2_camcorder"]
 [ext_resource type="Script" uid="uid://31tf3fbhx061" path="res://interaction/Interactor.cs" id="3_interactor"]
 [ext_resource type="Script" uid="uid://bedjhor70jvv7" path="res://player/DeathScreen.cs" id="4_death_screen"]
-[ext_resource type="Shader" uid="uid://c27qq2feuvekm" path="res://player/choke_overlay.gdshader" id="5_choke_shader"]
+[ext_resource type="Shader" uid="uid://c27qq2feuvekm" path="res://player/hurt_overlay.gdshader" id="5_hurt_shader"]
 [ext_resource type="PackedScene" path="res://player/view_hands.tscn" id="6_view_hands"]
 [ext_resource type="Script" uid="uid://dgfd51ni7krb4" path="res://player/PlayerCamera.cs" id="7_camera"]
 [ext_resource type="PackedScene" path="res://audio/footsteps.tscn" id="8_footsteps"]
@@ -20,6 +20,7 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/player/cloth.tres" id="18_cloth"]
 [ext_resource type="AudioStream" uid="uid://4woh0v35vty8" path="res://assets/sounds/player/held_breath.ogg" id="19_held_breath"]
 [ext_resource type="Script" path="res://objectives/ObjectiveDisplay.cs" id="20_objective"]
+[ext_resource type="AudioStream" path="res://assets/sounds/enemy/punch_hit.tres" id="21_punch_hit"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_standing"]
 radius = 0.35
@@ -37,24 +38,22 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 16
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_choke"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hurt"]
 resource_local_to_scene = true
-shader = ExtResource("5_choke_shader")
-shader_parameter/amount = 0.0
-shader_parameter/tint = Color(0.25, 0, 0, 1)
+shader = ExtResource("5_hurt_shader")
+shader_parameter/hurt = 0.0
+shader_parameter/flash = 0.0
+shader_parameter/tint = Color(0.3, 0, 0, 1)
 
-[node name="Player" type="CharacterBody3D" unique_id=2075214660 node_paths=PackedStringArray("ClothSound", "CrouchSound", "StandUpSound", "GrabPoints", "LeftShoulder", "RightShoulder", "ThroatLeft", "ThroatRight", "ChokeOverlay", "EarRing", "Head", "CameraRig", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "Hands", "Footsteps", "ObjectiveDisplay")]
+[node name="Player" type="CharacterBody3D" unique_id=2075214660 node_paths=PackedStringArray("ClothSound", "CrouchSound", "StandUpSound", "HurtOverlay", "HitSound", "PainSound", "EarRing", "Head", "CameraRig", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "Hands", "Footsteps", "ObjectiveDisplay")]
 collision_layer = 2
 script = ExtResource("1_player")
 ClothSound = NodePath("Sounds/Cloth")
 CrouchSound = NodePath("Sounds/Crouch")
 StandUpSound = NodePath("Sounds/StandUp")
-GrabPoints = NodePath("GrabPoints")
-LeftShoulder = NodePath("GrabPoints/LeftShoulder")
-RightShoulder = NodePath("GrabPoints/RightShoulder")
-ThroatLeft = NodePath("GrabPoints/ThroatLeft")
-ThroatRight = NodePath("GrabPoints/ThroatRight")
-ChokeOverlay = NodePath("Hud/ChokeOverlay")
+HurtOverlay = NodePath("Hud/HurtOverlay")
+HitSound = NodePath("Sounds/Hit")
+PainSound = NodePath("Sounds/Pain")
 EarRing = NodePath("EarRing")
 Head = NodePath("Head")
 CameraRig = NodePath("Head/CameraRig")
@@ -109,20 +108,6 @@ stream = ExtResource("9_ear_ring")
 autoplay = true
 bus = &"Player"
 
-[node name="GrabPoints" type="Node3D" parent="." unique_id=142444649]
-
-[node name="LeftShoulder" type="Marker3D" parent="GrabPoints" unique_id=1794163240]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 1.4, 0.02)
-
-[node name="RightShoulder" type="Marker3D" parent="GrabPoints" unique_id=1067328434]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 1.4, 0.02)
-
-[node name="ThroatLeft" type="Marker3D" parent="GrabPoints" unique_id=733339780]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05, 1.43, -0.07)
-
-[node name="ThroatRight" type="Marker3D" parent="GrabPoints" unique_id=1325775216]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 1.43, -0.07)
-
 [node name="Hud" type="CanvasLayer" parent="." unique_id=1623080597]
 layer = 3
 
@@ -174,8 +159,8 @@ horizontal_alignment = 1
 autowrap_mode = 3
 script = ExtResource("20_objective")
 
-[node name="ChokeOverlay" type="ColorRect" parent="Hud" unique_id=315879115]
-material = SubResource("ShaderMaterial_choke")
+[node name="HurtOverlay" type="ColorRect" parent="Hud" unique_id=315879115]
+material = SubResource("ShaderMaterial_hurt")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -261,6 +246,15 @@ bus = &"Player"
 [node name="Gasp" type="AudioStreamPlayer" parent="Sounds" unique_id=1865934558]
 stream = ExtResource("17_gasp")
 volume_db = -3.0
+bus = &"Player"
+
+[node name="Hit" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("21_punch_hit")
+bus = &"Player"
+
+[node name="Pain" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("17_gasp")
+pitch_scale = 0.8
 bus = &"Player"
 
 [node name="Breathing" type="Node" parent="." unique_id=1680420066 node_paths=PackedStringArray("Player", "Breath", "HeldBreath")]

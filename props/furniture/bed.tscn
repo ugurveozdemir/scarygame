@@ -1,7 +1,10 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene format=3]
 
 [ext_resource type="Material" path="res://materials/hospital_metal.tres" id="1_metal"]
 [ext_resource type="Material" path="res://materials/stained_fabric.tres" id="2_fabric"]
+[ext_resource type="Script" path="res://props/furniture/Bed.cs" id="3_bed"]
+[ext_resource type="AudioStream" path="res://assets/sounds/player/cloth.tres" id="4_cloth"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/bed_creak.tres" id="5_creak"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_mattress"]
 material = ExtResource("2_fabric")
@@ -42,7 +45,16 @@ rings = 1
 [sub_resource type="BoxShape3D" id="BoxShape3D_bed"]
 size = Vector3(0.94, 0.6, 2)
 
-[node name="Bed" type="StaticBody3D"]
+[node name="Bed" type="StaticBody3D" node_paths=PackedStringArray("CrawlSound", "CreakSound", "ApproachPoint", "HidePoint", "ExitPoint", "SearchPoint", "LookPoint")]
+collision_layer = 9
+script = ExtResource("3_bed")
+CrawlSound = NodePath("Sounds/Crawl")
+CreakSound = NodePath("Sounds/Creak")
+ApproachPoint = NodePath("ApproachPoint")
+HidePoint = NodePath("HidePoint")
+ExitPoint = NodePath("ExitPoint")
+SearchPoint = NodePath("SearchPoint")
+LookPoint = NodePath("LookPoint")
 
 [node name="Collision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
@@ -87,3 +99,36 @@ mesh = SubResource("CylinderMesh_foot_post")
 [node name="FootRail" type="MeshInstance3D" parent="."]
 transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 0.72, 0.98)
 mesh = SubResource("CylinderMesh_rail")
+
+[node name="ApproachPoint" type="Marker3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -0.9, 0, 0)
+
+[node name="HidePoint" type="Marker3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.05, 0, 0)
+
+[node name="ExitPoint" type="Marker3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.75, 0, 0.35)
+
+[node name="SearchPoint" type="Marker3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -1.25, 0, -0.45)
+
+[node name="LookPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+
+[node name="Sounds" type="Node3D" parent="."]
+
+[node name="Crawl" type="AudioStreamPlayer3D" parent="Sounds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.2, 0)
+stream = ExtResource("4_cloth")
+volume_db = -6.0
+unit_size = 2.0
+max_distance = 15.0
+bus = &"Sfx"
+
+[node name="Creak" type="AudioStreamPlayer3D" parent="Sounds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+stream = ExtResource("5_creak")
+volume_db = -8.0
+unit_size = 2.0
+max_distance = 15.0
+bus = &"Sfx"

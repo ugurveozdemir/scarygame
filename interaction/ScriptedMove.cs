@@ -1,0 +1,64 @@
+using System;
+using Godot;
+
+/// <summary>
+/// A timeline of steps that move the player along a scripted path, like getting into a hiding spot.
+/// Every step starts after its own delay, so steps can overlap. The player can't walk, look or interact
+/// until the move finishes.
+/// </summary>
+public class ScriptedMove
+{
+	private readonly Player _player;
+	private Transform3D _walkStart;
+
+	public ScriptedMove(Node owner, Player player)
+	{
+		_player = player;
+		player.LockControls();
+		// A parallel tween is a timeline: every step starts after its own delay.
+		Tween = owner.CreateTween().SetParallel().SetProcessMode(Tween.TweenProcessMode.Physics);
+	}
+
+	/// <summary>The underlying timeline, for steps that move something other than the player.</summary>
+	public Tween Tween { get; }
+
+	public void At(float time, Action action)
+	{
+		Tween.TweenCallback(Callable.From(action)).SetDelay(time);
+	}
+
+	/// <summary>Gives the player their controls back at <paramref name="time"/>.</summary>
+	public void FinishAt(float time)
+	{
+		At(time, _player.UnlockControls);
+	}
+
+	public void Kill()
+	{
+		Tween.Kill();
+	}
+
+	/// <summary>
+	/// Walks the player to <paramref name="point"/>, starting at <paramref name="startVelocity"/> and ending at rest.
+	/// The path is a cubic Hermite curve, so a player who was already walking curves smoothly into it.
+	/// </summary>
+	public void Walk(Node3D point, float headPitchDegrees, float start, float seconds, Vector3 startVelocity = default)
+	{
+		At(start, () => _walkStart = _player.GlobalTransform);
+		Tween.TweenMethod(Callable.From<float>(t =>
+		{
+			Transform3D end = point.GlobalTransform;
+			float t2 = t * t;
+			float t3 = t2 * t;
+			Vector3 position = (2f * t3 - 3f * t2 + 1f) * _walkStart.Origin
+				+ (t3 - 2f * t2 + t) * seconds * startVelocity
+				+ (3f * t2 - 2f * t3) * end.Origin;
+			// The player only turns around the vertical axis, so blending the yaw is enough
+			// and always yields a clean rotation.
+			float yaw = Mathf.LerpAngle(_walkStart.Basis.GetEuler().Y, end.Basis.GetEuler().Y, Mathf.SmoothStep(0f, 1f, t));
+			_player.GlobalTransform = new Transform3D(new Basis(Vector3.Up, yaw), position);
+		}), 0f, 1f, seconds).SetDelay(start);
+		Tween.TweenProperty(_player.Head, "rotation:x", Mathf.DegToRad(headPitchDegrees), seconds)
+			.SetDelay(start).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
+	}
+}

@@ -34,9 +34,9 @@ public partial class TensionDrone : Node
 	{
 		switch (Enemy.State)
 		{
-			case Enemy.EnemyState.Chase or Enemy.EnemyState.Strangling:
+			case Enemy.EnemyState.Chase or Enemy.EnemyState.Attack:
 				return 0f;
-			case Enemy.EnemyState.Investigate when Player.GlobalPosition.DistanceTo(Enemy.GlobalPosition) < SearchDistance:
+			case Enemy.EnemyState.Investigate or Enemy.EnemyState.Search when Player.GlobalPosition.DistanceTo(Enemy.GlobalPosition) < SearchDistance:
 				return 1f;
 			default:
 				return CalmVolume;

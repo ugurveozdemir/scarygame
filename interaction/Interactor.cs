@@ -27,7 +27,7 @@ public partial class Interactor : RayCast3D
 
 	private IInteractable FindTarget()
 	{
-		if (Player.IsGrabbed || Player.AreControlsLocked)
+		if (Player.AreControlsLocked)
 			return null;
 
 		// While hiding, the only thing the player can use is their hiding spot.

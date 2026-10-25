@@ -23,8 +23,7 @@ public partial class ChaseMusic : Node
 	private void OnEnemyStateChanged(Enemy.EnemyState state)
 	{
 		_fade?.Kill();
-		bool isChasing = state is Enemy.EnemyState.Chase or Enemy.EnemyState.Strangling;
-		if (isChasing)
+		if (Enemy.IsHunting)
 		{
 			if (!Music.Playing)
 			{
