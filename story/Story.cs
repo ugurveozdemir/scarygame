@@ -36,12 +36,19 @@ public partial class Story : Node
 	[Export] public ServiceLift Lift { get; set; }
 	[Export] public Enemy Sentinel { get; set; }
 
+	[ExportGroup("Act 3")]
+	/// <summary>The first memo of the player's own, when they reach the floor no earlier trial reached.</summary>
+	[Export] public string UpperFloorMemo { get; set; } = "";
+
+	private bool _hasBeenUpstairs;
+
 	public override void _Ready()
 	{
 		HideoutDoor.TriedWhileBarred += OnHideoutDoorTried;
 		Trial13Tape.Finished += OnTapeWatched;
 		MainBreaker.Thrown += OnBreakerThrown;
 		Lift.DoorsOpened += OnLiftDoorsOpened;
+		Lift.Arrived += OnLiftArrived;
 		PlayPrologue();
 	}
 
@@ -109,6 +116,15 @@ public partial class Story : Node
 		pop.GlobalPosition = light.GlobalPosition;
 		pop.Finished += pop.QueueFree;
 		pop.Play();
+	}
+
+	private void OnLiftArrived(bool isUpstairs)
+	{
+		if (!isUpstairs || _hasBeenUpstairs)
+			return;
+
+		_hasBeenUpstairs = true;
+		Player.ObjectiveDisplay.AnnounceOwn(UpperFloorMemo);
 	}
 
 	/// <summary>The lift's chime carries through the floor: the Sentinel comes to see who called it.</summary>

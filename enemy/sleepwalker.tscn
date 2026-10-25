@@ -1,0 +1,75 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://enemy/Sleepwalker.cs" id="1_sleepwalker"]
+[ext_resource type="PackedScene" path="res://assets/rocketbox/male_adult_12/Male_Adult_12.fbx" id="2_body"]
+[ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual1_standard.glb" id="3_ual1"]
+[ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual2_standard.glb" id="4_ual2"]
+[ext_resource type="AudioStream" path="res://assets/sounds/enemy/roar.tres" id="5_roar"]
+[ext_resource type="AudioStream" path="res://assets/sounds/enemy/breath_calm.ogg" id="6_breath"]
+[ext_resource type="Material" path="res://materials/stained_fabric.tres" id="7_fabric"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.32
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pale"]
+transparency = 1
+albedo_color = Color(0.68, 0.7, 0.72, 0.42)
+roughness = 0.9
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_blindfold"]
+material = ExtResource("7_fabric")
+top_radius = 0.105
+bottom_radius = 0.11
+height = 0.07
+radial_segments = 16
+rings = 1
+
+[node name="Sleepwalker" type="CharacterBody3D" node_paths=PackedStringArray("NavigationAgent", "AnimationPlayer", "Shriek")]
+collision_layer = 4
+script = ExtResource("1_sleepwalker")
+NavigationAgent = NodePath("NavigationAgent")
+AnimationPlayer = NodePath("Body/AnimationPlayer")
+Ual1Animations = ExtResource("3_ual1")
+Ual2Animations = ExtResource("4_ual2")
+PaleOverlay = SubResource("StandardMaterial3D_pale")
+Shriek = NodePath("Shriek")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Body" parent="." instance=ExtResource("2_body")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="Blindfold" type="BoneAttachment3D" parent="Body/GeneralSkeleton"]
+bone_name = "Head"
+
+[node name="Band" type="MeshInstance3D" parent="Body/GeneralSkeleton/Blindfold"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 0.015)
+mesh = SubResource("CylinderMesh_blindfold")
+
+[node name="NavigationAgent" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.5
+target_desired_distance = 0.5
+height = 1.8
+radius = 0.32
+
+[node name="Shriek" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+stream = ExtResource("5_roar")
+volume_db = -4.0
+pitch_scale = 1.45
+unit_size = 6.0
+max_distance = 40.0
+bus = &"Sfx"
+
+[node name="Breath" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+stream = ExtResource("6_breath")
+volume_db = -10.0
+pitch_scale = 1.2
+unit_size = 1.5
+max_distance = 10.0
+autoplay = true
+bus = &"Sfx"

@@ -84,7 +84,7 @@
 [ext_resource type="Material" path="res://materials/door_wood.tres" id="82_wood"]
 [ext_resource type="Script" path="res://story/TapeRecording.cs" id="83_tape_recording"]
 [ext_resource type="Script" path="res://props/archive/TapeDeck.cs" id="84_tape_deck"]
-[ext_resource type="Script" path="res://props/archive/TapeRow.cs" id="85_tape_row"]
+[ext_resource type="Script" path="res://props/decor/ItemRow.cs" id="85_item_row"]
 [ext_resource type="Shader" path="res://materials/tape_screen.gdshader" id="86_tape_shader"]
 [ext_resource type="PackedScene" path="res://assets/rocketbox/medical_male_04/Medical_Male_04.fbx" id="87_surgeon_model"]
 [ext_resource type="AnimationLibrary" path="res://assets/quaternius/ual1_standard.glb" id="88_ual1"]
@@ -108,6 +108,13 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/story/keypad_beep.wav" id="106_keypad_beep"]
 [ext_resource type="AudioStream" path="res://assets/sounds/story/keypad_accept.wav" id="107_keypad_accept"]
 [ext_resource type="AudioStream" path="res://assets/sounds/story/keypad_error.wav" id="108_keypad_error"]
+[ext_resource type="PackedScene" path="res://enemy/sleepwalker.tscn" id="109_sleepwalker"]
+[ext_resource type="Script" path="res://props/decor/GlassShards.cs" id="110_glass_shards"]
+[ext_resource type="Script" path="res://props/office/LockConsole.cs" id="111_lock_console"]
+[ext_resource type="Script" path="res://props/office/KeyPickup.cs" id="112_key_pickup"]
+[ext_resource type="Script" path="res://props/security/SecurityFeed.cs" id="113_security_feed"]
+[ext_resource type="Script" path="res://props/lift/LiftButton.cs" id="114_lift_button"]
+[ext_resource type="AudioStream" path="res://assets/sounds/camcorder/pick_up_battery.wav" id="115_pick_up"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_stair_ramp"]
 size = Vector3(3, 0.2, 5.92)
@@ -332,6 +339,95 @@ content_margin_left = 40.0
 content_margin_top = 30.0
 content_margin_right = 40.0
 content_margin_bottom = 30.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_glass_shard"]
+transparency = 1
+albedo_color = Color(0.85, 0.9, 0.9, 0.55)
+metallic = 0.3
+roughness = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_one_way_mirror"]
+transparency = 1
+albedo_color = Color(0.25, 0.28, 0.3, 0.22)
+metallic = 0.6
+roughness = 0.05
+
+[sub_resource type="QuadMesh" id="QuadMesh_mirror"]
+material = SubResource("StandardMaterial3D_one_way_mirror")
+size = Vector2(6, 1.3)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_security_screen"]
+render_priority = 0
+shader = ExtResource("86_tape_shader")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_medicine"]
+albedo_color = Color(0.85, 0.85, 0.82, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_console_screen"]
+albedo_color = Color(0.02, 0.08, 0.03, 1)
+emission_enabled = true
+emission = Color(0.1, 0.6, 0.2, 1)
+emission_energy_multiplier = 0.6
+
+[sub_resource type="QuadMesh" id="QuadMesh_console_screen"]
+material = SubResource("StandardMaterial3D_console_screen")
+size = Vector2(0.38, 0.28)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_brass"]
+albedo_color = Color(0.75, 0.6, 0.3, 1)
+metallic = 0.9
+roughness = 0.35
+
+[sub_resource type="BoxMesh" id="BoxMesh_key"]
+material = SubResource("StandardMaterial3D_brass")
+size = Vector3(0.07, 0.006, 0.02)
+
+[sub_resource type="TorusMesh" id="TorusMesh_key_ring"]
+material = SubResource("StandardMaterial3D_brass")
+inner_radius = 0.012
+outer_radius = 0.02
+
+[sub_resource type="BoxMesh" id="BoxMesh_key_tag"]
+material = SubResource("StandardMaterial3D_sticky_note")
+size = Vector3(0.05, 0.003, 0.03)
+
+[sub_resource type="BoxMesh" id="BoxMesh_button_panel"]
+material = SubResource("StandardMaterial3D_black_plastic")
+size = Vector3(0.12, 0.2, 0.02)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_glass_corridor"]
+size = Vector3(1.7, 1.2, 3.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_glass_pharmacy"]
+size = Vector3(6.6, 1.2, 3.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_indoors_upper"]
+size = Vector3(23.2, 3.4, 28.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_observation_room"]
+size = Vector3(8.8, 2.8, 3.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tread"]
+material = ExtResource("15_duct")
+size = Vector3(1.2, 0.04, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fire_escape_ramp"]
+size = Vector3(1.2, 0.1, 6.19)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fire_escape_steps"]
+size = Vector3(1.6, 6.8, 12.4)
+
+[sub_resource type="SphereMesh" id="SphereMesh_head"]
+material = ExtResource("68_fabric")
+radius = 0.11
+height = 0.22
+
+[sub_resource type="SphereMesh" id="SphereMesh_electrode_cap"]
+material = SubResource("StandardMaterial3D_black_plastic")
+radius = 0.12
+height = 0.12
+is_hemisphere = true
 
 [node name="TestLevel" type="Node3D"]
 
@@ -3133,6 +3229,7 @@ Remnant = NodePath("../Remnant")
 BreakerMemo = "It got out again. You only see it through night vision. Don't let it touch you. The lift is in the left middle room upstairs."
 Lift = NodePath("../Act2/ServiceLift")
 Sentinel = NodePath("../Enemy")
+UpperFloorMemo = "No trial got this far before. From here the memos are mine. They can't see, but they hear everything. Stay low."
 
 [node name="StoryScreen" type="CanvasLayer" parent="."]
 layer = 10
@@ -3529,91 +3626,91 @@ pitch_scale = 0.9
 
 [node name="TapesEast12" type="Node3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -5.28, -11.38)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 31
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesEast13" type="Node3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.68, -11.38)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesEast14" type="Node3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.08, -11.38)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesEast22" type="Node3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -5.28, -9.48)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesEast23" type="Node3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.68, -9.48)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesEast24" type="Node3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.08, -9.48)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 31
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesEast32" type="Node3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -5.28, -7.58)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesEast33" type="Node3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.68, -7.58)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 31
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesEast34" type="Node3D" parent="Act2"]
 transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 8.45, -4.08, -7.58)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 48
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesNorth12" type="Node3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.78, -5.28, -12.95)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 37
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesNorth13" type="Node3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.78, -4.68, -12.95)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 44
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesNorth14" type="Node3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.78, -4.08, -12.95)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 37
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesNorth22" type="Node3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78, -5.28, -12.95)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 37
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesNorth23" type="Node3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78, -4.68, -12.95)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 37
 Material = SubResource("StandardMaterial3D_tape_case")
 
 [node name="TapesNorth24" type="Node3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78, -4.08, -12.95)
-script = ExtResource("85_tape_row")
+script = ExtResource("85_item_row")
 Count = 37
 Material = SubResource("StandardMaterial3D_tape_case")
 
@@ -3864,10 +3961,11 @@ Lair = NodePath("../Act2/RemnantLair")
 [node name="RemnantLair" type="Marker3D" parent="Act2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0, -6, 3.5)
 
-[node name="ServiceLift" type="Node3D" parent="Act2" node_paths=PackedStringArray("GroundLanding", "GroundCar", "RideSound")]
+[node name="ServiceLift" type="Node3D" parent="Act2" node_paths=PackedStringArray("GroundLanding", "UpperLanding", "GroundCar", "RideSound")]
 script = ExtResource("91_lift")
 Code = "4719"
 GroundLanding = NodePath("GroundLanding")
+UpperLanding = NodePath("UpperLanding")
 GroundCar = NodePath("GroundCar")
 RideSound = NodePath("RideSound")
 
@@ -4035,3 +4133,1249 @@ horizontal_alignment = 1
 stream = ExtResource("106_keypad_beep")
 volume_db = -10.0
 bus = &"Sfx"
+
+[node name="UpperShell" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.9, 0)
+size = Vector3(23.2, 3.4, 28.6)
+material = ExtResource("16_brick")
+[node name="UpperCorridor" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.9, 0)
+operation = 2
+size = Vector3(3.4, 3, 27.6)
+material = ExtResource("2_wall")
+[node name="DormWest1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 4.9, -9.3)
+operation = 2
+size = Vector3(9, 3, 9)
+material = ExtResource("2_wall")
+[node name="UpperLiftLobby" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 4.9, 0)
+operation = 2
+size = Vector3(9, 3, 8.4)
+material = ExtResource("2_wall")
+[node name="DormWest3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 4.9, 9.3)
+operation = 2
+size = Vector3(9, 3, 9)
+material = ExtResource("2_wall")
+[node name="ChiefOffice" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.9, -10.7)
+operation = 2
+size = Vector3(9, 3, 6.2)
+material = ExtResource("2_wall")
+[node name="ObservationRoom" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.9, -5.3)
+operation = 2
+size = Vector3(9, 3, 3.8)
+material = ExtResource("2_wall")
+[node name="SleepLab" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.9, 1.55)
+operation = 2
+size = Vector3(9, 3, 9.3)
+material = ExtResource("2_wall")
+[node name="Pharmacy" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.9, 10.2)
+operation = 2
+size = Vector3(9, 3, 7.2)
+material = ExtResource("2_wall")
+[node name="DoorwayDormWest1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.85, 4.625, -9.3)
+operation = 2
+size = Vector3(0.4, 2.45, 1.1)
+material = ExtResource("2_wall")
+[node name="DoorwayUpperLiftLobby" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.85, 4.625, 0)
+operation = 2
+size = Vector3(0.4, 2.45, 1.6)
+material = ExtResource("2_wall")
+[node name="DoorwayDormWest3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.85, 4.625, 9.3)
+operation = 2
+size = Vector3(0.4, 2.45, 1.1)
+material = ExtResource("2_wall")
+[node name="DoorwayChiefOffice" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.85, 4.625, -10.7)
+operation = 2
+size = Vector3(0.4, 2.45, 1.1)
+material = ExtResource("2_wall")
+[node name="DoorwayObservation" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.85, 4.625, -5.3)
+operation = 2
+size = Vector3(0.4, 2.45, 1.1)
+material = ExtResource("2_wall")
+[node name="DoorwayPharmacy" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.85, 4.625, 10.2)
+operation = 2
+size = Vector3(0.4, 2.45, 1.1)
+material = ExtResource("2_wall")
+[node name="DoorwayFireEscape" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3, 4.625, 11.5)
+operation = 2
+size = Vector3(0.8, 2.45, 1.1)
+material = ExtResource("2_wall")
+[node name="OneWayMirrorWindow" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.9, -3.25)
+operation = 2
+size = Vector3(6, 1.3, 0.5)
+material = ExtResource("2_wall")
+[node name="UpperLiftShaft" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.85, 4.9, 0)
+size = Vector3(2.3, 3, 3.2)
+material = ExtResource("2_wall")
+[node name="UpperLiftCar" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.9, 4.6, 0)
+operation = 2
+size = Vector3(1.9, 2.4, 1.9)
+material = ExtResource("15_duct")
+[node name="UpperLiftDoorway" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.82, 4.45, 0)
+operation = 2
+size = Vector3(0.3, 2.1, 1.1)
+material = ExtResource("15_duct")
+[node name="WindowDormWest1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, -9.3)
+operation = 2
+size = Vector3(0.8, 1.2, 1.4)
+material = ExtResource("2_wall")
+[node name="WindowDormWest1Bar1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, -9.86)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowDormWest1Bar2" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, -9.58)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowDormWest1Bar3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, -9.3)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowDormWest1Bar4" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, -9.02)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowDormWest1Bar5" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, -8.74)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowDormWest3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, 9.3)
+operation = 2
+size = Vector3(0.8, 1.2, 1.4)
+material = ExtResource("2_wall")
+[node name="WindowDormWest3Bar1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, 8.74)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowDormWest3Bar2" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, 9.02)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowDormWest3Bar3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, 9.3)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowDormWest3Bar4" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, 9.58)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowDormWest3Bar5" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 5.1, 9.86)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowChiefOffice" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3, 5.1, -10.7)
+operation = 2
+size = Vector3(0.8, 1.2, 1.4)
+material = ExtResource("2_wall")
+[node name="WindowChiefOfficeBar1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3, 5.1, -11.26)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowChiefOfficeBar2" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3, 5.1, -10.98)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowChiefOfficeBar3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3, 5.1, -10.7)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowChiefOfficeBar4" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3, 5.1, -10.42)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowChiefOfficeBar5" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3, 5.1, -10.14)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowUpperCorridorSouth" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.1, 14.05)
+operation = 2
+size = Vector3(1.4, 1.2, 0.8)
+material = ExtResource("2_wall")
+[node name="WindowUpperCorridorSouthBar1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.56, 5.1, 14.05)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowUpperCorridorSouthBar2" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.28, 5.1, 14.05)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowUpperCorridorSouthBar3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.1, 14.05)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowUpperCorridorSouthBar4" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 5.1, 14.05)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="WindowUpperCorridorSouthBar5" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.56, 5.1, 14.05)
+size = Vector3(0.03, 1.2, 0.03)
+material = ExtResource("3_prop")
+[node name="ChiefDesk" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 3.775, -10)
+size = Vector3(1.8, 0.75, 0.8)
+material = ExtResource("82_wood")
+[node name="ChiefBookcase" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8, 4.4, -13.55)
+size = Vector3(3, 2, 0.4)
+material = ExtResource("82_wood")
+[node name="ObservationDesk" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 3.775, -6.75)
+size = Vector3(6.4, 0.75, 0.7)
+material = ExtResource("15_duct")
+[node name="NeuralFilter" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.15, 1.5)
+size = Vector3(1.2, 1.5, 0.8)
+material = ExtResource("15_duct")
+[node name="PharmacyCounter" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 3.85, 9)
+size = Vector3(0.6, 0.9, 2.4)
+material = ExtResource("82_wood")
+[node name="LabMachine1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.75, 4.2, -0.8)
+size = Vector3(0.4, 1.6, 0.5)
+material = ExtResource("15_duct")
+[node name="LabMachine2" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.75, 4.2, 1.4)
+size = Vector3(0.4, 1.6, 0.5)
+material = ExtResource("15_duct")
+[node name="LabMachine3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.75, 4.2, 3.6)
+size = Vector3(0.4, 1.6, 0.5)
+material = ExtResource("15_duct")
+[node name="LabMachine4" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.75, 4.2, 5.8)
+size = Vector3(0.4, 1.6, 0.5)
+material = ExtResource("15_duct")
+
+[node name="FireEscape" type="CSGCombiner3D" parent="Navigation"]
+use_collision = true
+metadata/surface = &"manhole"
+[node name="UpperLanding" type="CSGBox3D" parent="Navigation/FireEscape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 3.3, 11.5)
+size = Vector3(1.4, 0.2, 2.4)
+material = ExtResource("15_duct")
+[node name="MiddleLanding" type="CSGBox3D" parent="Navigation/FireEscape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.1, 4.4)
+size = Vector3(1.4, 0.2, 1.2)
+material = ExtResource("15_duct")
+[node name="UpperLandingRailEast" type="CSGBox3D" parent="Navigation/FireEscape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.97, 4.35, 11.5)
+size = Vector3(0.05, 0.05, 2.4)
+material = ExtResource("15_duct")
+[node name="UpperLandingRailNorth" type="CSGBox3D" parent="Navigation/FireEscape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 4.35, 12.67)
+size = Vector3(1.4, 0.05, 0.05)
+material = ExtResource("15_duct")
+[node name="MiddleLandingRailEast" type="CSGBox3D" parent="Navigation/FireEscape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.97, 1.15, 4.4)
+size = Vector3(0.05, 0.05, 1.2)
+material = ExtResource("15_duct")
+
+[node name="FireEscapeRamp1" type="StaticBody3D" parent="Navigation"]
+transform = Transform3D(1, 0, 0, 0, 0.8561, 0.5169, 0, -0.5169, 0.8561, 12.3, 1.757, 7.676)
+
+[node name="Collision" type="CollisionShape3D" parent="Navigation/FireEscapeRamp1"]
+shape = SubResource("BoxShape3D_fire_escape_ramp")
+
+[node name="FireEscapeRamp2" type="StaticBody3D" parent="Navigation"]
+transform = Transform3D(1, 0, 0, 0, 0.8561, 0.5169, 0, -0.5169, 0.8561, 12.3, -1.443, 1.176)
+
+[node name="Collision" type="CollisionShape3D" parent="Navigation/FireEscapeRamp2"]
+shape = SubResource("BoxShape3D_fire_escape_ramp")
+
+[node name="Act3" type="Node3D" parent="."]
+
+[node name="FireEscapeSteps" type="Node3D" parent="Act3"]
+
+[node name="Flight1Step1" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 3.202, 10.15)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step2" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 3.024, 9.858)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step3" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.847, 9.564)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step4" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.669, 9.269)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step5" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.491, 8.975)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step6" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.313, 8.681)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step7" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.136, 8.386)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step8" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.958, 8.092)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step9" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.78, 7.797)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step10" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.602, 7.503)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step11" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.424, 7.208)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step12" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.247, 6.914)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step13" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 1.069, 6.619)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step14" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.8911, 6.325)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step15" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.7133, 6.031)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step16" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.5356, 5.736)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step17" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.3578, 5.442)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Step18" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.18, 5.147)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight1Rail" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 0.8561, 0.5169, 0, -0.5169, 0.8561, 12.97, 2.7, 7.65)
+size = Vector3(0.05, 0.05, 6.191)
+material = ExtResource("15_duct")
+
+[node name="Flight1Stringer" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 0.8561, 0.5169, 0, -0.5169, 0.8561, 12.95, 1.65, 7.65)
+size = Vector3(0.04, 0.25, 6.191)
+material = ExtResource("15_duct")
+
+[node name="Flight2Step1" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.002222, 3.653)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step2" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -0.1756, 3.358)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step3" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -0.3533, 3.064)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step4" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -0.5311, 2.769)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step5" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -0.7089, 2.475)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step6" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -0.8867, 2.181)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step7" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.064, 1.886)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step8" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.242, 1.592)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step9" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.42, 1.297)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step10" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.598, 1.003)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step11" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.776, 0.7083)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step12" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -1.953, 0.4139)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step13" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -2.131, 0.1194)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step14" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -2.309, -0.175)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step15" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -2.487, -0.4694)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step16" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -2.664, -0.7639)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step17" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -2.842, -1.058)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Step18" type="MeshInstance3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, -3.02, -1.353)
+mesh = SubResource("BoxMesh_tread")
+
+[node name="Flight2Rail" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 0.8561, 0.5169, 0, -0.5169, 0.8561, 12.97, -0.5, 1.15)
+size = Vector3(0.05, 0.05, 6.191)
+material = ExtResource("15_duct")
+
+[node name="Flight2Stringer" type="CSGBox3D" parent="Act3/FireEscapeSteps"]
+transform = Transform3D(1, 0, 0, 0, 0.8561, 0.5169, 0, -0.5169, 0.8561, 12.95, -1.55, 1.15)
+size = Vector3(0.04, 0.25, 6.191)
+material = ExtResource("15_duct")
+
+[node name="DoorChiefOffice" parent="." instance=ExtResource("6_door")]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 1.85, 3.4, -11.2)
+
+[node name="DoorPharmacy" parent="." instance=ExtResource("6_door")]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 1.85, 3.4, 9.7)
+
+[node name="FireDoor" parent="." instance=ExtResource("6_door")]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 11.3, 3.4, 11)
+IsBarred = true
+BarredCaption = "A fire door. The magnetic lock holds it, and the panel beside it reads LOCKDOWN."
+
+[node name="Upper" type="CollisionShape3D" parent="SoundZones/Indoors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.9, 0)
+shape = SubResource("BoxShape3D_indoors_upper")
+
+[node name="GlassCorridor" type="Area3D" parent="SoundZones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 3.9, -6.0)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("43_surface_zone")
+Surface = &"glass"
+
+[node name="Shape" type="CollisionShape3D" parent="SoundZones/GlassCorridor"]
+shape = SubResource("BoxShape3D_glass_corridor")
+
+[node name="GlassPharmacy" type="Area3D" parent="SoundZones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 3.9, 9.4)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("43_surface_zone")
+Surface = &"glass"
+
+[node name="Shape" type="CollisionShape3D" parent="SoundZones/GlassPharmacy"]
+shape = SubResource("BoxShape3D_glass_pharmacy")
+
+[node name="FireEscape" type="Area3D" parent="SoundZones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 0.2, 5.2)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("43_surface_zone")
+Surface = &"manhole"
+
+[node name="Shape" type="CollisionShape3D" parent="SoundZones/FireEscape"]
+shape = SubResource("BoxShape3D_fire_escape_steps")
+
+[node name="GlassCorridorShards" type="Node3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 3.4, -6.0)
+script = ExtResource("110_glass_shards")
+Count = 90
+AreaSize = Vector2(1.6, 2.9)
+Material = SubResource("StandardMaterial3D_glass_shard")
+
+[node name="GlassPharmacyShards" type="Node3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 3.4, 9.4)
+script = ExtResource("110_glass_shards")
+Count = 220
+AreaSize = Vector2(6.4, 3.0)
+Material = SubResource("StandardMaterial3D_glass_shard")
+
+[node name="UpperCorridorNorthLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.1, -7)
+light_color = Color(0.85, 0.92, 1, 1)
+light_energy = 0.3
+shadow_enabled = true
+omni_range = 9.0
+
+[node name="Hum" parent="UpperCorridorNorthLight" instance=ExtResource("48_light_hum")]
+pitch_scale = 0.96
+
+[node name="UpperCorridorSouthLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.1, 6.5)
+light_color = Color(0.85, 0.92, 1, 1)
+light_energy = 0.35
+shadow_enabled = true
+omni_range = 9.0
+script = ExtResource("4_flicker")
+Buzz = NodePath("FlickerSound/Buzz")
+Crackle = NodePath("FlickerSound/Crackle")
+
+[node name="FlickerSound" parent="UpperCorridorSouthLight" instance=ExtResource("40_flicker_sound")]
+
+[node name="DormWest1Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 6.1, -9.3)
+light_color = Color(0.55, 0.65, 1, 1)
+light_energy = 0.18
+shadow_enabled = true
+omni_range = 7.0
+
+[node name="DormWest3Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 6.1, 9.3)
+light_color = Color(0.55, 0.65, 1, 1)
+light_energy = 0.18
+shadow_enabled = true
+omni_range = 7.0
+
+[node name="UpperLiftLobbyLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 6.1, 0)
+light_color = Color(1, 0.86, 0.72, 1)
+light_energy = 0.3
+shadow_enabled = true
+omni_range = 8.0
+
+[node name="Hum" parent="UpperLiftLobbyLight" instance=ExtResource("48_light_hum")]
+pitch_scale = 0.96
+
+[node name="ChiefOfficeLamp" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.3, 4.6, -10.3)
+light_color = Color(1, 0.8, 0.55, 1)
+light_energy = 0.45
+shadow_enabled = true
+omni_range = 5.0
+
+[node name="ObservationGlow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.6, -6.2)
+light_color = Color(0.6, 0.75, 1, 1)
+light_energy = 0.25
+shadow_enabled = true
+omni_range = 4.0
+
+[node name="SleepLabLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 6, 1.5)
+light_color = Color(0.45, 0.6, 1, 1)
+light_energy = 0.45
+shadow_enabled = true
+omni_range = 9.0
+
+[node name="Hum" parent="SleepLabLight" instance=ExtResource("48_light_hum")]
+pitch_scale = 0.96
+
+[node name="PharmacyLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 6.1, 10.2)
+light_color = Color(0.8, 0.95, 0.85, 1)
+light_energy = 0.35
+shadow_enabled = true
+omni_range = 8.0
+script = ExtResource("4_flicker")
+Buzz = NodePath("FlickerSound/Buzz")
+Crackle = NodePath("FlickerSound/Crackle")
+
+[node name="FlickerSound" parent="PharmacyLight" instance=ExtResource("40_flicker_sound")]
+
+[node name="DormWest1Bed1" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -10.15, 3.4, -12.3)
+
+[node name="DormWest1Bed2" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -10.15, 3.4, -10.1)
+
+[node name="DormWest1Bed3" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -10.15, 3.4, -7.9)
+
+[node name="DormWest1Bed4" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -10.15, 3.4, -5.7)
+
+[node name="DormWest3Bed1" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -10.15, 3.4, 6)
+
+[node name="DormWest3Bed2" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -10.15, 3.4, 8.2)
+
+[node name="DormWest3Bed3" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -10.15, 3.4, 10.4)
+
+[node name="DormWest3Bed4" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -10.15, 3.4, 12.6)
+
+[node name="SleepLabBed1" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 10, 3.4, -1.6)
+
+[node name="SleepLabSleeper1" type="CSGBox3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.85, 4.12, -1.6)
+size = Vector3(1.6, 0.24, 0.5)
+material = ExtResource("68_fabric")
+
+[node name="SleepLabHead1" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.65, 4.18, -1.6)
+mesh = SubResource("SphereMesh_head")
+
+[node name="SleepLabCap1" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(0.342, 0.9397, 0, -0.9397, 0.342, 0, 0, 0, 1, 10.66, 4.2, -1.6)
+mesh = SubResource("SphereMesh_electrode_cap")
+
+[node name="SleepLabCable1" type="CSGCylinder3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 0.6428, -0.766, 0, 0.766, 0.6428, 10.78, 4.65, -1.2)
+radius = 0.012
+height = 1.0
+sides = 6
+material = SubResource("StandardMaterial3D_black_plastic")
+
+[node name="SleepLabMachineLed1" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.54, 4.75, -0.8)
+mesh = SubResource("BoxMesh_led")
+
+[node name="SleepLabBed2" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 10, 3.4, 0.6)
+
+[node name="SleepLabSleeper2" type="CSGBox3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.85, 4.12, 0.6)
+size = Vector3(1.6, 0.24, 0.5)
+material = ExtResource("68_fabric")
+
+[node name="SleepLabHead2" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.65, 4.18, 0.6)
+mesh = SubResource("SphereMesh_head")
+
+[node name="SleepLabCap2" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(0.342, 0.9397, 0, -0.9397, 0.342, 0, 0, 0, 1, 10.66, 4.2, 0.6)
+mesh = SubResource("SphereMesh_electrode_cap")
+
+[node name="SleepLabCable2" type="CSGCylinder3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 0.6428, -0.766, 0, 0.766, 0.6428, 10.78, 4.65, 1)
+radius = 0.012
+height = 1.0
+sides = 6
+material = SubResource("StandardMaterial3D_black_plastic")
+
+[node name="SleepLabMachineLed2" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.54, 4.75, 1.4)
+mesh = SubResource("BoxMesh_led")
+
+[node name="SleepLabBed3" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 10, 3.4, 2.8)
+
+[node name="SleepLabSleeper3" type="CSGBox3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.85, 4.12, 2.8)
+size = Vector3(1.6, 0.24, 0.5)
+material = ExtResource("68_fabric")
+
+[node name="SleepLabHead3" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.65, 4.18, 2.8)
+mesh = SubResource("SphereMesh_head")
+
+[node name="SleepLabCap3" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(0.342, 0.9397, 0, -0.9397, 0.342, 0, 0, 0, 1, 10.66, 4.2, 2.8)
+mesh = SubResource("SphereMesh_electrode_cap")
+
+[node name="SleepLabCable3" type="CSGCylinder3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 0.6428, -0.766, 0, 0.766, 0.6428, 10.78, 4.65, 3.2)
+radius = 0.012
+height = 1.0
+sides = 6
+material = SubResource("StandardMaterial3D_black_plastic")
+
+[node name="SleepLabMachineLed3" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.54, 4.75, 3.5999999999999996)
+mesh = SubResource("BoxMesh_led")
+
+[node name="SleepLabBed4" parent="Navigation" instance=ExtResource("11_bed")]
+transform = Transform3D(6.123e-17, 0, -1, 0, 1, 0, 1, 0, 6.123e-17, 10, 3.4, 5)
+
+[node name="SleepLabSleeper4" type="CSGBox3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.85, 4.12, 5.0)
+size = Vector3(1.6, 0.24, 0.5)
+material = ExtResource("68_fabric")
+
+[node name="SleepLabHead4" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.65, 4.18, 5.0)
+mesh = SubResource("SphereMesh_head")
+
+[node name="SleepLabCap4" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(0.342, 0.9397, 0, -0.9397, 0.342, 0, 0, 0, 1, 10.66, 4.2, 5)
+mesh = SubResource("SphereMesh_electrode_cap")
+
+[node name="SleepLabCable4" type="CSGCylinder3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 0.6428, -0.766, 0, 0.766, 0.6428, 10.78, 4.65, 5.4)
+radius = 0.012
+height = 1.0
+sides = 6
+material = SubResource("StandardMaterial3D_black_plastic")
+
+[node name="SleepLabMachineLed4" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.54, 4.75, 5.8)
+mesh = SubResource("BoxMesh_led")
+
+[node name="SleepwalkerCorridorNorth" parent="Act3" node_paths=PackedStringArray("Player") instance=ExtResource("109_sleepwalker")]
+transform = Transform3D(-0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, -0.9397, 0.8, 3.4, -3)
+Player = NodePath("../../Player")
+
+[node name="SleepwalkerCorridorSouth" parent="Act3" node_paths=PackedStringArray("Player") instance=ExtResource("109_sleepwalker")]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, -0.6, 3.4, 6)
+Player = NodePath("../../Player")
+
+[node name="SleepwalkerDormWest1" parent="Act3" node_paths=PackedStringArray("Player") instance=ExtResource("109_sleepwalker")]
+transform = Transform3D(0.342, 0, -0.9397, 0, 1, 0, 0.9397, 0, 0.342, -5.5, 3.4, -9)
+Player = NodePath("../../Player")
+
+[node name="SleepwalkerDormWest3" parent="Act3" node_paths=PackedStringArray("Player") instance=ExtResource("109_sleepwalker")]
+transform = Transform3D(-0.342, 0, 0.9397, 0, 1, 0, -0.9397, 0, -0.342, -6, 3.4, 9.8)
+Player = NodePath("../../Player")
+
+[node name="SleepwalkerPharmacy" parent="Act3" node_paths=PackedStringArray("Player") instance=ExtResource("109_sleepwalker")]
+transform = Transform3D(-0.9397, 0, -0.342, 0, 1, 0, 0.342, 0, -0.9397, 5, 3.4, 11.6)
+Player = NodePath("../../Player")
+
+[node name="SleepwalkerAtTheMirror" parent="Act3" node_paths=PackedStringArray("Player") instance=ExtResource("109_sleepwalker")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 6.5, 3.4, -2.3)
+Player = NodePath("../../Player")
+
+[node name="OneWayMirror" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(-1, 0, 1.225e-16, 0, 1, 0, -1.225e-16, 0, -1, 6.5, 4.9, -3.3)
+mesh = SubResource("QuadMesh_mirror")
+
+[node name="RouteSign" type="Label3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 5.25, -7.17)
+pixel_size = 0.0015
+modulate = Color(0.85, 0.85, 0.8, 1)
+text = "SUBJECT 14 · TRIAL 14 · ROUTE"
+font_size = 48
+outline_size = 0
+
+[node name="ObservationLog" parent="Act3" instance=ExtResource("71_note")]
+transform = Transform3D(0.9848, 0, 0.1736, 0, 1, 0, -0.1736, 0, 0.9848, 8.9, 4.155, -6.6)
+Title = "Observation log. Trial 14."
+Text = "Woke in the parking lot on schedule. Went straight for the trash can by the fountain.
+
+Into the hideout through the east vent, as always. Archive: watched tape 13.
+
+Breaker thrown. The Remnant is loose again. Recover it after the reset.
+
+Lift used. He is now further than any trial before him.
+
+Keep watching. Do not intervene."
+
+[node name="WatchedTrigger" type="Area3D" parent="Objectives"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.9, -5.3)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("67_objective_trigger")
+Objective = "They watched every step. The chief's office is next door."
+IsOwnMemo = true
+
+[node name="Shape" type="CollisionShape3D" parent="Objectives/WatchedTrigger"]
+shape = SubResource("BoxShape3D_observation_room")
+
+[node name="SecurityMonitor1" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.35, 4.36, -6.9)
+mesh = SubResource("BoxMesh_monitor")
+
+[node name="SecurityScreen1" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.35, 4.37, -6.675)
+material_override = SubResource("ShaderMaterial_security_screen")
+mesh = SubResource("QuadMesh_monitor_screen")
+
+[node name="SecurityFeed1" type="Node" parent="Act3" node_paths=PackedStringArray("Player", "Picture", "Camera", "Overlay", "Screen")]
+script = ExtResource("113_security_feed")
+CameraName = "CAM 02 · PARKING LOT"
+Player = NodePath("../../Player")
+Picture = NodePath("Picture")
+Camera = NodePath("Picture/Camera")
+Overlay = NodePath("Picture/Overlay")
+Screen = NodePath("../SecurityScreen1")
+
+[node name="Picture" type="SubViewport" parent="Act3/SecurityFeed1"]
+size = Vector2i(256, 192)
+render_target_update_mode = 0
+
+[node name="Camera" type="Camera3D" parent="Act3/SecurityFeed1/Picture"]
+transform = Transform3D(0.6268, -0.1614, 0.7623, 0, 0.9783, 0.2071, -0.7792, -0.1298, 0.6132, 8, -0.5, 66)
+cull_mask = 3
+current = true
+fov = 70.0
+
+[node name="Overlay" type="Label" parent="Act3/SecurityFeed1/Picture"]
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 250.0
+offset_bottom = 46.0
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 12
+
+[node name="SecurityMonitor2" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 4.36, -6.9)
+mesh = SubResource("BoxMesh_monitor")
+
+[node name="SecurityScreen2" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 4.37, -6.675)
+material_override = SubResource("ShaderMaterial_security_screen")
+mesh = SubResource("QuadMesh_monitor_screen")
+
+[node name="SecurityFeed2" type="Node" parent="Act3" node_paths=PackedStringArray("Player", "Picture", "Camera", "Overlay", "Screen")]
+script = ExtResource("113_security_feed")
+CameraName = "CAM 05 · PLAZA"
+Player = NodePath("../../Player")
+Picture = NodePath("Picture")
+Camera = NodePath("Picture/Camera")
+Overlay = NodePath("Picture/Overlay")
+Screen = NodePath("../SecurityScreen2")
+
+[node name="Picture" type="SubViewport" parent="Act3/SecurityFeed2"]
+size = Vector2i(256, 192)
+render_target_update_mode = 0
+
+[node name="Camera" type="Camera3D" parent="Act3/SecurityFeed2/Picture"]
+transform = Transform3D(0.792, -0.1649, 0.5878, 0, 0.9628, 0.2701, -0.6105, -0.2139, 0.7626, 5, -0.8, 47.5)
+cull_mask = 3
+current = true
+fov = 70.0
+
+[node name="Overlay" type="Label" parent="Act3/SecurityFeed2/Picture"]
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 250.0
+offset_bottom = 46.0
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 12
+
+[node name="SecurityMonitor3" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.25, 4.36, -6.9)
+mesh = SubResource("BoxMesh_monitor")
+
+[node name="SecurityScreen3" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.25, 4.37, -6.675)
+material_override = SubResource("ShaderMaterial_security_screen")
+mesh = SubResource("QuadMesh_monitor_screen")
+
+[node name="SecurityFeed3" type="Node" parent="Act3" node_paths=PackedStringArray("Player", "Picture", "Camera", "Overlay", "Screen")]
+script = ExtResource("113_security_feed")
+CameraName = "CAM 11 · ROOM R1"
+Player = NodePath("../../Player")
+Picture = NodePath("Picture")
+Camera = NodePath("Picture/Camera")
+Overlay = NodePath("Picture/Overlay")
+Screen = NodePath("../SecurityScreen3")
+
+[node name="Picture" type="SubViewport" parent="Act3/SecurityFeed3"]
+size = Vector2i(256, 192)
+render_target_update_mode = 0
+
+[node name="Camera" type="Camera3D" parent="Act3/SecurityFeed3/Picture"]
+transform = Transform3D(0.8262, -0.104, 0.5537, 0, 0.9828, 0.1846, -0.5633, -0.1525, 0.812, 10.5, 2.7, -7.2)
+cull_mask = 3
+current = true
+fov = 70.0
+
+[node name="Overlay" type="Label" parent="Act3/SecurityFeed3/Picture"]
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 250.0
+offset_bottom = 46.0
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 12
+
+[node name="SecurityMonitor4" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.7, 4.36, -6.9)
+mesh = SubResource("BoxMesh_monitor")
+
+[node name="SecurityScreen4" type="MeshInstance3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.7, 4.37, -6.675)
+material_override = SubResource("ShaderMaterial_security_screen")
+mesh = SubResource("QuadMesh_monitor_screen")
+
+[node name="SecurityFeed4" type="Node" parent="Act3" node_paths=PackedStringArray("Player", "Picture", "Camera", "Overlay", "Screen")]
+script = ExtResource("113_security_feed")
+CameraName = "CAM 14 · ARCHIVE"
+Player = NodePath("../../Player")
+Picture = NodePath("Picture")
+Camera = NodePath("Picture/Camera")
+Overlay = NodePath("Picture/Overlay")
+Screen = NodePath("../SecurityScreen4")
+
+[node name="Picture" type="SubViewport" parent="Act3/SecurityFeed4"]
+size = Vector2i(256, 192)
+render_target_update_mode = 0
+
+[node name="Camera" type="Camera3D" parent="Act3/SecurityFeed4/Picture"]
+transform = Transform3D(0.1644, -0.2767, 0.9468, 0, 0.9598, 0.2805, -0.9864, -0.04612, 0.1578, 8.4, -3.6, -7.6)
+cull_mask = 3
+current = true
+fov = 70.0
+
+[node name="Overlay" type="Label" parent="Act3/SecurityFeed4/Picture"]
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 250.0
+offset_bottom = 46.0
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 12
+
+[node name="ChiefChair" parent="Navigation" instance=ExtResource("13_chair")]
+transform = Transform3D(-1, 0, 1.225e-16, 0, 1, 0, -1.225e-16, 0, -1, 6.5, 3.4, -10.75)
+
+[node name="LockConsole" type="StaticBody3D" parent="Act3" node_paths=PackedStringArray("ScreenText", "ConfirmSound")]
+transform = Transform3D(-1, 0, 1.225e-16, 0, 1, 0, -1.225e-16, 0, -1, 6.1, 4.36, -10.15)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("111_lock_console")
+ScreenText = NodePath("ScreenText")
+ReleasedText = "MAGNETIC LOCKS
+RELEASED
+RESET PROTOCOL ACTIVE"
+ConfirmSound = NodePath("ConfirmSound")
+
+[node name="Body" type="MeshInstance3D" parent="Act3/LockConsole"]
+mesh = SubResource("BoxMesh_monitor")
+
+[node name="Screen" type="MeshInstance3D" parent="Act3/LockConsole"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0.225)
+mesh = SubResource("QuadMesh_console_screen")
+
+[node name="ScreenText" type="Label3D" parent="Act3/LockConsole"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0.23)
+pixel_size = 0.0007
+modulate = Color(0.4, 1, 0.5, 1)
+text = "MAGNETIC LOCKS
+ENGAGED
+[ RELEASE ALL ]"
+font_size = 48
+outline_size = 0
+
+[node name="Shape" type="CollisionShape3D" parent="Act3/LockConsole"]
+shape = SubResource("SphereShape3D_small_interact")
+
+[node name="ConfirmSound" type="AudioStreamPlayer3D" parent="Act3/LockConsole"]
+stream = ExtResource("107_keypad_accept")
+unit_size = 2.0
+max_distance = 15.0
+bus = &"Sfx"
+
+[node name="CaseFile" parent="Act3" instance=ExtResource("71_note")]
+transform = Transform3D(0.9781, 0, -0.2079, 0, 1, 0, 0.2079, 0, 0.9781, 6.95, 4.155, -9.85)
+Title = "Vespera Clinic. Confidential. Subject 14."
+Text = "Admitted three years ago. Donor, class C: receives filtered material from clients 3, 7 and 11. Thirteen resets to date.
+
+The subject records memos on his camcorder for the trial after his, and follows them every time, step by step. We no longer plan the trials. His memos do it for us. Leave him the camera.
+
+The gate is the final stage. When he steps through it, the floodlight resets him and the trial ends. Compliance has been total since Trial 9.
+
+Maintenance: nobody touches the transmitter in the pump room under the fountain. The key stays in this desk.
+
+Dr. Aldren"
+Memo = "The gate is where they reset you. What they use on you comes from under the fountain, and his key opens it."
+IsOwnMemo = true
+
+[node name="PumpRoomKey" type="StaticBody3D" parent="Act3" node_paths=PackedStringArray("PickUpSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.35, 4.155, -9.8)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("112_key_pickup")
+KeyName = "pump room"
+FoundCaption = "A brass key on a yellow tag: PUMP ROOM."
+PickUpSound = NodePath("PickUpSound")
+
+[node name="Key" type="MeshInstance3D" parent="Act3/PumpRoomKey"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.003, 0)
+mesh = SubResource("BoxMesh_key")
+
+[node name="Ring" type="MeshInstance3D" parent="Act3/PumpRoomKey"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05, 0.003, 0)
+mesh = SubResource("TorusMesh_key_ring")
+
+[node name="Tag" type="MeshInstance3D" parent="Act3/PumpRoomKey"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.085, 0.002, 0.012)
+mesh = SubResource("BoxMesh_key_tag")
+
+[node name="Shape" type="CollisionShape3D" parent="Act3/PumpRoomKey"]
+shape = SubResource("SphereShape3D_small_interact")
+
+[node name="PickUpSound" type="AudioStreamPlayer3D" parent="Act3/PumpRoomKey"]
+stream = ExtResource("115_pick_up")
+unit_size = 2.0
+max_distance = 10.0
+bus = &"Sfx"
+
+[node name="BatteryPharmacy" parent="." instance=ExtResource("8_battery")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 4.3, 8.4)
+
+[node name="MedicineBoxesNorth1" type="Node3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 3.815, 6.85)
+script = ExtResource("85_item_row")
+Count = 75
+ItemSize = Vector3(0.06, 0.09, 0.05)
+Gap = 0.01
+Material = SubResource("StandardMaterial3D_medicine")
+
+[node name="MedicineBoxesNorth2" type="Node3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.315, 6.85)
+script = ExtResource("85_item_row")
+Count = 68
+ItemSize = Vector3(0.06, 0.09, 0.05)
+Gap = 0.01
+Material = SubResource("StandardMaterial3D_medicine")
+
+[node name="MedicineBoxesNorth3" type="Node3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.815, 6.85)
+script = ExtResource("85_item_row")
+Count = 61
+ItemSize = Vector3(0.06, 0.09, 0.05)
+Gap = 0.01
+Material = SubResource("StandardMaterial3D_medicine")
+
+[node name="MedicineBoxesSouth1" type="Node3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 3.815, 13.55)
+script = ExtResource("85_item_row")
+Count = 61
+ItemSize = Vector3(0.06, 0.09, 0.05)
+Gap = 0.01
+Material = SubResource("StandardMaterial3D_medicine")
+
+[node name="MedicineBoxesSouth2" type="Node3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.315, 13.55)
+script = ExtResource("85_item_row")
+Count = 54
+ItemSize = Vector3(0.06, 0.09, 0.05)
+Gap = 0.01
+Material = SubResource("StandardMaterial3D_medicine")
+
+[node name="MedicineBoxesSouth3" type="Node3D" parent="Act3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.815, 13.55)
+script = ExtResource("85_item_row")
+Count = 47
+ItemSize = Vector3(0.06, 0.09, 0.05)
+Gap = 0.01
+Material = SubResource("StandardMaterial3D_medicine")
+
+[node name="UpperLanding" type="Node3D" parent="Act2/ServiceLift" node_paths=PackedStringArray("LeftDoor", "RightDoor", "Chime", "DoorSound")]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -8.66, 3.4, 0)
+script = ExtResource("92_landing")
+LeftDoor = NodePath("LeftDoor")
+RightDoor = NodePath("RightDoor")
+Chime = NodePath("Chime")
+DoorSound = NodePath("DoorSound")
+
+[node name="LeftDoor" type="AnimatableBody3D" parent="Act2/ServiceLift/UpperLanding"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 1.05, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Act2/ServiceLift/UpperLanding/LeftDoor"]
+mesh = SubResource("BoxMesh_lift_door")
+
+[node name="Shape" type="CollisionShape3D" parent="Act2/ServiceLift/UpperLanding/LeftDoor"]
+shape = SubResource("BoxShape3D_lift_door")
+
+[node name="RightDoor" type="AnimatableBody3D" parent="Act2/ServiceLift/UpperLanding"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 1.05, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Act2/ServiceLift/UpperLanding/RightDoor"]
+mesh = SubResource("BoxMesh_lift_door")
+
+[node name="Shape" type="CollisionShape3D" parent="Act2/ServiceLift/UpperLanding/RightDoor"]
+shape = SubResource("BoxShape3D_lift_door")
+
+[node name="Chime" type="AudioStreamPlayer3D" parent="Act2/ServiceLift/UpperLanding"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+stream = ExtResource("103_lift_ding")
+unit_size = 8.0
+max_distance = 50.0
+bus = &"Sfx"
+
+[node name="DoorSound" type="AudioStreamPlayer3D" parent="Act2/ServiceLift/UpperLanding"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+stream = ExtResource("104_lift_doors")
+unit_size = 4.0
+max_distance = 30.0
+bus = &"Sfx"
+
+[node name="UpperLiftSign" type="Label3D" parent="Act3"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -8.684, 5.85, 0)
+pixel_size = 0.0015
+modulate = Color(0.85, 0.85, 0.8, 1)
+text = "SLEEP WARD · LEVEL 2"
+font_size = 48
+outline_size = 0
+
+[node name="GroundCarButton" type="StaticBody3D" parent="Act2" node_paths=PackedStringArray("Lift", "PressSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.3, 1.3, -0.935)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("114_lift_button")
+Lift = NodePath("../ServiceLift")
+PressSound = NodePath("PressSound")
+
+[node name="Panel" type="MeshInstance3D" parent="Act2/GroundCarButton"]
+mesh = SubResource("BoxMesh_button_panel")
+
+[node name="Led" type="MeshInstance3D" parent="Act2/GroundCarButton"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0.012)
+mesh = SubResource("BoxMesh_led")
+
+[node name="Shape" type="CollisionShape3D" parent="Act2/GroundCarButton"]
+shape = SubResource("SphereShape3D_small_interact")
+
+[node name="PressSound" type="AudioStreamPlayer3D" parent="Act2/GroundCarButton"]
+stream = ExtResource("106_keypad_beep")
+unit_size = 2.0
+max_distance = 10.0
+bus = &"Sfx"
+
+[node name="UpperCarButton" type="StaticBody3D" parent="Act2" node_paths=PackedStringArray("Lift", "PressSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.3, 4.7, -0.935)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("114_lift_button")
+Lift = NodePath("../ServiceLift")
+PressSound = NodePath("PressSound")
+
+[node name="Panel" type="MeshInstance3D" parent="Act2/UpperCarButton"]
+mesh = SubResource("BoxMesh_button_panel")
+
+[node name="Led" type="MeshInstance3D" parent="Act2/UpperCarButton"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0.012)
+mesh = SubResource("BoxMesh_led")
+
+[node name="Shape" type="CollisionShape3D" parent="Act2/UpperCarButton"]
+shape = SubResource("SphereShape3D_small_interact")
+
+[node name="PressSound" type="AudioStreamPlayer3D" parent="Act2/UpperCarButton"]
+stream = ExtResource("106_keypad_beep")
+unit_size = 2.0
+max_distance = 10.0
+bus = &"Sfx"
+
+[node name="UpperCallButton" type="StaticBody3D" parent="Act2" node_paths=PackedStringArray("Lift", "CallsTo", "PressSound")]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, -8.685, 4.75, 1.35)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("114_lift_button")
+Lift = NodePath("../ServiceLift")
+CallsTo = NodePath("../ServiceLift/UpperLanding")
+PressSound = NodePath("PressSound")
+
+[node name="Panel" type="MeshInstance3D" parent="Act2/UpperCallButton"]
+mesh = SubResource("BoxMesh_button_panel")
+
+[node name="Led" type="MeshInstance3D" parent="Act2/UpperCallButton"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0.012)
+mesh = SubResource("BoxMesh_led")
+
+[node name="Shape" type="CollisionShape3D" parent="Act2/UpperCallButton"]
+shape = SubResource("SphereShape3D_small_interact")
+
+[node name="PressSound" type="AudioStreamPlayer3D" parent="Act2/UpperCallButton"]
+stream = ExtResource("106_keypad_beep")
+unit_size = 2.0
+max_distance = 10.0
+bus = &"Sfx"
+
+[node name="PharmacyShelfNorthSide1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 4.4, 6.85)
+size = Vector3(0.04, 2, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfNorthSide2" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 4.4, 6.85)
+size = Vector3(0.04, 2, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfNorthSide3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 4.4, 6.85)
+size = Vector3(0.04, 2, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfNorthSide4" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 4.4, 6.85)
+size = Vector3(0.04, 2, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfNorthBoard1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 3.8, 6.85)
+size = Vector3(6, 0.03, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfNorthBoard2" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.3, 6.85)
+size = Vector3(6, 0.03, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfNorthBoard3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.8, 6.85)
+size = Vector3(6, 0.03, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfNorthBoard4" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 5.3, 6.85)
+size = Vector3(6, 0.03, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfSouthSide1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 4.4, 13.55)
+size = Vector3(0.04, 2, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfSouthSide2" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.4, 13.55)
+size = Vector3(0.04, 2, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfSouthSide3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 4.4, 13.55)
+size = Vector3(0.04, 2, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfSouthBoard1" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3.8, 13.55)
+size = Vector3(5, 0.03, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfSouthBoard2" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.3, 13.55)
+size = Vector3(5, 0.03, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfSouthBoard3" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.8, 13.55)
+size = Vector3(5, 0.03, 0.4)
+material = ExtResource("3_prop")
+[node name="PharmacyShelfSouthBoard4" type="CSGBox3D" parent="Navigation/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 5.3, 13.55)
+size = Vector3(5, 0.03, 0.4)
+material = ExtResource("3_prop")

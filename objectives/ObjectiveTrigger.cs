@@ -6,6 +6,8 @@ using Godot;
 public partial class ObjectiveTrigger : Area3D
 {
 	[Export] public string Objective { get; set; } = "";
+	/// <summary>Whether the memo is the player's own, saved for the next trial, instead of one left by the last.</summary>
+	[Export] public bool IsOwnMemo { get; set; }
 
 	public override void _Ready()
 	{
@@ -17,7 +19,10 @@ public partial class ObjectiveTrigger : Area3D
 		if (body is not Player player)
 			return;
 
-		player.ObjectiveDisplay.Announce(Objective);
+		if (IsOwnMemo)
+			player.ObjectiveDisplay.AnnounceOwn(Objective);
+		else
+			player.ObjectiveDisplay.Announce(Objective);
 		QueueFree();
 	}
 }

@@ -15,9 +15,11 @@ public partial class Footsteps : AudioStreamPlayer3D
 	/// <summary>Used where the ground doesn't say what it is.</summary>
 	[Export] public StringName DefaultSurface { get; set; } = "concrete";
 
-	public void Step(float volumeDb)
+	/// <summary>Plays a step on whatever is underfoot and returns what that is.</summary>
+	public StringName Step(float volumeDb)
 	{
-		AudioStream sound = Surfaces.TryGetValue(SurfaceUnderFeet(), out AudioStream surfaceSound)
+		StringName surface = SurfaceUnderFeet();
+		AudioStream sound = Surfaces.TryGetValue(surface, out AudioStream surfaceSound)
 			? surfaceSound
 			: Surfaces[DefaultSurface];
 
@@ -26,6 +28,7 @@ public partial class Footsteps : AudioStreamPlayer3D
 			Stream = sound;
 		VolumeDb = volumeDb;
 		Play();
+		return surface;
 	}
 
 	private StringName SurfaceUnderFeet()

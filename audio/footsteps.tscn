@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://audio/Footsteps.cs" id="1_footsteps"]
 [ext_resource type="AudioStream" path="res://assets/sounds/footsteps/tile.tres" id="2_tile"]
@@ -10,6 +10,7 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/footsteps/asphalt.tres" id="8_asphalt"]
 [ext_resource type="AudioStream" path="res://assets/sounds/footsteps/manhole.tres" id="9_manhole"]
 [ext_resource type="AudioStream" path="res://assets/sounds/footsteps/shrub.tres" id="10_shrub"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/glass.tres" id="11_glass"]
 
 [node name="Footsteps" type="AudioStreamPlayer3D"]
 unit_size = 3.0
@@ -21,6 +22,7 @@ Surfaces = Dictionary[StringName, AudioStream]({
 &"asphalt": ExtResource("8_asphalt"),
 &"concrete": ExtResource("4_concrete"),
 &"duct": ExtResource("3_duct"),
+&"glass": ExtResource("11_glass"),
 &"grass": ExtResource("6_grass"),
 &"manhole": ExtResource("9_manhole"),
 &"paving": ExtResource("7_paving"),

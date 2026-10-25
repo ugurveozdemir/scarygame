@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 
 /// <summary>
@@ -17,6 +18,8 @@ public partial class Player : CharacterBody3D
 	[ExportGroup("Noise")]
 	[Export] public float WalkNoiseRadius { get; set; } = 4f;
 	[Export] public float SprintNoiseRadius { get; set; } = 12f;
+	/// <summary>How far a step on broken glass carries, however carefully it is taken.</summary>
+	[Export] public float GlassNoiseRadius { get; set; } = 8f;
 
 	[ExportGroup("Footsteps")]
 	[Export] public float WalkStepVolumeDb { get; set; } = -6f;
@@ -92,6 +95,9 @@ public partial class Player : CharacterBody3D
 	public bool IsHiding => HidingSpot is not null;
 	public bool IsDead { get; private set; }
 
+	/// <summary>The names of the keys the player carries.</summary>
+	public HashSet<string> Keys { get; } = new();
+
 	/// <summary>How badly hurt the player is, from 0 to 1 when the next hit would be the last.</summary>
 	public float Hurt => Mathf.Clamp(_damage / (HitsToDie - 1), 0f, 1f);
 
@@ -104,6 +110,9 @@ public partial class Player : CharacterBody3D
 	/// Raised when something hits the player, so whatever was moving them can stop.
 	/// </summary>
 	public event Action Hit;
+
+	/// <summary>Raised with each footstep that can be heard: where it was and how far it carries.</summary>
+	public event Action<Vector3, float> MadeNoise;
 
 	/// <summary>
 	/// How far away enemies can hear the player's footsteps.
@@ -302,9 +311,13 @@ public partial class Player : CharacterBody3D
 		float volumeDb = IsCrouching ? CrouchStepVolumeDb
 			: IsSprinting ? SprintStepVolumeDb
 			: WalkStepVolumeDb;
-		Footsteps.Step(volumeDb);
+		StringName surface = Footsteps.Step(volumeDb);
 		ClothSound.VolumeDb = volumeDb;
 		ClothSound.Play();
+
+		float noiseRadius = surface == "glass" ? GlassNoiseRadius : NoiseRadius;
+		if (noiseRadius > 0f)
+			MadeNoise?.Invoke(GlobalPosition, noiseRadius);
 	}
 
 	private void SlideToAStop(float delta)
