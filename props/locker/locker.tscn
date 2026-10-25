@@ -136,6 +136,7 @@ AnimatedRoot = NodePath("LockerHide/PlayerRoot")
 Eye = NodePath("LockerHide/PlayerRoot/Eye")
 Parts = [NodePath("../Door")]
 AnimatedParts = [NodePath("LockerHide/Door")]
+Speed = 1.5
 
 [node name="LockerHide" parent="HideAnimation" instance=ExtResource("9_hide")]
 

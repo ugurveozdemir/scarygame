@@ -20,6 +20,11 @@ public partial class PlayerAnimation : Node3D
 	/// <summary>The prop's moving parts, each following the animated twin at the same index.</summary>
 	[Export] public Node3D[] Parts { get; set; } = [];
 	[Export] public Node3D[] AnimatedParts { get; set; } = [];
+	/// <summary>
+	/// How many times faster than authored the animation plays. Times passed in and out are in the animation's
+	/// own seconds; <see cref="RealSeconds"/> turns them into seconds of play.
+	/// </summary>
+	[Export] public float Speed { get; set; } = 1f;
 
 	private Player _player;
 	private Animation _animation;
@@ -27,6 +32,11 @@ public partial class PlayerAnimation : Node3D
 	public bool IsPlaying => _player is not null;
 
 	public float Length => (float)_animation.Length;
+
+	public float RealSeconds(float animationSeconds)
+	{
+		return animationSeconds / Speed;
+	}
 
 	public override void _Ready()
 	{
@@ -70,7 +80,7 @@ public partial class PlayerAnimation : Node3D
 		if (!IsPlaying)
 			return;
 
-		AnimationPlayer.Advance(delta);
+		AnimationPlayer.Advance(delta * Speed);
 		Apply();
 		if (!AnimationPlayer.IsPlaying())
 			Stop();

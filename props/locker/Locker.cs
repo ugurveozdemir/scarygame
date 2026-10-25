@@ -111,25 +111,25 @@ public partial class Locker : StaticBody3D, IHidingSpot
 		_move.At(approach, () => HideAnimation.Play(player, from));
 
 		// The rest follows the animation, timed from its start.
-		float zero = approach - from;
+		float zero = approach - HideAnimation.RealSeconds(from);
 		if (from < LatchSeconds)
 		{
-			_move.At(zero + LatchSeconds, () =>
+			_move.At(zero + HideAnimation.RealSeconds(LatchSeconds), () =>
 			{
 				LatchSound.Play();
 				CreakSound.Play();
 			});
 		}
-		_move.At(zero + BumpSeconds, () => BumpSound.Play());
-		_move.At(zero + PullShutSeconds, () => CreakSound.Play());
-		_move.At(zero + ShutSeconds, () =>
+		_move.At(zero + HideAnimation.RealSeconds(BumpSeconds), () => BumpSound.Play());
+		_move.At(zero + HideAnimation.RealSeconds(PullShutSeconds), () => CreakSound.Play());
+		_move.At(zero + HideAnimation.RealSeconds(ShutSeconds), () =>
 		{
 			ShutSound.Play();
 			_doorOpenness = 0f;
 			_occupant = player;
 			player.StartHiding(this, ExitPoint.GlobalTransform);
 		});
-		_move.FinishAt(zero + HideAnimation.Length);
+		_move.FinishAt(zero + HideAnimation.RealSeconds(HideAnimation.Length));
 	}
 
 	private void LetOut(Player player)
