@@ -1534,14 +1534,14 @@ mesh = SubResource("BoxMesh_bay_line")
 [node name="CorridorLightNear" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 9)
 light_color = Color(0.85, 0.92, 1, 1)
-light_energy = 1.2
+light_energy = 0.78
 shadow_enabled = true
 omni_range = 10.0
 
 [node name="CorridorLightMiddle" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
 light_color = Color(0.85, 0.92, 1, 1)
-light_energy = 1.2
+light_energy = 0.78
 shadow_enabled = true
 omni_range = 10.0
 script = ExtResource("4_flicker")
@@ -1553,49 +1553,49 @@ Crackle = NodePath("FlickerSound/Crackle")
 [node name="RoomRight3Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 2.7, 9.3)
 light_color = Color(1, 0.8, 0.6, 1)
-light_energy = 1.0
+light_energy = 0.65
 shadow_enabled = true
 omni_range = 9.0
 
 [node name="RoomLeft1Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 2.7, -9.3)
 light_color = Color(1, 0.86, 0.72, 1)
-light_energy = 0.6
+light_energy = 0.39
 shadow_enabled = true
 omni_range = 8.0
 
 [node name="RoomLeft2Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 2.7, 0)
 light_color = Color(1, 0.86, 0.72, 1)
-light_energy = 0.55
+light_energy = 0.36
 shadow_enabled = true
 omni_range = 8.0
 
 [node name="RoomLeft3Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 2.7, 9.3)
 light_color = Color(1, 0.86, 0.72, 1)
-light_energy = 0.6
+light_energy = 0.39
 shadow_enabled = true
 omni_range = 8.0
 
 [node name="RoomRight1Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 2.7, -9.3)
 light_color = Color(0.8, 0.9, 1, 1)
-light_energy = 0.6
+light_energy = 0.39
 shadow_enabled = true
 omni_range = 8.0
 
 [node name="RoomRight2Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 2.7, 0)
 light_color = Color(0.8, 0.9, 1, 1)
-light_energy = 0.55
+light_energy = 0.36
 shadow_enabled = true
 omni_range = 8.0
 
 [node name="DayRoomLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, -21)
 light_color = Color(0.85, 0.92, 1, 1)
-light_energy = 1.0
+light_energy = 0.65
 shadow_enabled = true
 omni_range = 11.0
 script = ExtResource("4_flicker")
@@ -1607,14 +1607,14 @@ Crackle = NodePath("FlickerSound/Crackle")
 [node name="WardLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.8, 2.7, -21)
 light_color = Color(1, 0.86, 0.72, 1)
-light_energy = 0.5
+light_energy = 0.33
 shadow_enabled = true
 omni_range = 8.0
 
 [node name="ShowersLight" type="OmniLight3D" parent="." node_paths=PackedStringArray("Buzz", "Crackle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8, 2.7, -21)
 light_color = Color(0.8, 0.95, 0.85, 1)
-light_energy = 0.6
+light_energy = 0.39
 shadow_enabled = true
 omni_range = 8.0
 script = ExtResource("4_flicker")
@@ -1626,7 +1626,7 @@ Crackle = NodePath("FlickerSound/Crackle")
 [node name="Moon" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.862, 0.313, -0.399, 0.0, 0.786, 0.618, 0.507, -0.533, 0.678, 0, 30, 0)
 light_color = Color(0.6, 0.7, 0.95, 1)
-light_energy = 0.25
+light_energy = 0.16
 shadow_enabled = true
 shadow_blur = 1.5
 directional_shadow_mode = 1
