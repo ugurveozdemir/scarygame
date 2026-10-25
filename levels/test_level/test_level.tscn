@@ -118,6 +118,12 @@
 [ext_resource type="Script" path="res://lighting/AlarmLight.cs" id="116_alarm_light"]
 [ext_resource type="AudioStream" path="res://assets/sounds/story/siren.wav" id="117_siren"]
 [ext_resource type="AudioStream" path="res://assets/sounds/story/reset_whine.wav" id="118_reset_whine"]
+[ext_resource type="Script" path="res://props/pumproom/Ladder.cs" id="119_ladder"]
+[ext_resource type="Script" path="res://props/pumproom/Hatch.cs" id="120_hatch"]
+[ext_resource type="Script" path="res://props/pumproom/Transmitter.cs" id="121_transmitter"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/transmitter_hum.wav" id="122_transmitter_hum"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/transmitter_destroy.wav" id="123_transmitter_destroy"]
+[ext_resource type="AudioStream" path="res://assets/sounds/player/cloth.tres" id="124_cloth"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_stair_ramp"]
 size = Vector3(3, 0.2, 5.92)
@@ -460,6 +466,55 @@ bottom_radius = 0.08
 height = 5.6
 radial_segments = 10
 rings = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_hatch_lid"]
+material = ExtResource("15_duct")
+size = Vector3(0.8, 0.04, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hatch_frame"]
+material = ExtResource("3_prop")
+size = Vector3(0.95, 0.03, 0.95)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hatch"]
+size = Vector3(1.0, 0.5, 1.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ladder"]
+size = Vector3(0.5, 2.4, 0.8)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_rung"]
+material = ExtResource("15_duct")
+top_radius = 0.018
+bottom_radius = 0.018
+height = 0.5
+radial_segments = 8
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_drain_water"]
+albedo_color = Color(0.02, 0.025, 0.03, 1)
+metallic = 0.3
+roughness = 0.05
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_drain_water"]
+material = SubResource("StandardMaterial3D_drain_water")
+size = Vector2(39, 0.7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_transmitter_led"]
+albedo_color = Color(0.05, 0.1, 0.4, 1)
+emission_enabled = true
+emission = Color(0.3, 0.5, 1, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_transmitter_led"]
+material = SubResource("StandardMaterial3D_transmitter_led")
+size = Vector3(0.02, 0.03, 0.03)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_transmitter"]
+size = Vector3(1.2, 2.0, 1.8)
+
+[sub_resource type="TorusMesh" id="TorusMesh_coil"]
+material = SubResource("StandardMaterial3D_brass")
+inner_radius = 0.24
+outer_radius = 0.3
 
 [node name="TestLevel" type="Node3D"]
 
@@ -3244,7 +3299,7 @@ MaxSeconds = 35.0
 [node name="Camcorder" parent="Player/Head/CameraRig/Camera3D"]
 StartCharge = 0.18
 
-[node name="Story" type="Node" parent="." node_paths=PackedStringArray("Player", "TitleCard", "HideoutDoor", "Trial13Tape", "MainBreaker", "BasementLights", "Remnant", "Lift", "Sentinel", "LockConsole", "CaseFile", "Gate", "FireDoor", "Siren", "GroundLamps", "AlarmLights", "World", "GroundsPatrolRoute", "SentinelExit", "GateResetZone", "Floodlight", "ResetWhine", "WhiteFlash")]
+[node name="Story" type="Node" parent="." node_paths=PackedStringArray("Player", "TitleCard", "HideoutDoor", "Trial13Tape", "MainBreaker", "BasementLights", "Remnant", "Lift", "Sentinel", "LockConsole", "CaseFile", "Gate", "FireDoor", "Siren", "GroundLamps", "AlarmLights", "World", "GroundsPatrolRoute", "SentinelExit", "GateResetZone", "Floodlight", "ResetWhine", "WhiteFlash", "Transmitter", "WayOut")]
 script = ExtResource("69_story")
 Player = NodePath("../Player")
 TitleCard = NodePath("../StoryScreen/TitleCard")
@@ -3277,6 +3332,9 @@ GateResetZone = NodePath("../Act4/GateResetZone")
 Floodlight = NodePath("../Act4/Floodlight")
 ResetWhine = NodePath("../Audio/ResetWhine")
 WhiteFlash = NodePath("../StoryScreen/WhiteFlash")
+Transmitter = NodePath("../SignalLost/Transmitter")
+TransmitterMemo = "The signal's dead. The drain runs east, under the fence."
+WayOut = NodePath("../SignalLost/WayOut")
 UpperFloorMemo = "No trial got this far before. From here the memos are mine. They can't see, but they hear everything. Stay low."
 
 [node name="StoryScreen" type="CanvasLayer" parent="."]
@@ -5530,3 +5588,387 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 1, 1, 0)
+
+[node name="PumpRoom" type="CSGCombiner3D" parent="Navigation"]
+use_collision = true
+metadata/surface = &"concrete"
+[node name="RoomShell" type="CSGBox3D" parent="Navigation/PumpRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5.7, 32)
+size = Vector3(8, 3.2, 7)
+material = ExtResource("17_concrete")
+[node name="TunnelShell" type="CSGBox3D" parent="Navigation/PumpRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.25, -5.95, 32)
+size = Vector3(39.5, 2.9, 2.4)
+material = ExtResource("17_concrete")
+[node name="ExitShaftShell" type="CSGBox3D" parent="Navigation/PumpRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, -5.75, 32)
+size = Vector3(2, 3.3, 2)
+material = ExtResource("17_concrete")
+[node name="Room" type="CSGBox3D" parent="Navigation/PumpRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5.7, 32)
+operation = 2
+size = Vector3(7, 2.6, 6)
+material = ExtResource("17_concrete")
+[node name="Tunnel" type="CSGBox3D" parent="Navigation/PumpRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, -5.95, 32)
+operation = 2
+size = Vector3(39, 2.1, 1.6)
+material = ExtResource("17_concrete")
+[node name="ExitShaft" type="CSGBox3D" parent="Navigation/PumpRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, -5.75, 32)
+operation = 2
+size = Vector3(1.4, 2.5, 1.4)
+material = ExtResource("17_concrete")
+[node name="HatchShaft" type="CSGBox3D" parent="Navigation/PumpRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, -4.25, 31.5)
+operation = 2
+size = Vector3(0.8, 0.5, 0.8)
+material = ExtResource("17_concrete")
+[node name="TransmitterCabinet" type="CSGBox3D" parent="Navigation/PumpRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, -6, 32)
+size = Vector3(0.9, 2, 1.6)
+material = ExtResource("15_duct")
+[node name="Antenna" type="CSGCylinder3D" parent="Navigation/PumpRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, -5.0, 34.6)
+radius = 0.2
+height = 1.6
+sides = 16
+material = ExtResource("15_duct")
+
+[node name="Pump" type="CSGCylinder3D" parent="Navigation/PumpRoom"]
+transform = Transform3D(6.123e-17, -1, 0, 1, 6.123e-17, 0, 0, 0, 1, 1.6, -6.6, 29.4)
+radius = 0.35
+height = 1.4
+sides = 16
+material = ExtResource("3_prop")
+
+[node name="PumpPipe" type="CSGCylinder3D" parent="Navigation/PumpRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, -5.6, 29.4)
+radius = 0.08
+height = 2.4
+sides = 10
+material = ExtResource("15_duct")
+
+[node name="SignalLost" type="Node3D" parent="."]
+
+[node name="Coil1" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, -5.6, 34.6)
+mesh = SubResource("TorusMesh_coil")
+
+[node name="Coil2" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, -5.2, 34.6)
+mesh = SubResource("TorusMesh_coil")
+
+[node name="Coil3" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, -4.8, 34.6)
+mesh = SubResource("TorusMesh_coil")
+
+[node name="TransmitterLed00" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.2, 31.6)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed01" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.2, 31.72)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed02" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.2, 31.84)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed03" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.2, 31.96)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed04" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.2, 32.08)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed10" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.32, 31.6)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed11" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.32, 31.72)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed12" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.32, 31.84)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed13" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.32, 31.96)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed14" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.32, 32.08)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed20" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.44, 31.6)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed21" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.44, 31.72)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed22" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.44, 31.84)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed23" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.44, 31.96)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed24" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.44, 32.08)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed30" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.56, 31.6)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed31" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.56, 31.72)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed32" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.56, 31.84)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed33" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.56, 31.96)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="TransmitterLed34" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.14, -5.56, 32.08)
+mesh = SubResource("BoxMesh_transmitter_led")
+
+[node name="DrainWater" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.0, -6.985, 32)
+mesh = SubResource("PlaneMesh_drain_water")
+
+[node name="TransmitterGlow" type="OmniLight3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, -5.4, 32)
+light_color = Color(0.4, 0.55, 1, 1)
+light_energy = 0.5
+shadow_enabled = true
+omni_range = 6.0
+
+[node name="PilotLamp" type="OmniLight3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, -4.7, 34.5)
+light_color = Color(1, 0.2, 0.1, 1)
+light_energy = 0.25
+omni_range = 5.0
+
+[node name="Sparks" type="OmniLight3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9, -5.6, 32)
+light_color = Color(1, 0.8, 0.5, 1)
+light_energy = 0.0
+omni_range = 7.0
+
+[node name="Moonlight" type="OmniLight3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.0, -4.8, 32)
+light_color = Color(0.6, 0.7, 0.95, 1)
+light_energy = 0.6
+omni_range = 6.0
+
+[node name="Transmitter" type="StaticBody3D" parent="SignalLost" node_paths=PackedStringArray("Hum", "DestroySound", "Lights", "Sparks")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, -6.0, 32)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("121_transmitter")
+Hum = NodePath("Hum")
+DestroySound = NodePath("DestroySound")
+Lights = [NodePath("../TransmitterLed00"), NodePath("../TransmitterLed01"), NodePath("../TransmitterLed02"), NodePath("../TransmitterLed03"), NodePath("../TransmitterLed04"), NodePath("../TransmitterLed10"), NodePath("../TransmitterLed11"), NodePath("../TransmitterLed12"), NodePath("../TransmitterLed13"), NodePath("../TransmitterLed14"), NodePath("../TransmitterLed20"), NodePath("../TransmitterLed21"), NodePath("../TransmitterLed22"), NodePath("../TransmitterLed23"), NodePath("../TransmitterLed24"), NodePath("../TransmitterLed30"), NodePath("../TransmitterLed31"), NodePath("../TransmitterLed32"), NodePath("../TransmitterLed33"), NodePath("../TransmitterLed34"), NodePath("../TransmitterGlow")]
+Sparks = NodePath("../Sparks")
+
+[node name="Shape" type="CollisionShape3D" parent="SignalLost/Transmitter"]
+shape = SubResource("BoxShape3D_transmitter")
+
+[node name="Hum" type="AudioStreamPlayer3D" parent="SignalLost/Transmitter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+stream = ExtResource("122_transmitter_hum")
+volume_db = -6.0
+unit_size = 3.0
+max_distance = 30.0
+autoplay = true
+bus = &"Sfx"
+
+[node name="DestroySound" type="AudioStreamPlayer3D" parent="SignalLost/Transmitter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+stream = ExtResource("123_transmitter_destroy")
+unit_size = 6.0
+max_distance = 40.0
+bus = &"Sfx"
+
+[node name="Hatch" type="StaticBody3D" parent="SignalLost" node_paths=PackedStringArray("Lid", "LadderDown", "RattleSound", "OpenSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, -2.95, 31.5)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("120_hatch")
+KeyName = "pump room"
+LockedCaption = "A maintenance hatch in the paving, padlocked. The plate reads PUMP ROOM."
+Lid = NodePath("../HatchLid")
+OpenAngleDegrees = -110.0
+LadderDown = NodePath("../LadderDown")
+RattleSound = NodePath("RattleSound")
+OpenSound = NodePath("OpenSound")
+
+[node name="Shape" type="CollisionShape3D" parent="SignalLost/Hatch"]
+shape = SubResource("BoxShape3D_hatch")
+
+[node name="RattleSound" type="AudioStreamPlayer3D" parent="SignalLost/Hatch"]
+stream = ExtResource("58_chain")
+volume_db = -6.0
+unit_size = 3.0
+max_distance = 20.0
+bus = &"Sfx"
+
+[node name="OpenSound" type="AudioStreamPlayer3D" parent="SignalLost/Hatch"]
+stream = ExtResource("81_latch")
+pitch_scale = 0.7
+unit_size = 3.0
+max_distance = 20.0
+bus = &"Sfx"
+
+[node name="HatchFrame" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, -2.955, 31.5)
+mesh = SubResource("BoxMesh_hatch_frame")
+
+[node name="HatchLid" type="Node3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, -2.93, 31.1)
+
+[node name="Plate" type="MeshInstance3D" parent="SignalLost/HatchLid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
+mesh = SubResource("BoxMesh_hatch_lid")
+
+[node name="LadderDown" type="StaticBody3D" parent="SignalLost" node_paths=PackedStringArray("Destination", "Fader", "ClimbSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, -2.9, 31.5)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("119_ladder")
+Prompt = "Climb down"
+Destination = NodePath("../PumpRoomLanding")
+Fader = NodePath("../../StoryScreen/TitleCard")
+ClimbSound = NodePath("ClimbSound")
+
+[node name="Shape" type="CollisionShape3D" parent="SignalLost/LadderDown"]
+shape = SubResource("BoxShape3D_hatch")
+
+[node name="ClimbSound" type="AudioStreamPlayer" parent="SignalLost/LadderDown"]
+stream = ExtResource("124_cloth")
+bus = &"Sfx"
+
+[node name="PumpRoomLanding" type="Marker3D" parent="SignalLost"]
+transform = Transform3D(6.123e-17, 0, 1, 0, 1, 0, -1, 0, 6.123e-17, 2.2, -7, 31.5)
+
+[node name="LadderUp" type="StaticBody3D" parent="SignalLost" node_paths=PackedStringArray("Destination", "Fader", "ClimbSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, -5.8, 31.5)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("119_ladder")
+Prompt = "Climb up"
+Destination = NodePath("../PlazaLanding")
+Fader = NodePath("../../StoryScreen/TitleCard")
+ClimbSound = NodePath("ClimbSound")
+
+[node name="Shape" type="CollisionShape3D" parent="SignalLost/LadderUp"]
+shape = SubResource("BoxShape3D_ladder")
+
+[node name="ClimbSound" type="AudioStreamPlayer" parent="SignalLost/LadderUp"]
+stream = ExtResource("124_cloth")
+bus = &"Sfx"
+
+[node name="PlazaLanding" type="Marker3D" parent="SignalLost"]
+transform = Transform3D(-1, 0, 1.225e-16, 0, 1, 0, -1.225e-16, 0, -1, 2.8, -2.96, 30.4)
+
+[node name="WayOut" type="StaticBody3D" parent="SignalLost" node_paths=PackedStringArray("ClimbSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.3, -5.8, 32)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("119_ladder")
+Prompt = "Climb out"
+ClimbSound = NodePath("ClimbSound")
+
+[node name="Shape" type="CollisionShape3D" parent="SignalLost/WayOut"]
+shape = SubResource("BoxShape3D_ladder")
+
+[node name="ClimbSound" type="AudioStreamPlayer" parent="SignalLost/WayOut"]
+stream = ExtResource("124_cloth")
+bus = &"Sfx"
+
+[node name="Drips" type="AudioStreamPlayer3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.0, -5.5, 32)
+stream = ExtResource("52_drips_01")
+volume_db = -8.0
+unit_size = 3.0
+max_distance = 25.0
+autoplay = true
+bus = &"Ambience"
+
+[node name="BatteryPumpRoom" parent="SignalLost" instance=ExtResource("8_battery")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, -6.98, 29.6)
+
+[node name="HatchRung1" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -6.75, 31.5)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="HatchRung2" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -6.45, 31.5)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="HatchRung3" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -6.15, 31.5)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="HatchRung4" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -5.85, 31.5)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="HatchRung5" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -5.55, 31.5)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="HatchRung6" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -5.25, 31.5)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="HatchRung7" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -4.95, 31.5)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="HatchRung8" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 3.42, -4.65, 31.5)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="ExitRung1" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -6.75, 32)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="ExitRung2" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -6.45, 32)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="ExitRung3" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -6.15, 32)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="ExitRung4" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -5.85, 32)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="ExitRung5" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -5.55, 32)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="ExitRung6" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -5.25, 32)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="ExitRung7" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -4.95, 32)
+mesh = SubResource("CylinderMesh_rung")
+
+[node name="ExitRung8" type="MeshInstance3D" parent="SignalLost"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 42.65, -4.65, 32)
+mesh = SubResource("CylinderMesh_rung")

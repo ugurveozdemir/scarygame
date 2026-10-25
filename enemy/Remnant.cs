@@ -17,8 +17,8 @@ public partial class Remnant : Node3D
 	/// <summary>Closer than this, its touch hurts the player.</summary>
 	[Export] public float TouchDistance { get; set; } = 1.1f;
 	[Export] public float TouchCooldownSeconds { get; set; } = 2.5f;
-	/// <summary>The player is in its reach while below this height, in the basement.</summary>
-	[Export] public float BasementCeilingY { get; set; } = -2.5f;
+	/// <summary>The basement, where the player is within its reach.</summary>
+	[Export] public Aabb Basement { get; set; } = new(new Vector3(-11.6f, -6.5f, -26.4f), new Vector3(23.2f, 4f, 40.7f));
 
 	[ExportGroup("Interference")]
 	/// <summary>Closer than this it starts to break up the camcorder's picture.</summary>
@@ -44,7 +44,8 @@ public partial class Remnant : Node3D
 
 	private float _touchCooldownLeft;
 
-	private bool IsPlayerInReach => Player.GlobalPosition.Y < BasementCeilingY && !Player.IsHiding && !Player.IsDead;
+	private bool IsPlayerInReach => Basement.HasPoint(Player.GlobalPosition) && !Player.IsHiding && !Player.IsDead;
+	private bool _wasInterfering;
 
 	public override void _Ready()
 	{
@@ -118,6 +119,13 @@ public partial class Remnant : Node3D
 	{
 		float distance = GlobalPosition.DistanceTo(Player.GlobalPosition);
 		float closeness = IsPlayerInReach ? Mathf.Clamp(1f - distance / InterferenceDistance, 0f, 1f) : 0f;
+
+		// Once the camcorder's picture is clean again, it is left alone for anything else that disturbs it.
+		bool isInterfering = closeness > 0f;
+		if (!isInterfering && !_wasInterfering)
+			return;
+
+		_wasInterfering = isInterfering;
 		Player.Camcorder.Interference = closeness * closeness;
 		Player.Camcorder.DrainMultiplier = Mathf.Lerp(1f, MaxDrainMultiplier, closeness);
 	}

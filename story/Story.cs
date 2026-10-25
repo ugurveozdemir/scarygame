@@ -70,6 +70,12 @@ public partial class Story : Node
 	[Export] public AudioStreamPlayer ResetWhine { get; set; }
 	[Export] public ColorRect WhiteFlash { get; set; }
 
+	[ExportGroup("Signal Lost")]
+	[Export] public Transmitter Transmitter { get; set; }
+	[Export] public string TransmitterMemo { get; set; } = "";
+	/// <summary>The ladder up out of the drainage tunnel, outside the fence.</summary>
+	[Export] public Ladder WayOut { get; set; }
+
 	private bool _hasBeenUpstairs;
 	private bool _isEnding;
 
@@ -82,6 +88,8 @@ public partial class Story : Node
 		Lift.Arrived += OnLiftArrived;
 		LockConsole.Released += OnLocksReleased;
 		GateResetZone.BodyEntered += OnGateCrossed;
+		Transmitter.Destroyed += OnTransmitterDestroyed;
+		WayOut.Climbed += PlaySignalLostEnding;
 		PlayPrologue();
 	}
 
@@ -226,6 +234,37 @@ public partial class Story : Node
 		tween.TweenCallback(Callable.From(() =>
 		{
 			GameState.StartNextTrial(reachedTheGate: true);
+			GetTree().ReloadCurrentScene();
+		}));
+	}
+
+	/// <summary>The transmitter dies: the siren stops and the camcorder's picture breaks up one last time.</summary>
+	private void OnTransmitterDestroyed()
+	{
+		Siren.Stop();
+		Tween tween = CreateTween();
+		tween.TweenMethod(Callable.From<float>(amount => Player.Camcorder.Interference = amount), 1f, 0f, 2.5f);
+		tween.TweenCallback(Callable.From(() => Player.ObjectiveDisplay.AnnounceOwn(TransmitterMemo)));
+	}
+
+	/// <summary>Out of the drain and outside the fence, with nothing left to reset the player.</summary>
+	private void PlaySignalLostEnding()
+	{
+		if (_isEnding)
+			return;
+
+		_isEnding = true;
+		Player.LockControls();
+		Tween tween = TitleCard.FadeIn("SIGNAL LOST", 2.5f);
+		tween.TweenInterval(3f);
+		tween.TweenCallback(Callable.From(() =>
+			TitleCard.Lines.Text = "SIGNAL LOST\n\nThe memos stop.\nFor the first time in three years, you remember yesterday."));
+		tween.TweenInterval(6f);
+		tween.TweenCallback(Callable.From(() => TitleCard.Lines.Text = "SIGNAL LOST\n\nENDING 2 OF 2"));
+		tween.TweenInterval(4f);
+		tween.TweenCallback(Callable.From(() =>
+		{
+			GameState.StartOver();
 			GetTree().ReloadCurrentScene();
 		}));
 	}
