@@ -159,6 +159,13 @@ public partial class Story : Node
 		pop.Play();
 	}
 
+	/// <summary>The lift's chime carries through the floor: the Sentinel comes to see who called it.</summary>
+	private void OnLiftDoorsOpened(LiftLanding landing)
+	{
+		if (landing == Lift.GroundLanding)
+			Sentinel.HearNoise(landing.GlobalPosition);
+	}
+
 	private void OnLiftArrived(bool isUpstairs)
 	{
 		if (!isUpstairs || _hasBeenUpstairs)
@@ -267,12 +274,5 @@ public partial class Story : Node
 			GameState.StartOver();
 			GetTree().ReloadCurrentScene();
 		}));
-	}
-
-	/// <summary>The lift's chime carries through the floor: the Sentinel comes to see who called it.</summary>
-	private void OnLiftDoorsOpened(LiftLanding landing)
-	{
-		if (landing == Lift.GroundLanding)
-			Sentinel.HearNoise(landing.GlobalPosition);
 	}
 }
