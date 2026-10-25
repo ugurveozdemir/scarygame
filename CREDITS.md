@@ -105,3 +105,5 @@ The chase music is "The typical horror strings" and the tension drone is "Hallow
 Sascha Ende (ende.app), licensed under CC BY 4.0.
 The camcorder's beeps and night vision whine, the television's hum, the death screen's static and the ringing
 in the ears are synthesized for this project.
+The story's machine sounds in `assets/sounds/story` (memo beeps, paper, the intercom, the keypad, the lift, the
+breaker, the siren, the transmitter and the rest) are synthesized by `tools/synthesize_sounds.py`.

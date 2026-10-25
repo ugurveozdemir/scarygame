@@ -13,6 +13,8 @@ public partial class Camcorder : Node3D
 	private static readonly ScreenLook NightVisionLook = new(Grain: 0.15f, Vignette: 0.6f, Scanlines: 0.08f, ChromaticAberration: 0.0015f);
 
 	[Export] public float BatteryLifeSeconds { get; set; } = 120f;
+	/// <summary>How charged the battery is when the level starts.</summary>
+	[Export(PropertyHint.Range, "0,1")] public float StartCharge { get; set; } = 1f;
 	[Export] public int MaxSpareBatteries { get; set; } = 10;
 
 	/// <summary>Below this charge the camcorder beeps every <see cref="LowBatteryBeepSeconds"/>.</summary>
@@ -61,6 +63,7 @@ public partial class Camcorder : Node3D
 
 	public override void _Ready()
 	{
+		Charge = StartCharge;
 		_screenMaterial = (ShaderMaterial)ScreenEffect.Material;
 		_infraredEnergy = InfraredLight.LightEnergy;
 		AutoGainProbe.TargetPosition = Vector3.Forward * AutoGainDistance;

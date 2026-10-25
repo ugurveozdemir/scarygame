@@ -1,15 +1,20 @@
+using System;
 using Godot;
 
 /// <summary>
 /// A hinged door that swings open away from whoever opens it. The body's origin is the hinge.
 /// The player opens and closes it by hand without stopping: the hand pushes or pulls the door
 /// and rides along for a moment while the door starts to move. Someone in a hurry bursts it open.
+/// A barred door only thuds against its bar until the bar is lifted on the other side.
 /// </summary>
 public partial class Door : AnimatableBody3D, IInteractable
 {
 	[Export] public float OpenAngleDegrees { get; set; } = 100f;
 	[Export] public float SwingSeconds { get; set; } = 0.6f;
 	[Export] public float BurstSeconds { get; set; } = 0.3f;
+	/// <summary>Held shut by a bar on one side, see <see cref="DoorBar"/>.</summary>
+	[Export] public bool IsBarred { get; set; }
+	[Export] public string BarredCaption { get; set; } = "It won't open. Something holds it shut from the other side.";
 
 	[ExportGroup("Sounds")]
 	[Export] public AudioStreamPlayer3D UnlatchSound { get; set; }
@@ -21,6 +26,8 @@ public partial class Door : AnimatableBody3D, IInteractable
 	[Export] public AudioStreamPlayer3D PushSound { get; set; }
 	/// <summary>The door knocking against its stop at the end of its swing.</summary>
 	[Export] public AudioStreamPlayer3D StopSound { get; set; }
+	/// <summary>The door thudding against the bar that holds it shut.</summary>
+	[Export] public AudioStreamPlayer3D RattleSound { get; set; }
 	/// <summary>Each door's hinges creak a little higher or lower than the others.</summary>
 	[Export] public float CreakPitchVariation { get; set; } = 0.12f;
 
@@ -42,6 +49,9 @@ public partial class Door : AnimatableBody3D, IInteractable
 
 	public bool IsOpen { get; private set; }
 	public string InteractionPrompt => IsOpen ? "Close" : "Open";
+
+	/// <summary>Raised when the player tries to open the door while it is barred.</summary>
+	public event Action TriedWhileBarred;
 
 	public override void _Ready()
 	{
@@ -66,7 +76,13 @@ public partial class Door : AnimatableBody3D, IInteractable
 			if (isFlatHand)
 				PushSound.Play();
 
-			if (IsOpen)
+			if (IsBarred)
+			{
+				Rattle();
+				player.Caption.Say(BarredCaption);
+				TriedWhileBarred?.Invoke();
+			}
+			else if (IsOpen)
 				Close();
 			else
 				Open(player);
@@ -90,6 +106,18 @@ public partial class Door : AnimatableBody3D, IInteractable
 		}
 		SwingTo(Mathf.DegToRad(OpenAngleDegrees) * SwingDirectionAwayFrom(opener), burst ? BurstSeconds : SwingSeconds);
 		_swingTween.TweenCallback(Callable.From(() => StopSound.Play()));
+	}
+
+	/// <summary>Shoves the barred door against its bar.</summary>
+	public void Rattle()
+	{
+		if (!RattleSound.Playing)
+			RattleSound.Play();
+	}
+
+	public void Unbar()
+	{
+		IsBarred = false;
 	}
 
 	public void Close()

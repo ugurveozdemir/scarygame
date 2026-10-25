@@ -21,6 +21,10 @@
 [ext_resource type="AudioStream" uid="uid://4woh0v35vty8" path="res://assets/sounds/player/held_breath.ogg" id="19_held_breath"]
 [ext_resource type="Script" path="res://objectives/ObjectiveDisplay.cs" id="20_objective"]
 [ext_resource type="AudioStream" path="res://assets/sounds/enemy/punch_hit.tres" id="21_punch_hit"]
+[ext_resource type="Script" path="res://story/NoteReader.cs" id="22_note_reader"]
+[ext_resource type="Script" path="res://story/Caption.cs" id="23_caption"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/osd_beep.wav" id="24_osd_beep"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/paper.wav" id="25_paper"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_standing"]
 radius = 0.35
@@ -38,6 +42,21 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 16
 
+[sub_resource type="SystemFont" id="SystemFont_osd"]
+font_names = PackedStringArray("Menlo", "Consolas", "DejaVu Sans Mono", "Monospace")
+
+[sub_resource type="SystemFont" id="SystemFont_typewriter"]
+font_names = PackedStringArray("Courier New", "Courier", "Liberation Mono", "Monospace")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_paper"]
+bg_color = Color(0.82, 0.79, 0.7, 1)
+content_margin_left = 48.0
+content_margin_top = 40.0
+content_margin_right = 48.0
+content_margin_bottom = 40.0
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 24
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hurt"]
 resource_local_to_scene = true
 shader = ExtResource("5_hurt_shader")
@@ -45,7 +64,7 @@ shader_parameter/hurt = 0.0
 shader_parameter/flash = 0.0
 shader_parameter/tint = Color(0.3, 0, 0, 1)
 
-[node name="Player" type="CharacterBody3D" unique_id=2075214660 node_paths=PackedStringArray("ClothSound", "CrouchSound", "StandUpSound", "HurtOverlay", "HitSound", "PainSound", "EarRing", "Head", "CameraRig", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "Hands", "Footsteps", "ObjectiveDisplay")]
+[node name="Player" type="CharacterBody3D" unique_id=2075214660 node_paths=PackedStringArray("ClothSound", "CrouchSound", "StandUpSound", "HurtOverlay", "HitSound", "PainSound", "EarRing", "Head", "CameraRig", "StandingCollision", "CrouchingCollision", "CeilingCheck", "Camcorder", "DeathScreen", "Hands", "Footsteps", "ObjectiveDisplay", "NoteReader", "Caption")]
 collision_layer = 2
 script = ExtResource("1_player")
 ClothSound = NodePath("Sounds/Cloth")
@@ -65,6 +84,8 @@ DeathScreen = NodePath("Hud/DeathScreen")
 Hands = NodePath("Head/CameraRig/Camera3D/ViewHands")
 Footsteps = NodePath("Footsteps")
 ObjectiveDisplay = NodePath("Hud/ObjectiveDisplay")
+NoteReader = NodePath("Hud/NoteReader")
+Caption = NodePath("Hud/Caption")
 
 [node name="StandingCollision" type="CollisionShape3D" parent="." unique_id=14462477]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
@@ -141,7 +162,7 @@ theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 
-[node name="ObjectiveDisplay" type="Label" parent="Hud"]
+[node name="ObjectiveDisplay" type="Label" parent="Hud" node_paths=PackedStringArray("Beep")]
 modulate = Color(1, 1, 1, 0)
 anchors_preset = 5
 anchor_left = 0.5
@@ -154,10 +175,112 @@ grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 1, 1, 0.85)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 26
+theme_override_fonts/font = SubResource("SystemFont_osd")
+theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
 autowrap_mode = 3
 script = ExtResource("20_objective")
+Beep = NodePath("Beep")
+
+[node name="Beep" type="AudioStreamPlayer" parent="Hud/ObjectiveDisplay"]
+stream = ExtResource("24_osd_beep")
+volume_db = -12.0
+bus = &"Sfx"
+
+[node name="Caption" type="Label" parent="Hud"]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -450.0
+offset_top = -150.0
+offset_right = 450.0
+offset_bottom = -100.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.95, 0.95, 0.9, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+autowrap_mode = 3
+script = ExtResource("23_caption")
+
+[node name="NoteReader" type="Control" parent="Hud" node_paths=PackedStringArray("Player", "TitleLabel", "BodyLabel", "PaperSound")]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("22_note_reader")
+Player = NodePath("../..")
+TitleLabel = NodePath("Paper/Lines/Title")
+BodyLabel = NodePath("Paper/Lines/Body")
+PaperSound = NodePath("PaperSound")
+
+[node name="Dim" type="ColorRect" parent="Hud/NoteReader"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="Paper" type="PanelContainer" parent="Hud/NoteReader"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -300.0
+offset_right = 340.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_paper")
+
+[node name="Lines" type="VBoxContainer" parent="Hud/NoteReader/Paper"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="Hud/NoteReader/Paper/Lines"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.1, 0.08, 1)
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Body" type="Label" parent="Hud/NoteReader/Paper/Lines"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.15, 0.13, 0.1, 1)
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/font_size = 19
+autowrap_mode = 3
+
+[node name="Hint" type="Label" parent="Hud/NoteReader/Paper/Lines"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.27, 0.22, 1)
+theme_override_font_sizes/font_size = 16
+text = "[E] Put it down"
+horizontal_alignment = 2
+
+[node name="PaperSound" type="AudioStreamPlayer" parent="Hud/NoteReader"]
+stream = ExtResource("25_paper")
+volume_db = -8.0
+bus = &"Sfx"
 
 [node name="HurtOverlay" type="ColorRect" parent="Hud" unique_id=315879115]
 material = SubResource("ShaderMaterial_hurt")

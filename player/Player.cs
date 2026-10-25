@@ -82,6 +82,8 @@ public partial class Player : CharacterBody3D
 	[Export] public ViewHands Hands { get; set; }
 	[Export] public Footsteps Footsteps { get; set; }
 	[Export] public ObjectiveDisplay ObjectiveDisplay { get; set; }
+	[Export] public NoteReader NoteReader { get; set; }
+	[Export] public Caption Caption { get; set; }
 
 	public bool IsCrouching { get; private set; }
 	public bool IsLyingDown { get; private set; }

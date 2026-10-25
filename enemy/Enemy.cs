@@ -76,6 +76,8 @@ public partial class Enemy : CharacterBody3D
 	[Export] public float KneelSeconds { get; set; } = 0.8f;
 	/// <summary>How long it stares into a hiding spot that turns out to be empty.</summary>
 	[Export] public float StareSeconds { get; set; } = 1.5f;
+	/// <summary>After shoving a barred door it leaves that door alone for this long.</summary>
+	[Export] public float BarredDoorSeconds { get; set; } = 4f;
 
 	[ExportGroup("Nodes")]
 	[Export] public Player Player { get; set; }
@@ -106,6 +108,7 @@ public partial class Enemy : CharacterBody3D
 	private IHidingSpot _spotToCheck;
 	private bool _isCheckingSpot;
 	private float _straightWalkSeconds;
+	private float _barredDoorTimeLeft;
 	private Tween _headTween;
 
 	public override void _Ready()
@@ -152,6 +155,27 @@ public partial class Enemy : CharacterBody3D
 			Velocity += GetGravity() * dt;
 		OpenDoorsInTheWay();
 		MoveAndSlide();
+	}
+
+	/// <summary>
+	/// A noise somewhere in the building, like a page over the intercom: it goes to look, unless it is busy
+	/// hunting the player or checking a hiding spot.
+	/// </summary>
+	public void HearNoise(Vector3 position)
+	{
+		if (State is EnemyState.Patrol or EnemyState.Investigate)
+			StartInvestigating(position, SpotsToCheckAfterNoise);
+	}
+
+	/// <summary>Sends it somewhere else to walk its rounds, like out onto the grounds.</summary>
+	public void ChangePatrolRoute(Node3D route)
+	{
+		PatrolRoute = route;
+		_patrolPoints = route.GetChildren().OfType<Node3D>().ToArray();
+		_patrolIndex = 0;
+		_waitTimeLeft = 0f;
+		if (!IsHunting)
+			ChangeState(EnemyState.Patrol);
 	}
 
 	private void UpdateSenses(float delta)
@@ -459,8 +483,26 @@ public partial class Enemy : CharacterBody3D
 
 	private void OpenDoorsInTheWay()
 	{
-		if (DoorCheck.GetCollider() is Door { IsOpen: false } door)
+		_barredDoorTimeLeft -= (float)GetPhysicsProcessDeltaTime();
+		if (DoorCheck.GetCollider() is not Door { IsOpen: false } door)
+			return;
+
+		if (!door.IsBarred)
+		{
 			door.Open(this, burst: State == EnemyState.Chase);
+			return;
+		}
+
+		if (_barredDoorTimeLeft > 0f)
+			return;
+
+		// It shoves the barred door and goes somewhere else: on along its rounds, or it looks around here.
+		_barredDoorTimeLeft = BarredDoorSeconds;
+		door.Rattle();
+		if (State == EnemyState.Patrol)
+			_patrolIndex = (_patrolIndex + 1) % _patrolPoints.Length;
+		else
+			StartInvestigating(GlobalPosition, 0);
 	}
 
 	private void MoveTowards(Vector3 destination, float speed, float delta)

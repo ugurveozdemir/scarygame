@@ -68,6 +68,20 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/ambience/sewer.ogg" id="66_sewer"]
 [ext_resource type="Script" path="res://objectives/ObjectiveTrigger.cs" id="67_objective_trigger"]
 [ext_resource type="Material" path="res://materials/stained_fabric.tres" id="68_fabric"]
+[ext_resource type="Script" path="res://story/Story.cs" id="69_story"]
+[ext_resource type="Script" path="res://story/TitleCard.cs" id="70_title_card"]
+[ext_resource type="PackedScene" path="res://story/note.tscn" id="71_note"]
+[ext_resource type="Script" path="res://story/Stash.cs" id="72_stash"]
+[ext_resource type="Script" path="res://story/Note.cs" id="73_note_script"]
+[ext_resource type="Script" path="res://props/door/DoorBar.cs" id="74_door_bar"]
+[ext_resource type="Script" path="res://props/decor/TallyMarks.cs" id="75_tally"]
+[ext_resource type="Script" path="res://story/ShowAfterTheLoop.cs" id="76_after_loop"]
+[ext_resource type="Script" path="res://props/intercom/Intercom.cs" id="77_intercom"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/rummage.wav" id="78_rummage"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/intercom_page.wav" id="79_page"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/intercom_click.wav" id="80_click"]
+[ext_resource type="AudioStream" path="res://assets/sounds/locker/latch.tres" id="81_latch"]
+[ext_resource type="Material" path="res://materials/door_wood.tres" id="82_wood"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_stair_ramp"]
 size = Vector3(3, 0.2, 5.92)
@@ -167,8 +181,6 @@ radius = 0.7
 material = ExtResource("21_paint")
 size = Vector3(0.1, 0.01, 4.6)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_objective_start"]
-size = Vector3(8, 3, 6)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_basement_ramp"]
 size = Vector3(10.7834, 0.2, 1.4)
@@ -178,6 +190,52 @@ size = Vector3(23.2, 6.1, 40.7)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_objective_basement"]
 size = Vector3(1.8, 2.7, 2.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_scratch"]
+albedo_color = Color(0.07, 0.06, 0.05, 1)
+roughness = 1.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_stash"]
+radius = 0.45
+
+[sub_resource type="BoxMesh" id="BoxMesh_door_bar"]
+material = ExtResource("82_wood")
+size = Vector3(0.05, 0.14, 1.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_door_bar"]
+size = Vector3(0.25, 0.3, 1.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bracket"]
+material = ExtResource("3_prop")
+size = Vector3(0.07, 0.2, 0.06)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_intercom"]
+albedo_color = Color(0.62, 0.6, 0.53, 1)
+roughness = 0.55
+
+[sub_resource type="BoxMesh" id="BoxMesh_intercom"]
+material = SubResource("StandardMaterial3D_intercom")
+size = Vector3(0.26, 0.12, 0.18)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_led"]
+albedo_color = Color(0.5, 0.05, 0.03, 1)
+emission_enabled = true
+emission = Color(1, 0.08, 0.04, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_led"]
+material = SubResource("StandardMaterial3D_led")
+size = Vector3(0.03, 0.01, 0.03)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_intercom"]
+radius = 0.25
+
+[sub_resource type="BoxMesh" id="BoxMesh_loudspeaker"]
+material = ExtResource("3_prop")
+size = Vector3(0.35, 0.12, 0.35)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_corridor_north"]
+size = Vector3(3.4, 3, 2.4)
 
 [node name="TestLevel" type="Node3D"]
 
@@ -2086,7 +2144,7 @@ directional_shadow_max_distance = 45.0
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 2.75, 14.3)
 
 [node name="Player" parent="." instance=ExtResource("5_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.0, 73)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, -3.0, 58.6)
 
 [node name="DoorLeft1" parent="." instance=ExtResource("6_door")]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -1.85, 0, -9.8)
@@ -2239,24 +2297,13 @@ Enemy = NodePath("../../Enemy")
 
 [node name="Objectives" type="Node3D" parent="."]
 
-[node name="ReachTheBasement" type="Area3D" parent="Objectives"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 73)
-collision_layer = 0
-collision_mask = 2
-monitorable = false
-script = ExtResource("67_objective_trigger")
-Objective = "Get down to the basement. The stairs are in the last room on the right of the corridor."
-
-[node name="Shape" type="CollisionShape3D" parent="Objectives/ReachTheBasement"]
-shape = SubResource("BoxShape3D_objective_start")
-
 [node name="SearchTheBasement" type="Area3D" parent="Objectives"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.65, -5.5)
 collision_layer = 0
 collision_mask = 2
 monitorable = false
 script = ExtResource("67_objective_trigger")
-Objective = "Search the basement."
+Objective = "The archive is off this corridor. Find tape 13."
 
 [node name="Shape" type="CollisionShape3D" parent="Objectives/SearchTheBasement"]
 shape = SubResource("BoxShape3D_objective_basement")
@@ -3003,3 +3050,197 @@ MaxSeconds = 35.0
 
 [editable path="Navigation/LampParkingWest"]
 [editable path="Navigation/LampRoad"]
+
+[node name="Camcorder" parent="Player/Head/CameraRig/Camera3D"]
+StartCharge = 0.18
+
+[node name="Story" type="Node" parent="." node_paths=PackedStringArray("Player", "TitleCard", "HideoutDoor")]
+script = ExtResource("69_story")
+Player = NodePath("../Player")
+TitleCard = NodePath("../StoryScreen/TitleCard")
+FirstMemo = "They wiped you again. I hid a battery in the trash can by the fountain."
+FirstMemoAfterTheLoop = "You opened the gate last time. That is where they reset you. The trash can by the fountain."
+HideoutDoor = NodePath("../DoorRight1")
+BarredDoorMemo = "I barred it from inside. Crawl in through the vent from the showers in the north wing."
+
+[node name="StoryScreen" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="TitleCard" type="Control" parent="StoryScreen" node_paths=PackedStringArray("Lines")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("70_title_card")
+Lines = NodePath("Lines")
+
+[node name="Background" type="ColorRect" parent="StoryScreen/TitleCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Lines" type="Label" parent="StoryScreen/TitleCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.82, 1)
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Act1" type="Node3D" parent="."]
+
+[node name="TrashCanStash" type="StaticBody3D" parent="Act1" node_paths=PackedStringArray("NoteInside", "RummageSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, -2.065, 42.7)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("72_stash")
+NoteInside = NodePath("Note")
+RummageSound = NodePath("Rummage")
+
+[node name="Shape" type="CollisionShape3D" parent="Act1/TrashCanStash"]
+shape = SubResource("SphereShape3D_stash")
+
+[node name="Rummage" type="AudioStreamPlayer3D" parent="Act1/TrashCanStash"]
+stream = ExtResource("78_rummage")
+unit_size = 4.0
+max_distance = 30.0
+bus = &"Sfx"
+
+[node name="Note" type="StaticBody3D" parent="Act1/TrashCanStash"]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("73_note_script")
+Title = "Trial 13. For whoever I am tomorrow."
+Text = "The battery's for you. Charge the camera before you go in. Night vision eats it.
+
+The surgeon isn't deaf. Walk, don't run, and crouch when he's close. Lockers and beds hide you, unless he sees you get in.
+
+The gate does not open from this side. Don't waste time on it.
+
+The stairs to the basement are in the last room on the right."
+TextAfterTheLoop = "I made it all the way last time. The lift, the sleep ward upstairs, the chief's office. I opened the gate.
+
+The gate is where they reset you. Don't go through it.
+
+The chief keeps a key in his desk, for the pump room under the fountain. Whatever they use on us comes from down there.
+
+The battery's in here. Same way in as always: the last room on the right."
+Memo = "Get into the building. The basement stairs are in the last room on the right."
+
+[node name="HideoutBar" type="StaticBody3D" parent="Act1" node_paths=PackedStringArray("Door", "RestPoint", "LiftSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.03, 1.05, -9.3)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("74_door_bar")
+Door = NodePath("../../DoorRight1")
+RestPoint = NodePath("../HideoutBarRest")
+LiftSound = NodePath("LiftSound")
+
+[node name="Plank" type="MeshInstance3D" parent="Act1/HideoutBar"]
+mesh = SubResource("BoxMesh_door_bar")
+
+[node name="Shape" type="CollisionShape3D" parent="Act1/HideoutBar"]
+shape = SubResource("BoxShape3D_door_bar")
+
+[node name="LiftSound" type="AudioStreamPlayer3D" parent="Act1/HideoutBar"]
+stream = ExtResource("81_latch")
+pitch_scale = 0.6
+unit_size = 3.0
+max_distance = 20.0
+bus = &"Sfx"
+
+[node name="HideoutBarRest" type="Marker3D" parent="Act1"]
+transform = Transform3D(0.9903, -8.522e-18, -0.1392, 0.1392, 6.064e-17, 0.9903, 0, -1, 6.123e-17, 2.14, 0.8, -7.5)
+
+[node name="HideoutBracketNorth" type="MeshInstance3D" parent="Act1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.035, 1.02, -10.15)
+mesh = SubResource("BoxMesh_bracket")
+
+[node name="HideoutBracketSouth" type="MeshInstance3D" parent="Act1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.035, 1.02, -8.45)
+mesh = SubResource("BoxMesh_bracket")
+
+[node name="HideoutTallyMarks" type="Node3D" parent="Act1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.0, 1.75, -13.79)
+script = ExtResource("75_tally")
+Material = SubResource("StandardMaterial3D_scratch")
+
+[node name="HideoutScrawl" type="Label3D" parent="Act1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.6, 1.75, -13.79)
+script = ExtResource("76_after_loop")
+pixel_size = 0.004
+modulate = Color(0.08, 0.07, 0.06, 1)
+outline_modulate = Color(0, 0, 0, 0)
+text = "THE GATE IS THE RESET"
+font_size = 48
+outline_size = 0
+
+[node name="HideoutNote" parent="Act1" instance=ExtResource("71_note")]
+transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, 9.85, 0.6, -9.6)
+Title = "Trial 13."
+Text = "If you're reading this, it didn't work again. All those marks on the wall. I made every one of them and I remember none.
+
+They let me keep the camera. I don't know why. Everything I shoot ends up in the archive in the basement. They copy the tapes after every reset.
+
+Tonight I found the code for the service lift and filmed it. If he catches me before I get up there, the tape will be in the archive. Trial 13. Watch it.
+
+The stairs are behind the door in the corner."
+Memo = "The basement. Find the archive and watch tape 13."
+
+[node name="Intercom" type="StaticBody3D" parent="Act1" node_paths=PackedStringArray("Enemy", "Loudspeaker", "HandsetSound")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 1.11, -17.25)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("77_intercom")
+Enemy = NodePath("../../Enemy")
+Loudspeaker = NodePath("../Loudspeaker")
+HandsetSound = NodePath("Handset")
+
+[node name="Panel" type="MeshInstance3D" parent="Act1/Intercom"]
+mesh = SubResource("BoxMesh_intercom")
+
+[node name="Led" type="MeshInstance3D" parent="Act1/Intercom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0.062, -0.04)
+mesh = SubResource("BoxMesh_led")
+
+[node name="Shape" type="CollisionShape3D" parent="Act1/Intercom"]
+shape = SubResource("SphereShape3D_intercom")
+
+[node name="Handset" type="AudioStreamPlayer3D" parent="Act1/Intercom"]
+stream = ExtResource("80_click")
+unit_size = 2.0
+max_distance = 15.0
+bus = &"Sfx"
+
+[node name="Loudspeaker" type="AudioStreamPlayer3D" parent="Act1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 2.85, 9.3)
+stream = ExtResource("79_page")
+unit_size = 10.0
+max_distance = 60.0
+bus = &"Sfx"
+
+[node name="Box" type="MeshInstance3D" parent="Act1/Loudspeaker"]
+mesh = SubResource("BoxMesh_loudspeaker")
+
+[node name="IntercomHint" type="Area3D" parent="Objectives"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -15)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("67_objective_trigger")
+Objective = "The intercom at the nurse station pages the south rooms. He goes wherever it rings."
+
+[node name="Shape" type="CollisionShape3D" parent="Objectives/IntercomHint"]
+shape = SubResource("BoxShape3D_corridor_north")

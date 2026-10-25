@@ -25,7 +25,7 @@ roughness = 0.4
 material = SubResource("StandardMaterial3D_handle")
 size = Vector3(0.12, 0.025, 0.03)
 
-[node name="Door" type="AnimatableBody3D" node_paths=PackedStringArray("GripPoint", "UnlatchSound", "CreakSound", "ShutSound", "BurstSound", "PushSound", "StopSound")]
+[node name="Door" type="AnimatableBody3D" node_paths=PackedStringArray("GripPoint", "UnlatchSound", "CreakSound", "ShutSound", "BurstSound", "PushSound", "StopSound", "RattleSound")]
 collision_layer = 9
 script = ExtResource("1_door")
 GripPoint = NodePath("GripPoint")
@@ -35,6 +35,7 @@ ShutSound = NodePath("Sounds/ShutSound")
 BurstSound = NodePath("Sounds/BurstSound")
 PushSound = NodePath("Sounds/PushSound")
 StopSound = NodePath("Sounds/StopSound")
+RattleSound = NodePath("Sounds/RattleSound")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.2, 0)
@@ -96,4 +97,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 1.2, 0)
 stream = ExtResource("8_stop")
 unit_size = 3.0
 max_distance = 20.0
+bus = &"Sfx"
+
+[node name="RattleSound" type="AudioStreamPlayer3D" parent="Sounds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.2, 0)
+stream = ExtResource("6_burst")
+volume_db = -8.0
+pitch_scale = 0.7
+unit_size = 4.0
+max_distance = 30.0
 bus = &"Sfx"

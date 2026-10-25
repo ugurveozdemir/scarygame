@@ -1,14 +1,59 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3]
 
 [ext_resource type="PackedScene" path="res://assets/polyhaven/large_iron_gate/large_iron_gate.gltf" id="1_model"]
+[ext_resource type="Script" path="res://props/outdoor/IronGate.cs" id="2_gate"]
+[ext_resource type="Script" path="res://interaction/Lock.cs" id="3_lock"]
+[ext_resource type="AudioStream" path="res://assets/sounds/ambience/chain.tres" id="4_chain"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/magnetic_release.wav" id="5_release"]
+[ext_resource type="AudioStream" path="res://assets/sounds/story/gate_motor.wav" id="6_motor"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_body"]
 size = Vector3(2.95, 2.95, 0.12)
 
-[node name="IronGate" type="StaticBody3D"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_lock"]
+size = Vector3(2.9, 2.2, 0.4)
+
+[node name="IronGate" type="AnimatableBody3D" node_paths=PackedStringArray("Lock", "ReleaseSound", "MotorSound")]
+sync_to_physics = false
+script = ExtResource("2_gate")
+Lock = NodePath("Lock")
+ReleaseSound = NodePath("ReleaseSound")
+MotorSound = NodePath("MotorSound")
 
 [node name="Model" parent="." instance=ExtResource("1_model")]
 
 [node name="Collision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.47, 0)
 shape = SubResource("BoxShape3D_body")
+
+[node name="Lock" type="StaticBody3D" parent="." node_paths=PackedStringArray("RattleSound")]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("3_lock")
+LockedCaption = "Locked. A magnetic lock holds it, and there is no release on this side."
+RattleSound = NodePath("../RattleSound")
+
+[node name="Shape" type="CollisionShape3D" parent="Lock"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+shape = SubResource("BoxShape3D_lock")
+
+[node name="RattleSound" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+stream = ExtResource("4_chain")
+unit_size = 4.0
+max_distance = 40.0
+bus = &"Sfx"
+
+[node name="ReleaseSound" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+stream = ExtResource("5_release")
+unit_size = 8.0
+max_distance = 80.0
+bus = &"Sfx"
+
+[node name="MotorSound" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+stream = ExtResource("6_motor")
+unit_size = 8.0
+max_distance = 80.0
+bus = &"Sfx"
