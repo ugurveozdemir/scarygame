@@ -83,8 +83,9 @@ the grounds. There are doors to open,
 rows of lockers to hide in, beds to crawl under and spare batteries lying around,
 and a masked surgeon that patrols, hears footsteps, chases on sight and punches you when it catches up.
 Each hit shoves you back, snaps your head away, flashes the screen red and leaves your ears ringing, and the
-edges of the view stay redder the more hurt you are; the fourth hit knocks you down. Between hits you can run:
-you are faster than it when you sprint. Where it loses you it checks a couple of hiding spots nearby at random,
+edges of the view stay redder the more hurt you are; four hits in quick succession knock you down. Between hits
+you can run: you are faster than it when you sprint. After 8 seconds without being hit you start to recover,
+one hit's worth every 6 seconds, and the red fades from the edges. Where it loses you it checks a couple of hiding spots nearby at random,
 tearing lockers open and kneeling to look under beds, and drags out whoever it finds to hit them again. It
 always finds a player it saw hiding.
 Everything that matters for the feel has a sound: footsteps on every surface, doors, lockers, the camcorder,

@@ -39,6 +39,10 @@ public partial class Player : CharacterBody3D
 	[ExportGroup("Getting Hit")]
 	/// <summary>How many hits knock the player down for good.</summary>
 	[Export] public int HitsToDie { get; set; } = 4;
+	/// <summary>How long after the last hit the player starts to recover.</summary>
+	[Export] public float RecoveryDelaySeconds { get; set; } = 8f;
+	/// <summary>How long it takes to recover from one hit, once recovering.</summary>
+	[Export] public float RecoverySecondsPerHit { get; set; } = 6f;
 	/// <summary>How fast a hit shoves the player away from the attacker.</summary>
 	[Export] public float KnockbackSpeed { get; set; } = 6f;
 	/// <summary>How long the red flash, the ringing ears and the muffled hearing last after a hit.</summary>
@@ -87,7 +91,7 @@ public partial class Player : CharacterBody3D
 	public bool IsDead { get; private set; }
 
 	/// <summary>How badly hurt the player is, from 0 to 1 when the next hit would be the last.</summary>
-	public float Hurt => Mathf.Clamp((float)_hits / (HitsToDie - 1), 0f, 1f);
+	public float Hurt => Mathf.Clamp(_damage / (HitsToDie - 1), 0f, 1f);
 
 	/// <summary>
 	/// True while something else, like a locker, is moving the player. They can't walk, look or interact.
@@ -118,7 +122,9 @@ public partial class Player : CharacterBody3D
 	private Vector3 _previousPosition;
 	private Transform3D _hidingExitPoint;
 	private float _headHeight;
-	private int _hits;
+	// Counted in hits; it wears off gradually, so it is fractional.
+	private float _damage;
+	private float _secondsSinceHit;
 	private float _daze;
 	private ShaderMaterial _hurtMaterial;
 	private AudioEffectLowPassFilter _worldMuffle;
@@ -162,6 +168,7 @@ public partial class Player : CharacterBody3D
 	{
 		float dt = (float)delta;
 		UpdateHeadPosition(dt);
+		Recover(dt);
 		UpdateDaze(dt);
 		CameraRig.UpdateCamera(dt);
 		UpdateHearing(dt);
@@ -239,7 +246,7 @@ public partial class Player : CharacterBody3D
 
 	/// <summary>
 	/// A blow from <paramref name="attacker"/> shoves the player away, snaps the head back and dazes them for
-	/// a moment, but leaves them in control, so they can run. The last of <see cref="HitsToDie"/> hits knocks
+	/// a moment, but leaves them in control, so they can run. <see cref="HitsToDie"/> hits in a row knock
 	/// them down.
 	/// </summary>
 	public void TakeHit(Node3D attacker)
@@ -251,7 +258,8 @@ public partial class Player : CharacterBody3D
 		Hands.HideImmediately();
 		AreControlsLocked = false;
 		GetUp();
-		_hits++;
+		_damage += 1f;
+		_secondsSinceHit = 0f;
 		_daze = 1f;
 		HitSound.Play();
 		PainSound.Play();
@@ -263,7 +271,7 @@ public partial class Player : CharacterBody3D
 		CameraRig.AddShake(1f);
 		CameraRig.Flinch(GlobalBasis.Inverse() * away);
 
-		if (_hits >= HitsToDie)
+		if (_damage >= HitsToDie)
 			Die();
 	}
 
@@ -297,6 +305,14 @@ public partial class Player : CharacterBody3D
 			velocity += GetGravity() * delta;
 		Velocity = velocity;
 		MoveAndSlide();
+	}
+
+	/// <summary>A while after the last hit, the player slowly gets over their injuries.</summary>
+	private void Recover(float delta)
+	{
+		_secondsSinceHit += delta;
+		if (!IsDead && _secondsSinceHit >= RecoveryDelaySeconds)
+			_damage = Mathf.MoveToward(_damage, 0f, delta / RecoverySecondsPerHit);
 	}
 
 	/// <summary>
