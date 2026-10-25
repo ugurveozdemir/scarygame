@@ -30,9 +30,11 @@ TEX = str(ROOT / "assets/rocketbox/male_adult_12") + "/"
 
 FPS = 30
 
-# The camera sits at the game's head height (Player.StandingHeadHeight), forward at the face, so the hidden head
-# never shows; the game puts its camera on the exported Eye.
-CAMERA_OFFSET = Vector((0.0, -0.08, 1.6))
+# The camera sits in the middle of the head, which is hidden, and the game puts its camera on the exported Eye.
+# The body stands a little lower than the model so that point is at the game's head height
+# (Player.StandingHeadHeight).
+HEAD_CENTER = Vector((0.0, -0.02, 1.67))
+HEAD_HEIGHT = 1.6
 
 # Locker: the door's hinge and the pull bar on its free edge (door-local), mirroring props/locker/locker.tscn.
 HINGE = Vector((0.32, 0.29, 0.0))
@@ -209,15 +211,19 @@ def build_player(hidden_bones):
     for o in bpy.context.selected_objects:
         if o.type == "MESH":
             skin_material(o)
+    # The model comes with a take that would hold the armature in place.
+    arm.animation_data_clear()
     arm.parent = root
+    arm.location.z -= HEAD_CENTER.z - HEAD_HEIGHT
     # Shrunk as HideBonesModifier does in the game.
     for name in hidden_bones:
         arm.pose.bones[name].scale = (0.001, 0.001, 0.001)
 
     # The eye carries the view; the game reads it from the exported animation.
-    eye = empty("Eye", CAMERA_OFFSET)
+    eye_at = Vector((HEAD_CENTER.x, HEAD_CENTER.y, HEAD_HEIGHT))
+    eye = empty("Eye", eye_at)
     eye.parent = root
-    eye.location = CAMERA_OFFSET
+    eye.location = eye_at
 
     bpy.ops.object.camera_add()
     cam = bpy.context.object
@@ -277,6 +283,21 @@ def pose_posture(arm_obj, root, drop, back, bend, lean):
         turn = Matrix.Translation(head) @ Matrix.Rotation(math.radians(bend * share), 4, axis) @ Matrix.Translation(-head)
         bone.matrix = turn @ bone.matrix
         bpy.context.view_layer.update()
+
+
+def pose_head(arm_obj, root, lift):
+    """Tips the head back by `lift` degrees around its base; returns the head bone in world space."""
+    bone = arm_obj.pose.bones["Bip01 Head"]
+    scale = bone.scale.copy()
+    bone.matrix_basis = Matrix.Identity(4)
+    bone.scale = scale
+    bpy.context.view_layer.update()
+    to_arm = arm_obj.matrix_world.inverted().to_3x3()
+    axis = (to_arm.normalized() @ (root.matrix_world.to_3x3().normalized() @ Vector((1, 0, 0)))).normalized()
+    base = bone.head.copy()
+    bone.matrix = Matrix.Translation(base) @ Matrix.Rotation(math.radians(-lift), 4, axis) @ Matrix.Translation(-base) @ bone.matrix
+    bpy.context.view_layer.update()
+    return arm_obj.matrix_world @ bone.matrix
 
 
 class Arm:
@@ -521,7 +542,7 @@ class Move:
 
     @staticmethod
     def head_up(f):
-        """From 0 to 1, how far the head is raised to look ahead while lying face down."""
+        """How far the head tips back from the body, in degrees, like to look ahead while lying face down."""
         return 0.0
 
     @staticmethod
@@ -694,7 +715,7 @@ class BatteryPickup(Move):
     @staticmethod
     def posture(f):
         squat = smooth(2, 15, f) * (1 - smooth(22, 36, f))
-        return 0.7 * squat, 0.05 * squat, 62.0 * squat, 0.0
+        return 0.63 * squat, 0.05 * squat, 62.0 * squat, 0.0
 
     @staticmethod
     def pitch(f):
@@ -778,12 +799,12 @@ class BedHide(Move):
     def posture(f):
         """Drops to the knees and straight down onto the belly."""
         keys = [(0, Vector((0, 0, 0, 0))), (2, Vector((0, 0, 0, 0))), (7, Vector((0.4, 0.0, 20, 15))),
-                (14, Vector((0.78, 0.0, 0, 90)))]
+                (14, Vector((0.71, 0.0, 0, 90)))]
         return tuple(catmull(keys, f))
 
     @staticmethod
     def head_up(f):
-        return smooth(7, 14, f)
+        return 75.0 * smooth(7, 14, f)
 
     @staticmethod
     def head_yaw(f):
@@ -850,18 +871,16 @@ MOVES = {
 
 # ---------------------------------------------------------------- baking
 
-def animate(move, arm_obj, right, left, root, eye, eye_on_neck, f):
+def animate(move, arm_obj, right, left, root, eye, eye_in_head, f):
     bpy.context.scene.frame_set(f)
     root.location = move.position(f)
     root.rotation_euler.z = math.radians(move.yaw(f))
     bpy.context.view_layer.update()
     pose_posture(arm_obj, root, *move.posture(f))
 
-    # The eye rides on the neck; lying face down, the head is raised to look ahead.
-    neck = arm_obj.matrix_world @ arm_obj.pose.bones["Bip01 Neck"].matrix
-    on_neck = root.matrix_world.inverted() @ (neck @ eye_on_neck)
-    raised = root.matrix_world.inverted() @ neck.translation + Vector((0, -0.1, 0.15))
-    eye.location = on_neck.lerp(raised, move.head_up(f))
+    # The eye stays in the middle of the head, which tips back as the move asks.
+    head = pose_head(arm_obj, root, move.head_up(f))
+    eye.location = root.matrix_world.inverted() @ (head.translation + head.to_3x3().normalized() @ eye_in_head)
     eye.rotation_euler = (math.radians(90 + move.pitch(f)), 0, math.pi + math.radians(move.head_yaw(f)))
     bpy.context.view_layer.update()
 
@@ -922,9 +941,9 @@ def main():
     move = move_type()
     root, arm_obj, eye, cam = build_player(move_type.hidden_bones)
     bpy.context.view_layer.update()
-    # The eye rides on the neck, so it follows the body when it bends.
-    neck = arm_obj.matrix_world @ arm_obj.pose.bones["Bip01 Neck"].matrix
-    eye_on_neck = neck.inverted() @ (root.matrix_world @ CAMERA_OFFSET)
+    # The eye rides in the head, so it follows the body when it bends.
+    head = arm_obj.matrix_world @ arm_obj.pose.bones["Bip01 Head"].matrix
+    eye_in_head = head.to_3x3().normalized().inverted() @ (eye.matrix_world.translation - head.translation)
 
     if CAM in move.debug_views:
         location, target, lens, hidden = move.debug_views[CAM]
@@ -941,7 +960,7 @@ def main():
     bpy.context.scene.frame_end = move.end
     right, left = Arm(arm_obj, "R"), Arm(arm_obj, "L")
     for f in range(0, move.end + 1):
-        animate(move, arm_obj, right, left, root, eye, eye_on_neck, f)
+        animate(move, arm_obj, right, left, root, eye, eye_in_head, f)
         key_pose(move, arm_obj, root, eye, f)
 
     if MODE == "export":
