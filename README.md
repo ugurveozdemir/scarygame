@@ -72,6 +72,13 @@ reflections and a few dim room lights so the PBR materials stay readable in the 
 gives the lights a hazy glow and a dark distance fog swallows corridors and the grounds after about 20 m.
 The camcorder's infrared light casts shadows too, which keeps it from leaking through walls.
 
+Godot doesn't hide what is behind walls by itself, so from the grounds the whole building's insides are drawn.
+To keep that cheap, the lights inside the building fade out, shadows and all, beyond 24 m, and small props, beds
+and notes beyond 25 to 35 m, where the fog has swallowed them anyway. Many small copies of one thing, like tapes,
+medicine boxes or broken glass, are a single multimesh. Anything animated that casts shadows makes every
+shadowed light around it redraw its shadows each frame, so the Sleepwalkers cast none and stop moving when the
+player is far away. Security monitors render their cameras a few frames a second, in turn.
+
 ## Project structure
 
 Scenes and their scripts live together, grouped by feature.
