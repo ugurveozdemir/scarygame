@@ -33,7 +33,8 @@ godot --path .
 
 The first-person view sits on a small camera rig (`player/PlayerCamera.cs`) between the head and the camera.
 It adds the procedural movement that makes the view feel handheld: a step bob that scales with speed, a lean
-when strafing, a slightly wider field of view while sprinting, and a small roll and yaw lag when turning the
+when strafing, an aim that drifts in a figure of eight while sprinting (the head nods with each footfall and turns
+with each stride), a slightly wider field of view while sprinting, and a small roll and yaw lag when turning the
 view. Getting grabbed adds a shake impulse and the strangle adds a continuous shake. The view hands, the
 camcorder and the interaction ray are children of the camera, so they all move with these effects.
 
@@ -105,7 +106,8 @@ Footsteps (`audio/Footsteps.cs`, `audio/footsteps.tscn`) play the sound of the g
 says what it is made of with a `surface` metadata entry (the building is `tile`, the stairs `stairs`, the lawn
 `grass`), and a `SurfaceZone` area on the "zones" physics layer overrides it where one body has several surfaces:
 the vents, the balcony, the paths, the parking lot, the road, the manhole cover and the shrubs. The player steps at the bottom of each head bob, so
-the steps match the camera. The enemy steps whenever one of its animated feet lands (`audio/SkeletonFootsteps.cs`),
+the steps match the camera. Strides lengthen as the player speeds up, like a real walker's: about 1.5 steps a second
+walking and 2.4 sprinting. The enemy steps whenever one of its animated feet lands (`audio/SkeletonFootsteps.cs`),
 which keeps the steps in time with every animation and blend.
 
 The `Indoors` area covers the building: it sends the sounds made inside it to the reverb bus, and `audio/Ambience.cs`

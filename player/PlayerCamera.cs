@@ -3,7 +3,7 @@ using Godot;
 
 /// <summary>
 /// Procedural first-person camera effects, inspired by Cinemachine: head bob while walking and sprinting,
-/// a wider field of view at sprint speed, a lean into strafes, a small roll and yaw lag when turning the view,
+/// an aim that drifts with the stride while sprinting, a wider field of view at sprint speed, a lean into strafes, a small roll and yaw lag when turning the view,
 /// and shake for impacts and choking. The effects live on a rig between the head and the camera, so the view,
 /// the interaction ray and the view hands all move together.
 /// </summary>
@@ -22,6 +22,10 @@ public partial class PlayerCamera : Node3D
 	[Export] public float BobHeight { get; set; } = 0.04f;
 	[Export] public float BobSway { get; set; } = 0.02f;
 	[Export] public float BobRollDegrees { get; set; } = 0.6f;
+	/// <summary>How far the view nods down as each foot lands at full sprint.</summary>
+	[Export] public float BobPitchDegrees { get; set; } = 2f;
+	/// <summary>How far the view swings left and right with each stride at full sprint.</summary>
+	[Export] public float BobYawDegrees { get; set; } = 1f;
 
 	[ExportGroup("Movement Sway")]
 	[Export] public float StrafeLean { get; set; } = 0.025f;
@@ -39,6 +43,8 @@ public partial class PlayerCamera : Node3D
 	[Export] public float ChokeShake { get; set; } = 0.5f;
 
 	private const float BobSmoothSpeed = 10f;
+	// The head nods a moment after the foot lands, in radians of bob phase.
+	private const float NodDelay = 0.6f;
 	private const float LookSmoothSpeed = 8f;
 	private const float FovSmoothSpeed = 5f;
 	private const float LookReferenceSpeed = 3f;
@@ -49,7 +55,8 @@ public partial class PlayerCamera : Node3D
 	private float _baseFov;
 	private float _bobPhase;
 	private Vector3 _bobOffset;
-	private float _bobRoll;
+	// Pitch, yaw and roll in degrees.
+	private Vector3 _bobAngles;
 	private float _previousYaw;
 	private float _lookWeight;
 	private float _shake;
@@ -90,14 +97,21 @@ public partial class PlayerCamera : Node3D
 		// Bob and sway grow with speed, so walking is calm and sprinting is pronounced.
 		float weight = Mathf.Clamp(Player.HorizontalSpeed / Player.SprintSpeed, 0f, 1f);
 		Vector3 targetOffset = Vector3.Zero;
-		float targetRoll = 0f;
+		Vector3 targetAngles = Vector3.Zero;
 		if (isWalking)
 		{
 			targetOffset = new Vector3(
 				Mathf.Cos(_bobPhase * 0.5f) * BobSway * weight,
 				Mathf.Sin(_bobPhase) * BobHeight * weight,
 				0f);
-			targetRoll = Mathf.Cos(_bobPhase * 0.5f) * BobRollDegrees * weight;
+
+			// The aim barely moves while walking but drifts in a figure of eight while sprinting:
+			// the head nods just after each footfall and turns a little with each stride.
+			float drift = weight * weight;
+			targetAngles = new Vector3(
+				Mathf.Sin(_bobPhase - NodDelay) * BobPitchDegrees * drift,
+				-Mathf.Cos(_bobPhase * 0.5f) * BobYawDegrees * drift,
+				Mathf.Cos(_bobPhase * 0.5f) * BobRollDegrees * weight);
 		}
 
 		// A strafing player leans into the movement.
@@ -108,11 +122,11 @@ public partial class PlayerCamera : Node3D
 			strafe = Mathf.Clamp(localVelocity.X / Player.SprintSpeed, -1f, 1f);
 		}
 		targetOffset.X += strafe * StrafeLean;
-		targetRoll += -strafe * StrafeRollDegrees;
+		targetAngles.Z += -strafe * StrafeRollDegrees;
 
 		float blend = Smoothing(BobSmoothSpeed, delta);
 		_bobOffset = _bobOffset.Lerp(targetOffset, blend);
-		_bobRoll = Mathf.Lerp(_bobRoll, targetRoll, blend);
+		_bobAngles = _bobAngles.Lerp(targetAngles, blend);
 	}
 
 	private void UpdateLookSway(float delta)
@@ -154,9 +168,10 @@ public partial class PlayerCamera : Node3D
 			+ Mathf.Sin(_shakeTime * 0.37f + 2.5f) * 0.4f;
 
 		Position = _basePosition + _bobOffset + new Vector3(shakeX, shakeY, 0f) * shake;
-		float roll = Mathf.DegToRad(_bobRoll + _lookWeight * LookRollDegrees) + shakeZ * shake;
-		float yaw = Mathf.DegToRad(-_lookWeight * LookYawLagDegrees) + shakeX * shake;
-		Rotation = _baseRotation + new Vector3(shakeY * shake, yaw, roll);
+		float pitch = Mathf.DegToRad(_bobAngles.X) + shakeY * shake;
+		float yaw = Mathf.DegToRad(_bobAngles.Y - _lookWeight * LookYawLagDegrees) + shakeX * shake;
+		float roll = Mathf.DegToRad(_bobAngles.Z + _lookWeight * LookRollDegrees) + shakeZ * shake;
+		Rotation = _baseRotation + new Vector3(pitch, yaw, roll);
 	}
 
 	/// <summary>
