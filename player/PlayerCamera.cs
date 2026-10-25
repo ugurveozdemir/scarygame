@@ -17,7 +17,8 @@ public partial class PlayerCamera : Node3D
 	[Export] public Camera3D Camera { get; set; }
 
 	[ExportGroup("Head Bob")]
-	[Export] public float BobFrequency { get; set; } = 4.5f;
+	[Export] public float WalkStepsPerSecond { get; set; } = 1.5f;
+	[Export] public float SprintStepsPerSecond { get; set; } = 2.4f;
 	[Export] public float BobHeight { get; set; } = 0.04f;
 	[Export] public float BobSway { get; set; } = 0.02f;
 	[Export] public float BobRollDegrees { get; set; } = 0.6f;
@@ -82,7 +83,7 @@ public partial class PlayerCamera : Node3D
 	{
 		bool isWalking = !Player.IsGrabbed && Player.IsOnFloor() && Player.HorizontalSpeed > 0.1f;
 		int steps = StepCount(_bobPhase);
-		_bobPhase += Player.HorizontalSpeed * BobFrequency * delta;
+		_bobPhase += StepsPerSecond(Player.HorizontalSpeed) * Mathf.Tau * delta;
 		if (isWalking && StepCount(_bobPhase) != steps)
 			Stepped?.Invoke();
 
@@ -156,6 +157,19 @@ public partial class PlayerCamera : Node3D
 		float roll = Mathf.DegToRad(_bobRoll + _lookWeight * LookRollDegrees) + shakeZ * shake;
 		float yaw = Mathf.DegToRad(-_lookWeight * LookYawLagDegrees) + shakeX * shake;
 		Rotation = _baseRotation + new Vector3(shakeY * shake, yaw, roll);
+	}
+
+	/// <summary>
+	/// Like a real walker, the player takes longer strides rather than only quicker ones as they speed up.
+	/// Below walking speed the cadence falls off gently, so creeping and crouching still take small steps.
+	/// </summary>
+	private float StepsPerSecond(float speed)
+	{
+		if (speed <= Player.WalkSpeed)
+			return WalkStepsPerSecond * Mathf.Sqrt(speed / Player.WalkSpeed);
+
+		float sprint = Mathf.Clamp(Mathf.InverseLerp(Player.WalkSpeed, Player.SprintSpeed, speed), 0f, 1f);
+		return Mathf.Lerp(WalkStepsPerSecond, SprintStepsPerSecond, sprint);
 	}
 
 	/// <summary>How many times the bob has passed its lowest point, where sin(phase) is -1.</summary>
