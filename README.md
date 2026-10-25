@@ -97,7 +97,7 @@ Scenes and their scripts live together, grouped by feature.
 | `audio/` | Footsteps and the surfaces they sound on, the ambience and the chase music |
 | `materials/` | PBR materials, the asylum interior shader and the exterior materials (brick, concrete, asphalt, paving, lawn, fountain water) |
 | `assets/` | Third-party models, animations, textures and sounds, see [CREDITS.md](CREDITS.md) |
-| `tools/` | `synthesize_sounds.py`, which makes the story's machine sounds in `assets/sounds/story`, and `locker_animations.py`, the Blender script that makes the animations of getting into and out of a locker |
+| `tools/` | `synthesize_sounds.py`, which makes the story's machine sounds in `assets/sounds/story`, and `player_animations.py`, the Blender script that makes the player's hand-made first-person animations |
 
 ## Status
 
@@ -226,17 +226,17 @@ sideways, turning to face out, and watches the room from floor level.
 
 Getting into and out of a locker are hand-made animations instead of IK, because a hand that has to hold a
 handle, follow a swinging door and change grips looks wrong when it is worked out on the fly.
-`tools/locker_animations.py` builds the locker in Blender at the game's measurements, poses the arm, the view
-and the door together frame by frame and exports each move as `props/locker/locker_<move>.glb`. Getting in
-(`hide`), the right hand takes the door's pull bar from the side and pulls the door open, the player steps in
+`tools/player_animations.py` builds the locker in Blender at the game's measurements, poses the body, the arm,
+the view and the door together frame by frame and exports each move as `props/locker/locker_<move>.glb`. Getting in
+(`locker_hide`), the right hand takes the door's pull bar from the side and pulls the door open, the player steps in
 turning around, hooks their fingers into the lowest vent slit and pulls the door shut while backing in. Getting
-out (`exit`), the hand pushes the door open flat-handed and the player steps out after it. Both play one and a
+out (`locker_exit`), the hand pushes the door open flat-handed and the player steps out after it. Both play one and a
 half times as fast as authored, since hiding is usually done on the run. Run the script with Blender after
 changing the locker, a move or the arms:
 
 ```bash
-/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/locker_animations.py -- export hide
-/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/locker_animations.py -- export exit
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/player_animations.py -- export locker_hide
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/player_animations.py -- export locker_exit
 ```
 
 `interaction/PlayerAnimation.cs` plays such an animation in the prop's space: the player's camera sits on the
