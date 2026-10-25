@@ -69,7 +69,8 @@ Prototype: a dark, textured asylum to explore with the camcorder. A 28 m corrido
 north into a second wing: a day room with tables, a TV and a nurse station, a ward with four beds, a shower room
 and a balcony outside the day room's barred windows. Two crawl-only ventilation ducts link the first side rooms
 to the ward and the showers; crouch to get through them, the enemy can't follow.
-Behind the spawn point a door opens onto stairs down to the asylum grounds at night: a lawn with trees, a fountain
+The player starts at the locked iron gate of the asylum grounds at night, under a flickering road lamp, and walks up
+to the building. Behind the corridor's south end a door opens onto stairs down to the grounds: a lawn with trees, a fountain
 on a paved plaza, benches and street lamps, a parking lot of cars under tarps, and a road out to a locked iron
 gate in the chain-link fence around it all. The building stands on a 3 m concrete base, so the balcony overlooks
 the grounds. There are doors to open,

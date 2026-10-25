@@ -1206,8 +1206,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.8, -3.0, 58)
 [node name="LampRoad" parent="Navigation" instance=ExtResource("32_lamp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4, -3.0, 70)
 
-[node name="Light" parent="Navigation/LampRoad"]
-visible = false
+[node name="Light" parent="Navigation/LampRoad" node_paths=PackedStringArray("Buzz", "Crackle")]
+script = ExtResource("4_flicker")
+Buzz = NodePath("FlickerSound/Buzz")
+Crackle = NodePath("FlickerSound/Crackle")
+
+[node name="FlickerSound" parent="Navigation/LampRoad/Light" instance=ExtResource("40_flicker_sound")]
 
 [node name="Tree1" parent="Navigation" instance=ExtResource("24_small_tree")]
 transform = Transform3D(1.248, 0, -1.781, 0, 2.175, 0, 1.781, 0, 1.248, -4.2, -3.0, 23)
@@ -1636,7 +1640,7 @@ directional_shadow_max_distance = 45.0
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 2.75, 14.3)
 
 [node name="Player" parent="." instance=ExtResource("5_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 12.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.0, 73)
 
 [node name="DoorLeft1" parent="." instance=ExtResource("6_door")]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -1.85, 0, -9.8)
